@@ -8,6 +8,8 @@
         <div class="card-body">
         <form action="{{ route('scarichi.update', $scarico) }}" method="POST">
 
+
+
                 @csrf
                 @method('PUT')
 

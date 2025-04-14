@@ -31,9 +31,10 @@ class MarchioEditorialeController extends Controller
 
     public function edit($id)
     {
-        $marchio = MarchioEditoriale::findOrFail($id);
-        return view('marchi-editoriali.edit', compact('marchio'));
+        $item = MarchioEditoriale::findOrFail($id);
+        return view('marchi-editoriali.edit', compact('item'));
     }
+    
 
     public function update(Request $request, $id)
     {

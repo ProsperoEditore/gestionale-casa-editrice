@@ -15,7 +15,9 @@ class Scarico extends Model
         'altro_ordine',
         'info_spedizione',
         'destinatario_nome',
-        'anagrafica_id'
+        'anagrafica_id',
+        'stato',
+        'data_stato_info'
     ];
 
     public function ordine()

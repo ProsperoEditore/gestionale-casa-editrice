@@ -14,6 +14,11 @@ class AnagraficaController extends Controller
         if ($request->filled('search')) {
             $query->where('nome', 'like', '%' . $request->search . '%');
         }
+
+        if ($request->filled('categoria')) {
+            $query->where('categoria', $request->categoria);
+        }
+
         $items = $query->latest()->paginate(100);
         return view('anagrafiche.index', compact('items'));
     }

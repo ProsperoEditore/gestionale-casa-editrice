@@ -22,16 +22,15 @@
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
         <form action="{{ route('registro-vendite.gestione', ['id' => $registroVendita->id]) }}" method="GET" class="d-flex" style="max-width: 300px;">
-    <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per titolo...">
-    <button class="btn btn-outline-primary">Cerca</button>
-</form>
-
-        <button type="submit" class="btn btn-primary">Salva</button>
-        <h5>Elenco Vendite</h5>
-
-        <form id="registroVenditeForm" action="{{ route('registro-vendite.store', ['registro_vendita' => $registroVendita->id]) }}" method="POST">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per titolo...">
+            <button class="btn btn-outline-primary">Cerca</button>
+        </form>
+        <form id="registroVenditeForm" action="{{ route('registro-vendite.salvaDettagli', ['id' => $registroVendita->id]) }}" method="POST">
             @csrf
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
+        <button type="submit" class="btn btn-primary">Salva</button>
+
+        <h5>Elenco Vendite</h5>
 
             <table class="table table-bordered">
                 <thead class="table-dark">
@@ -49,15 +48,11 @@
                 <tbody id="registroVenditeBody">
                     @if($dettagli->count() > 0)
                         @foreach($dettagli as $dettaglio)
-                            <tr>
+                            <tr data-id="{{ $dettaglio->id }}">
                                 <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
                                 <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
                                 <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
-                                <td>
-                                    <select name="titolo[]" class="form-control titolo-select">
-                                        <option value="{{ $dettaglio->isbn }}" selected>{{ $dettaglio->titolo }}</option>
-                                    </select>
-                                </td>
+                                <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
                                 <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
                                 <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
                                 <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
@@ -82,64 +77,94 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 
 <script>
 $(document).ready(function() {
+    let libri = @json($libri);
+
     function aggiornaValoreLordo(row) {
         let quantita = parseFloat(row.find(".quantita").val()) || 0;
         let prezzo = parseFloat(row.find(".prezzo").val()) || 0;
         row.find(".valore-lordo").val((quantita * prezzo).toFixed(2));
     }
 
-    function initSelect2() {
-        $(".titolo-select").select2({
-            placeholder: "Cerca un libro...",
-            ajax: {
-                url: "{{ route('libri.autocomplete') }}",
-                dataType: "json",
-                delay: 250,
-                data: params => ({ term: params.term }),
-                processResults: data => ({
-                    results: data.map(item => ({ id: item.isbn, text: item.titolo, prezzo: item.prezzo }))
-                })
+    function initAutocomplete(input) {
+        $(input).autocomplete({
+            source: libri.map(libro => libro.titolo),
+            select: function(event, ui) {
+                let libroTrovato = libri.find(libro => libro.titolo === ui.item.value);
+                let parentRow = $(this).closest("tr");
+
+                if (libroTrovato) {
+                    parentRow.find(".isbn").val(libroTrovato.isbn);
+                    parentRow.find(".prezzo").val(libroTrovato.prezzo);
+                    aggiornaValoreLordo(parentRow);
+                }
             }
-        }).on("select2:select", function (e) {
-            let data = e.params.data;
-            let row = $(this).closest("tr");
-            row.find(".isbn").val(data.id);
-            row.find(".prezzo").val(data.prezzo);
-            aggiornaValoreLordo(row);
         });
     }
 
-    initSelect2();
-
-    $(document).on("input", ".quantita, .prezzo", function() {
-        aggiornaValoreLordo($(this).closest("tr"));
+    // inizializza autocomplete per righe esistenti
+    $(".titolo").each(function(){
+        initAutocomplete(this);
     });
 
     $("#addRow").click(function() {
         let newRow = `<tr>
             <td><input type="date" name="data[]" value="{{ date('Y-m-d') }}" class="form-control"></td>
             <td><input type="text" name="periodo[]" class="form-control"></td>
-            <td><input type="text" name="isbn[]" class="form-control isbn"></td>
-            <td><select name="titolo[]" class="form-control titolo-select"></select></td>
+            <td><input type="text" name="isbn[]" class="form-control isbn" readonly></td>
+            <td><input type="text" name="titolo[]" class="form-control titolo" placeholder="Cerca titolo..."></td>
             <td><input type="number" name="quantita[]" value="0" class="form-control quantita"></td>
             <td><input type="number" name="prezzo[]" value="0.00" class="form-control prezzo" step="0.01"></td>
             <td><input type="number" name="valore_lordo[]" value="0.00" class="form-control valore-lordo" readonly></td>
             <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
         </tr>`;
         $("#registroVenditeBody").append(newRow);
-        initSelect2();
+
+        let addedRow = $("#registroVenditeBody tr").last();
+        initAutocomplete(addedRow.find(".titolo"));
+    });
+
+    $(document).on("input", ".quantita, .prezzo", function() {
+        aggiornaValoreLordo($(this).closest("tr"));
     });
 
     $(document).on("click", ".delete-row", function() {
-        $(this).closest("tr").remove();
-    });
+    let row = $(this).closest("tr");
+    let dettaglioId = row.data("id");
+
+    if (dettaglioId) {
+        if(confirm("Vuoi davvero eliminare questa riga?")) {
+            $.ajax({
+                url: `/registro-vendite/dettaglio/${dettaglioId}`,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(result) {
+                    if(result.success) {
+                        row.remove();
+                    } else {
+                        alert('Errore nell\'eliminazione della riga.');
+                    }
+                },
+                error: function() {
+                    alert('Errore nella richiesta.');
+                }
+            });
+        }
+    } else {
+        // Se la riga non è ancora salvata, rimuovila semplicemente
+        row.remove();
+    }
+});
+
 });
 </script>
+
 
 @endsection

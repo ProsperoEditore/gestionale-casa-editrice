@@ -12,18 +12,7 @@
                 <!-- Ordine associato -->
                 <div class="mb-3">
                     <label class="form-label">Ordine Associato (facoltativo)</label>
-                    <select name="ordine_id" id="ordine_id" class="form-select">
-                        <option value="">-- Nessun ordine associato --</option>
-                        @foreach($ordini as $ordine)
-                            <option 
-                                value="{{ $ordine->id }}"
-                                data-destinatario="{{ $ordine->anagrafica->nome }}"
-                                data-anagrafica-id="{{ $ordine->anagrafica->id }}"
-                            >
-                                {{ $ordine->codice }} - {{ $ordine->anagrafica->nome }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%"></select>
                 </div>
 
                 <!-- Altro ordine -->
@@ -48,7 +37,8 @@
     </div>
 </div>
 
-<!-- Select2 CSS & JS -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -56,58 +46,65 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("SCRIPT ATTIVO ✅");
 
-    const ordineSelect = document.getElementById('ordine_id');
+    const ordineSelect = $('#ordine_id');
     const altroOrdineInput = document.getElementById('altro_ordine');
     const destinatarioNome = document.getElementById('destinatario_nome');
     const anagraficaId = document.getElementById('anagrafica_id');
 
-    // Select2
-    $('#ordine_id').select2({
-    placeholder: 'Scrivi o seleziona un ordine...',
-    allowClear: true,
-    width: '100%'
-}).on('select2:select', function (e) {
-    ordineSelect.dispatchEvent(new Event('change')); // forza trigger evento
-});
-
-    ordineSelect.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const nomeDestinatario = selectedOption.getAttribute('data-destinatario');
-        const idAnagrafica = selectedOption.getAttribute('data-anagrafica-id');
-
-        console.log("Destinatario:", nomeDestinatario);
-        console.log("ID Anagrafica:", idAnagrafica);
-
-        if (this.value) {
-            altroOrdineInput.value = '';
-            altroOrdineInput.disabled = true;
-
-            destinatarioNome.value = nomeDestinatario || '';
-            destinatarioNome.readOnly = true;
-
-            anagraficaId.value = idAnagrafica || '';
-        } else {
-            altroOrdineInput.disabled = false;
-            destinatarioNome.readOnly = false;
-
-            destinatarioNome.value = '';
-            anagraficaId.value = '';
+    ordineSelect.select2({
+        placeholder: 'Scrivi codice ordine o nome cliente...',
+        allowClear: true,
+        width: '100%',
+        ajax: {
+            url: '{{ route("scarichi.autocomplete-ordini") }}',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { query: params.term };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (ordine) {
+                        return {
+                            id: ordine.id,
+                            text: ordine.codice + " - " + ordine.nome_cliente,
+                            nome_cliente: ordine.nome_cliente,
+                            anagrafica_id: ordine.anagrafica_id
+                        };
+                    })
+                };
+            }
         }
+    }).on('select2:select', function (e) {
+        const data = e.params.data;
+
+        altroOrdineInput.value = '';
+        altroOrdineInput.disabled = true;
+
+        destinatarioNome.value = data.nome_cliente || '';
+        destinatarioNome.readOnly = true;
+
+        anagraficaId.value = data.anagrafica_id || '';
+    }).on('select2:clear', function () {
+        altroOrdineInput.disabled = false;
+        destinatarioNome.readOnly = false;
+
+        destinatarioNome.value = '';
+        anagraficaId.value = '';
     });
 
     altroOrdineInput.addEventListener('input', function () {
         if (this.value.trim() !== '') {
-            $('#ordine_id').val(null).trigger('change');
-            ordineSelect.disabled = true;
+            ordineSelect.val(null).trigger('change');
+            ordineSelect.prop('disabled', true);
 
             destinatarioNome.readOnly = false;
             destinatarioNome.value = '';
             anagraficaId.value = '';
         } else {
-            ordineSelect.disabled = false;
+            ordineSelect.prop('disabled', false);
         }
     });
 });
 </script>
-
 @endsection

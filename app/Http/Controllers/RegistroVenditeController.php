@@ -29,23 +29,21 @@ class RegistroVenditeController extends Controller
     public function store(Request $request)
     {
         Log::info('Dati ricevuti:', $request->all());
-        
-        // Aggiungi una validazione per verificare che i campi siano presenti
+    
         $request->validate([
             'anagrafica_id' => 'required',
             'canale_vendita' => 'required',
         ]);
     
-        // Crea una nuova istanza del modello RegistroVendite
+        // 1. Crea il registro
         $registroVendita = new RegistroVendite();
         $registroVendita->anagrafica_id = $request->input('anagrafica_id');
         $registroVendita->canale_vendita = $request->input('canale_vendita');
         $registroVendita->save();
     
-        // Salva le righe solo se ci sono dati validi
+        // 2. Crea i dettagli
         if ($request->has('data') && is_array($request->data)) {
             foreach ($request->data as $index => $data) {
-                // Verifica se il periodo è stato inserito, altrimenti assegna un valore di default
                 $periodo = !empty($request->periodo[$index]) ? $request->periodo[$index] : 'N/D';
     
                 RegistroVenditeDettaglio::create([
@@ -61,26 +59,111 @@ class RegistroVenditeController extends Controller
             }
         }
     
+        // 3. AGGIORNA GIACENZE (dopo aver salvato tutto)
+        $magazzino = \App\Models\Magazzino::where('anagrafica_id', $registroVendita->anagrafica_id)->first();
+    
+        if ($magazzino) {
+            $dettagli = RegistroVenditeDettaglio::where('registro_vendita_id', $registroVendita->id)->get();
+    
+            foreach ($dettagli as $dettaglio) {
+                $libro = \App\Models\Libro::where('isbn', trim($dettaglio->isbn))->first();
+                if (!$libro) {
+                    Log::warning('Libro non trovato per ISBN: ' . $dettaglio->isbn);
+                    continue;
+                }
+            
+                $giacenza = \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
+                            ->where('libro_id', $libro->id)
+                            ->first();
+            
+                if ($giacenza) {
+                    $giacenza->quantita = max(0, $giacenza->quantita - $dettaglio->quantita);
+                    $giacenza->note = 'Aggiornato con rendiconto del ' . now()->format('d.m.Y');
+                    $giacenza->data_ultimo_aggiornamento = now();
+                    $giacenza->save();
+                } else {
+                    Log::info('Nessuna giacenza trovata per libro ID ' . $libro->id . ' nel magazzino ID ' . $magazzino->id);
+                }
+            }
+        }
+            
+    
         return redirect()->route('registro-vendite.index')->with('success', 'Registro Vendite creato con successo!');
-    }        
-     
-
-    public function gestione($id, Request $request)
+    }
+    
+    
+    
+    public function salvaDettagli(Request $request, $id)
     {
-        $registroVendita = RegistroVendite::with('dettagli')->findOrFail($id);
-        $query = RegistroVenditeDettaglio::where('registro_vendita_id', $id);
-
-        if ($request->has('search') && $request->input('search') != '') {
-            $searchTerm = $request->input('search');
-            $query->whereHas('libro', function($q) use ($searchTerm) {
-                $q->where('titolo', 'like', '%' . $searchTerm . '%');
-            });
+        $registroVendita = RegistroVendite::findOrFail($id);
+    
+        if ($request->has('data') && is_array($request->data)) {
+            foreach ($request->data as $index => $data) {
+                $periodo = !empty($request->periodo[$index]) ? $request->periodo[$index] : 'N/D';
+    
+                RegistroVenditeDettaglio::updateOrCreate(
+                    [
+                        'registro_vendita_id' => $registroVendita->id,
+                        'isbn' => $request->isbn[$index],
+                        'data' => $data
+                    ],
+                    [
+                        'periodo' => $periodo,
+                        'titolo' => $request->titolo[$index] ?? null,
+                        'quantita' => $request->quantita[$index] ?? 0,
+                        'prezzo' => $request->prezzo[$index] ?? 0.00,
+                        'valore_lordo' => ($request->quantita[$index] ?? 0) * ($request->prezzo[$index] ?? 0.00),
+                    ]
+                );
+    
+                // ✅ AGGIORNA GIACENZA se esiste il magazzino per l'anagrafica
+                $magazzino = \App\Models\Magazzino::where('anagrafica_id', $registroVendita->anagrafica_id)->first();
+    
+                if ($magazzino) {
+                    $libro = \App\Models\Libro::where('isbn', trim($request->isbn[$index]))->first();
+                    if ($libro) {
+                        $giacenza = \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
+                            ->where('libro_id', $libro->id)
+                            ->first();
+    
+                        if ($giacenza) {
+                            $quantitaDaSottrarre = $request->quantita[$index] ?? 0;
+                            $giacenza->quantita = max(0, $giacenza->quantita - $quantitaDaSottrarre);
+                            $giacenza->note = 'Aggiornato con rendiconto del ' . now()->format('d.m.Y');
+                            $giacenza->data_ultimo_aggiornamento = now();
+                            $giacenza->save();
+                        }
+                    }
+                }
+            }
         }
     
-        $dettagli = $query->paginate(100);
+        return redirect()->route('registro-vendite.gestione', ['id' => $id])
+            ->with('success', 'Dettagli aggiornati con successo!');
+    }
+    
 
-        return view('registro-vendite.gestione', compact('registroVendita', 'dettagli'));
-    }    
+     
+
+public function gestione($id, Request $request)
+    {
+    $registroVendita = RegistroVendite::with('dettagli')->findOrFail($id);
+    $query = RegistroVenditeDettaglio::where('registro_vendita_id', $id);
+
+    if ($request->has('search') && $request->input('search') != '') {
+        $searchTerm = $request->input('search');
+        $query->whereHas('libro', function($q) use ($searchTerm) {
+            $q->where('titolo', 'like', '%' . $searchTerm . '%');
+        });
+    }
+
+    $dettagli = $query->paginate(100)->appends($request->query());
+    $libri = Libro::with('marchio_editoriale')->get();
+
+    return view('registro-vendite.gestione', compact('registroVendita', 'dettagli', 'libri'));
+    }
+
+   
 
     public function importExcel(Request $request, $id)
     {
@@ -126,9 +209,17 @@ class RegistroVenditeController extends Controller
         return redirect()->route('registro-vendite.index');
     }
 
+    public function destroyDettaglio($id)
+    {
+    RegistroVenditeDettaglio::destroy($id);
+    return response()->json(['success' => true]);
+    }
+
+
     public function __construct()
-{
+    {
     Paginator::useBootstrap();
-}
+    }
+
 
 }

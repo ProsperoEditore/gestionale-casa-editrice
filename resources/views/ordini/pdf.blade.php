@@ -165,19 +165,31 @@
     @if($ordine->tipo_ordine === 'acquisto' && $ordine->totale_netto_compilato)
     <div style="margin: 30px 0; text-align: center;">
         <p style="font-size: 16px; font-weight: bold; margin: 10px 0;">
-            Totale Netto da Pagare: {{ number_format($ordine->totale_netto_compilato, 2) }} €
+            Totale a pagare: {{ number_format($ordine->totale_netto_compilato, 2) }} €
         </p>
     </div>
 
-        @if(!empty($ordine->tempi_pagamento))
-            <p><strong>Tempi di pagamento:</strong> {{ $ordine->tempi_pagamento }}</p>
-        @endif
-
-        @if(!empty($ordine->modalita_pagamento))
-            <p><strong>Modalità di pagamento</strong><br>
-                {!! nl2br(e($ordine->modalita_pagamento)) !!}
-            </p>
-        @endif
+    @if(!empty($ordine->specifiche_iva))
+        <p><strong>Specifiche IVA:</strong> {{ $ordine->specifiche_iva }}</p>
     @endif
+
+    @if(!empty($ordine->costo_spedizione))
+        <p><strong>Costo Spedizione:</strong> {{ $ordine->costo_spedizione }}</p>
+    @endif
+
+    @if(!empty($ordine->altre_specifiche_iva))
+        <p><strong>Altre Specifiche IVA:</strong> {{ $ordine->altre_specifiche_iva }}</p>
+    @endif
+
+    @if(!empty($ordine->tempi_pagamento))
+        <p><strong>Tempi di pagamento:</strong> {{ $ordine->tempi_pagamento }}</p>
+    @endif
+
+    @if(!empty($ordine->modalita_pagamento))
+        <p><strong>Modalità di pagamento</strong><br>
+            {!! nl2br(e($ordine->modalita_pagamento)) !!}
+        </p>
+    @endif
+@endif
 </body>
 </html>

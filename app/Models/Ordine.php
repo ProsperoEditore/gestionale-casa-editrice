@@ -25,7 +25,10 @@ class Ordine extends Model
         'condizioni_conto_deposito',
         'tempi_pagamento',
         'modalita_pagamento',
-        'totale_netto_compilato'
+        'totale_netto_compilato',
+        'specifiche_iva',
+        'costo_spedizione',
+        'altre_specifiche_iva'
 
     ];
 
@@ -44,6 +47,12 @@ class Ordine extends Model
         return $this->belongsToMany(Libro::class, 'ordine_titoli', 'ordine_id', 'libro_id')
                     ->withPivot('quantita', 'prezzo_copertina', 'valore_vendita_lordo', 'sconto', 'netto_a_pagare', 'info_spedizione'); 
     }
+
+    public function registroVendita()
+{
+    return $this->hasOne(\App\Models\RegistroVendite::class, 'ordine_id');
+}
+
     
 
 }

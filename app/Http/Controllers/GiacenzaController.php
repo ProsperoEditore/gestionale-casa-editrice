@@ -40,52 +40,82 @@ class GiacenzaController extends Controller
     public function store(Request $request, $magazzino_id)
     {
         $data = $request->json()->all();
-
+    
         if (!isset($data['giacenze']) || !is_array($data['giacenze'])) {
             return response()->json(['success' => false, 'message' => 'Dati non validi.']);
         }
-
+    
         $categoria = Magazzino::with('anagrafica')->find($magazzino_id)?->anagrafica?->categoria;
         $savedIds = [];
-
+    
         foreach ($data['giacenze'] as $giacenzaData) {
             if (empty($giacenzaData['isbn']) || empty($giacenzaData['titolo']) || (int)$giacenzaData['quantita'] === 0) {
                 continue;
             }
-
+    
             $libro = Libro::where('isbn', $giacenzaData['isbn'])->first();
             if (!$libro) {
-                continue; // Salta questa riga se non esiste un libro corrispondente
+                continue;
             }
-
-            $fields = [
-                'magazzino_id' => $magazzino_id,
-                'isbn' => $giacenzaData['isbn']
-            ];
-
-            $values = [
-                'titolo' => $giacenzaData['titolo'],
-                'quantita' => $giacenzaData['quantita'],
-                'prezzo' => $giacenzaData['prezzo'],
-                'note' => $giacenzaData['note'],
-                'data_ultimo_aggiornamento' => now(),
-                'libro_id' => $libro?->id,
-            ];
-
+    
+            $giacenza = Giacenza::where('magazzino_id', $magazzino_id)
+                                ->where('isbn', $giacenzaData['isbn'])
+                                ->first();
+    
+            $isNuova = false;
+            if (!$giacenza) {
+                $giacenza = new Giacenza([
+                    'magazzino_id' => $magazzino_id,
+                    'isbn' => $giacenzaData['isbn'],
+                    'libro_id' => $libro->id,
+                ]);
+                $isNuova = true;
+            }
+    
+            $modificata = false;
+    
+            // Campi comuni
+            foreach (['titolo', 'quantita', 'prezzo', 'note'] as $campo) {
+                if ($giacenza->$campo != $giacenzaData[$campo]) {
+                    $giacenza->$campo = $giacenzaData[$campo];
+                    $modificata = true;
+                }
+            }
+    
+            // Campi condizionati
             if ($categoria === 'magazzino editore') {
-                $values['costo_produzione'] = $giacenzaData['costo_produzione'] ?? $giacenzaData['costo_sconto'] ?? 0;
-                $values['sconto'] = null;
+                $costo = $giacenzaData['costo_produzione'] ?? $giacenzaData['costo_sconto'] ?? 0;
+                if ($giacenza->costo_produzione != $costo) {
+                    $giacenza->costo_produzione = $costo;
+                    $modificata = true;
+                }
+                if ($giacenza->sconto !== null) {
+                    $giacenza->sconto = null;
+                    $modificata = true;
+                }
             } else {
-                $values['sconto'] = $giacenzaData['sconto'] ?? $giacenzaData['costo_sconto'] ?? 0;
-                $values['costo_produzione'] = null;
+                $sconto = $giacenzaData['sconto'] ?? $giacenzaData['costo_sconto'] ?? 0;
+                if ($giacenza->sconto != $sconto) {
+                    $giacenza->sconto = $sconto;
+                    $modificata = true;
+                }
+                if ($giacenza->costo_produzione !== null) {
+                    $giacenza->costo_produzione = null;
+                    $modificata = true;
+                }
             }
-
-            $giacenza = Giacenza::updateOrCreate($fields, $values);
-            $savedIds[] = ['id' => $giacenza->id, 'isbn' => $giacenza->isbn];
+    
+            // Se è nuova o modificata → aggiorna data e salva
+            if ($isNuova || $modificata) {
+                $giacenza->data_ultimo_aggiornamento = now();
+                $giacenza->save();
+                $savedIds[] = ['id' => $giacenza->id, 'isbn' => $giacenza->isbn];
+            }
         }
-
+    
         return response()->json(['success' => true, 'saved_ids' => $savedIds]);
     }
+    
 
     public function importGiacenze(Request $request, $magazzino_id)
     {

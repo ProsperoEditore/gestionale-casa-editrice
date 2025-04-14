@@ -30,7 +30,7 @@
                             <td>
                                 <input type="date" class="form-control scadenza-input"
                                        data-id="{{ $magazzino->id }}"
-                                       value="{{ $magazzino->prossima_scadenza ?? '' }}"
+                                       value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
                                        onchange="updateScadenza({{ $magazzino->id }}, this)">
                             </td>
                             <td>
@@ -52,8 +52,14 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Colora tutte le date esistenti
     document.querySelectorAll('.scadenza-input').forEach(input => {
         colorizeDate(input);
+
+        input.addEventListener('change', () => {
+            updateScadenza(input.dataset.id, input);
+        });
     });
 
     function colorizeDate(input) {
@@ -66,18 +72,15 @@
         today.setHours(0, 0, 0, 0);
 
         const diffTime = scadenzaDate - today;
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // differenza in giorni
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-        // Reset
         input.style.backgroundColor = '';
         input.style.color = '';
 
         if (diffDays >= -7 && diffDays <= 14) {
-            // GIALLO
             input.style.backgroundColor = '#ffeb3b';
             input.style.color = '#000';
         } else if (diffDays < -14) {
-            // ROSSO
             input.style.backgroundColor = '#dc3545';
             input.style.color = '#fff';
         }
@@ -86,11 +89,12 @@
     let timeout;
 
     function updateScadenza(id, input) {
+        console.log("SALVATAGGIO SCADENZA ID:", id); // 👈 debug visibile in console
+
         clearTimeout(timeout);
+        const nuovaScadenza = input.value;
 
         timeout = setTimeout(() => {
-            const nuovaScadenza = input.value;
-
             fetch(`/magazzini/${id}/update-scadenza`, {
                 method: 'PUT',
                 headers: {
@@ -102,15 +106,20 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    colorizeDate(input); // Ricalcola i colori dopo aggiornamento
+                    colorizeDate(input);
                 } else {
                     alert("Errore nell'aggiornamento della data.");
                 }
             })
-            .catch(error => console.error('Errore:', error));
+            .catch(error => {
+                console.error('Errore:', error);
+                alert("Errore nella richiesta.");
+            });
         }, 500);
     }
+});
 </script>
+
 
 
 @endsection

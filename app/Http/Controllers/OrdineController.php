@@ -36,22 +36,59 @@ class OrdineController extends Controller
         return view('ordini.create', compact('anagrafiche'));
     }
 
+    public function autocompleteAnagrafica(Request $request)
+    {
+    $search = $request->input('query');
+
+    $anagrafiche = Anagrafica::where('nome', 'like', "%{$search}%")
+        ->select('id', 'nome')
+        ->limit(10)
+        ->get();
+
+    return response()->json($anagrafiche);
+    }
+
+
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        // Definizione regole di validazione di base
+        $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
-            'canale' => 'required|string',
             'tipo_ordine' => 'required|string',
-        ]);
+        ];
+    
+        // Se NON è un omaggio, il campo 'canale' è obbligatorio
+        if ($request->input('tipo_ordine') !== 'omaggio') {
+            $rules['canale'] = 'required|string';
+        } else {
+            // Se è omaggio, imposta comunque un valore per evitare problemi di database
+            $request->merge(['canale' => 'omaggio']);
+        }
+    
+        // Validazione
+        $validatedData = $request->validate($rules);
     
         // Creazione dell'ordine
         $ordine = Ordine::create($validatedData);
     
-        // Reindirizzamento alla pagina index con un messaggio di successo
+        // Se è un ordine di tipo "conto deposito", crea il magazzino (se non esiste)
+        if ($ordine->tipo_ordine === 'conto deposito') {
+            $magazzinoEsistente = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
+    
+            if (!$magazzinoEsistente) {
+                \App\Models\Magazzino::create([
+                    'anagrafica_id' => $ordine->anagrafica_id,
+                    'prossima_scadenza' => null,
+                ]);
+            }
+        }
+    
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
+    
 
     public function edit($id)
     {
@@ -78,7 +115,7 @@ class OrdineController extends Controller
     
         $ordine = \App\Models\Ordine::findOrFail($id);
     
-        // Salviamo prima i dati originali dei libri con quantità
+        // Salviamo i dati originali dei libri con quantità
         $libriPrecedenti = $ordine->libri()->withPivot('quantita')->get()->keyBy('id');
     
         // Aggiorna i dati dell'ordine
@@ -92,9 +129,8 @@ class OrdineController extends Controller
             'tempi_pagamento' => $request->input('tempi_pagamento'),
             'modalita_pagamento' => $request->input('modalita_pagamento'),
         ]);
-        
     
-        // ✅ Aggiorna i libri dell'ordine
+        // Aggiorna i libri dell'ordine
         if ($request->has('libri')) {
             $libriSync = [];
     
@@ -102,32 +138,33 @@ class OrdineController extends Controller
                 $libriSync[$libroId] = [
                     'quantita' => $dati['quantita'],
                     'sconto' => $dati['sconto'] ?? 0,
+                    'info_spedizione' => $dati['info_spedizione'] ?? null,
                 ];
             }
     
             $ordine->libri()->sync($libriSync);
         }
     
-        // 🔁 Ricarica i libri dell'ordine con pivot aggiornata
+        // Ricarica i libri con pivot aggiornata
         $ordine->load(['libri' => function ($query) {
-            $query->withPivot(['quantita', 'sconto']);
+            $query->withPivot(['quantita', 'sconto', 'info_spedizione']);
         }]);
     
-        // ✅ Gestione Delta per conto deposito
-        if ($ordine->tipo_ordine === 'conto deposito') {
-            $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
+        foreach ($ordine->libri as $libro) {
+            $libroId = $libro->id;
+            $quantitaPrecedente = (int) ($libriPrecedenti[$libroId]->pivot->quantita ?? 0);
+            $quantitaNuova = (int) $libro->pivot->quantita;
+            $differenza = $quantitaNuova - $quantitaPrecedente;
     
-            if ($magazzino) {
-                foreach ($ordine->libri as $libro) {
-                    $libroId = $libro->id;
-                    $quantitaNuova = (int) $libro->pivot->quantita;
-                    $quantitaVecchia = (int) ($libriPrecedenti[$libroId]->pivot->quantita ?? 0);
-                    $differenza = $quantitaNuova - $quantitaVecchia;
+            if ($differenza === 0) {
+                continue;
+            }
     
-                    if ($differenza === 0) {
-                        continue; // Nessuna modifica per questo libro
-                    }
+            // ✅ Se l'ordine è "conto deposito", aggiorna la giacenza nel magazzino del cliente
+            if ($ordine->tipo_ordine === 'conto deposito') {
+                $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
+                if ($magazzino) {
                     $giacenza = \App\Models\Giacenza::firstOrNew([
                         'magazzino_id' => $magazzino->id,
                         'libro_id' => $libroId,
@@ -135,20 +172,43 @@ class OrdineController extends Controller
     
                     $giacenza->isbn = $libro->isbn;
                     $giacenza->titolo = $libro->titolo;
-                    $giacenza->quantita = max(0, ($giacenza->quantita ?? 0) + $differenza); // Evita valori negativi
+                    $giacenza->quantita = max(0, ($giacenza->quantita ?? 0) + $differenza);
                     $giacenza->prezzo = $libro->prezzo_copertina;
                     $giacenza->sconto = $libro->pivot->sconto;
                     $giacenza->costo_produzione = $libro->costo_produzione;
                     $giacenza->data_ultimo_aggiornamento = now();
                     $giacenza->note = 'Aggiornata per delta ordine ' . $ordine->codice;
-    
                     $giacenza->save();
+                }
+            }
+    
+            // ✅ Indipendentemente dal tipo ordine, aggiorna magazzino editore se necessario
+            $info = strtolower(trim($libro->pivot->info_spedizione ?? ''));
+    
+            if ($info === 'spedito da magazzino editore' && $quantitaNuova > $quantitaPrecedente) {
+                $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
+                    $query->where('categoria', 'magazzino editore');
+                })->first();
+    
+                if ($magazzinoEditore) {
+                    $giacenzaEditore = \App\Models\Giacenza::where('magazzino_id', $magazzinoEditore->id)
+                        ->where('libro_id', $libroId)
+                        ->first();
+    
+                    if ($giacenzaEditore) {
+                        $delta = $quantitaNuova - $quantitaPrecedente;
+                        $giacenzaEditore->quantita = max(0, $giacenzaEditore->quantita - $delta);
+                        $giacenzaEditore->note = 'Aggiornato (aggiunta copie in ordine ' . $ordine->codice . ')';
+                        $giacenzaEditore->data_ultimo_aggiornamento = now();
+                        $giacenzaEditore->save();
+                    }
                 }
             }
         }
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiornato con successo.');
     }
+    
     
     
     
@@ -172,7 +232,10 @@ class OrdineController extends Controller
     
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
     
-        return $pdf->download('ordine_' . $ordine->codice . '.pdf');
+        $filename = 'ordine_' . preg_replace('/[\/\\\\]/', '-', $ordine->codice) . '.pdf';
+
+        return PDF::loadView('ordini.pdf', compact('ordine', 'marchio'))
+          ->download($filename);
     }
     
 
@@ -185,14 +248,50 @@ class OrdineController extends Controller
 
     public function importLibri(Request $request, $id)
     {
-    $request->validate([
-        'file' => 'required|mimes:xlsx',
-    ]);
-
-    // Qui implementi l'importazione dei dati da Excel.
-
-    return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri importati con successo.');
+        $request->validate([
+            'file' => 'required|mimes:xlsx'
+        ]);
+    
+        $file = $request->file('file');
+        $rows = Excel::toCollection(null, $file)->first();
+    
+        foreach ($rows as $row) {
+            // Estrazione dei dati
+            $isbn = $row['isbn'] ?? null;
+            $quantita = $row['quantita'];
+            $titolo = $row['titolo'] ?? null;
+            $sconto = $row['sconto'] ?? 0;
+    
+            if (empty($quantita)) {
+                continue; // Ignora righe senza quantità
+            }
+    
+            // Trova il libro usando ISBN o Titolo
+            $libro = null;
+            if ($isbn) {
+                $libro = Libro::where('isbn', $isbn)->first();
+            } elseif ($titolo) {
+                // Usa LIKE per trovare titoli simili
+                $libro = Libro::where('titolo', 'like', '%' . $titolo . '%')->first();
+            }
+    
+            // Se un libro è trovato, salvalo nell'ordine
+            if ($libro) {
+                OrdineLibro::create([
+                    'ordine_id' => $id,
+                    'libro_id' => $libro->id,
+                    'isbn' => $libro->isbn,
+                    'titolo' => $libro->titolo,
+                    'quantita' => $quantita,
+                    'prezzo_copertina' => $libro->prezzo_copertina,
+                    'sconto' => $sconto,
+                ]);
+            }
+        }
+    
+        return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri importati correttamente.');
     }
+    
 
     public function show($id)
     {
@@ -208,7 +307,11 @@ class OrdineController extends Controller
             'totale_netto_compilato' => $request->input('totale_netto_compilato'),
             'tempi_pagamento' => $request->input('tempi_pagamento'),
             'modalita_pagamento' => $request->input('modalita_pagamento'),
+            'specifiche_iva' => $request->input('specifiche_iva'),
+            'costo_spedizione' => $request->input('costo_spedizione'),
+            'altre_specifiche_iva' => $request->input('altre_specifiche_iva'),
         ]);
+    
         $ordine->libri()->detach();
     
         if ($request->has('titolo') && is_array($request->titolo)) {
@@ -229,10 +332,31 @@ class OrdineController extends Controller
                         'netto_a_pagare' => $netto,
                         'info_spedizione' => $info,
                     ]);
+    
+                    // ✅ Aggiorna magazzino editore se richiesto
+                    $info_normalized = strtolower(trim($info));
+                    if ($info_normalized === 'spedito da magazzino editore') {
+                        $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
+                            $query->where('categoria', 'magazzino editore');
+                        })->first();
+    
+                        if ($magazzinoEditore) {
+                            $giacenzaEditore = \App\Models\Giacenza::where('magazzino_id', $magazzinoEditore->id)
+                                ->where('libro_id', $libro_id)
+                                ->first();
+    
+                            if ($giacenzaEditore) {
+                                $giacenzaEditore->quantita = max(0, $giacenzaEditore->quantita - $quantita);
+                                $giacenzaEditore->note = 'Sottratto con ordine ' . $ordine->codice;
+                                $giacenzaEditore->data_ultimo_aggiornamento = now();
+                                $giacenzaEditore->save();
+                            }
+                        }
+                    }
                 }
             }
     
-            // ✅ Se è "conto deposito", aggiorna le giacenze in modo accumulativo
+            // ✅ Se è "conto deposito", aggiorna il magazzino cliente
             if ($ordine->tipo_ordine === 'conto deposito') {
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
@@ -250,8 +374,6 @@ class OrdineController extends Controller
     
                         $giacenza->titolo = $libro->titolo;
                         $giacenza->sconto = $request->sconto[$index] ?? 0;
-    
-                        // autocompletamento
                         $giacenza->isbn = $libro->isbn;
                         $giacenza->prezzo = $libro->prezzo;
                         $giacenza->costo_produzione = $libro->costo_produzione;
@@ -264,8 +386,34 @@ class OrdineController extends Controller
             }
         }
     
+        // ✅ Se è "acquisto", crea automaticamente un registro vendite
+        if ($ordine->tipo_ordine === 'acquisto') {
+            $registro = \App\Models\RegistroVendite::create([
+                'anagrafica_id' => $ordine->anagrafica_id,
+                'periodo' => date('Y'),
+                'origine' => 'ordine',
+                'ordine_id' => $ordine->id,
+            ]);
+    
+            foreach ($request->titolo as $index => $libro_id) {
+                $libro = \App\Models\Libro::find($libro_id);
+    
+                \App\Models\RegistroVenditeDettaglio::create([
+                    'registro_vendita_id' => $registro->id,
+                    'data' => $ordine->data,
+                    'periodo' => date('Y'),
+                    'isbn' => $libro->isbn,
+                    'titolo' => $libro->titolo,
+                    'quantita' => $request->quantita[$index],
+                    'prezzo' => $libro->prezzo,
+                    'valore_lordo' => $valore_lordo,
+                ]);
+            }
+        }
+    
         return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri salvati con successo.');
     }
+    
     
     
     

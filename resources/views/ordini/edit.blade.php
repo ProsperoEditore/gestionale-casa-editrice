@@ -51,6 +51,7 @@
                         <select name="tipo_ordine" class="form-control" required>
                             <option value="acquisto" {{ $ordine->tipo_ordine == 'acquisto' ? 'selected' : '' }}>Acquisto</option>
                             <option value="conto deposito" {{ $ordine->tipo_ordine == 'conto deposito' ? 'selected' : '' }}>Conto Deposito</option>
+                            <option value="omaggio" {{ old('tipo_ordine', $ordine->tipo_ordine) === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
                         </select>
                     </div>
                 </div>
@@ -64,4 +65,25 @@
         </div>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tipoOrdine = document.querySelector('select[name="tipo_ordine"]');
+    const canale = document.querySelector('select[name="canale"]');
+
+    function toggleCanale() {
+        if (tipoOrdine.value === 'omaggio') {
+            canale.setAttribute('disabled', 'disabled');
+        } else {
+            canale.removeAttribute('disabled');
+        }
+    }
+
+    tipoOrdine.addEventListener('change', toggleCanale);
+    toggleCanale(); // esegui al primo caricamento
+});
+</script>
+
+
 @endsection

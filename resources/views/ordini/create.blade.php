@@ -17,14 +17,11 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                    <label class="form-label">Anagrafica</label>
-                        <select name="anagrafica_id" id="anagrafica_id" class="form-control select2" required>
-                            <option value="">-- Seleziona Anagrafica --</option>
-                            @foreach ($anagrafiche as $anagrafica)
-                                <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome }}</option>
-                            @endforeach
-                        </select>
+                        <label class="form-label">Anagrafica</label>
+                        <input type="text" id="anagrafica_autocomplete" class="form-control" placeholder="Digita un nome..." required>
+                        <input type="hidden" name="anagrafica_id" id="anagrafica_id">
                     </div>
+
                 </div>
 
                 <div class="row">
@@ -35,12 +32,15 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Canale</label>
-                        <select name="canale" class="form-control" required>
+                        <select name="canale" id="canale" class="form-control" required>
                             <option value="vendite indirette">Vendite Indirette</option>
                             <option value="vendite dirette">Vendite Dirette</option>
                             <option value="eventi">Eventi</option>
+                            <option value="omaggio">Omaggio</option> {{-- opzionale --}}
                         </select>
+                        <input type="hidden" name="canale_hidden" id="canale_hidden">
                     </div>
+
                 </div>
 
                 <div class="row">
@@ -49,7 +49,7 @@
                         <select name="tipo_ordine" class="form-control" required>
                             <option value="acquisto">Acquisto</option>
                             <option value="conto deposito">Conto Deposito</option>
-                            <option value="conto deposito">Omaggio</option>
+                            <option value="omaggio" {{ old('tipo_ordine') === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
                         </select>
                     </div>
                 </div>
@@ -63,26 +63,74 @@
         </div>
     </div>
 </div>
+@endsection
 
-<!-- Include Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<!-- Include jQuery -->
+@push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
-<!-- Include Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        // Inizializza Select2 con opzione di ricerca
-        $('#anagrafica_id').select2({
-            placeholder: 'Cerca Anagrafica...',
-            allowClear: true,
-            width: '100%'
-        });
+$(document).ready(function () {
+    $("#anagrafica_autocomplete").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "{{ route('ordini.autocomplete-anagrafica') }}",
+                data: {
+                    query: request.term
+                },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return {
+                            label: item.nome,
+                            value: item.nome,
+                            id: item.id
+                        };
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            $('#anagrafica_autocomplete').val(ui.item.label);
+            $('#anagrafica_id').val(ui.item.id);
+            return false;
+        }
     });
+});
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tipoOrdine = document.querySelector('select[name="tipo_ordine"]');
+    const canale = document.querySelector('select[name="canale"]');
+    const canaleHidden = document.querySelector('input[name="canale_hidden"]');
 
-@endsection
+    function toggleCanale() {
+        if (tipoOrdine.value === 'omaggio') {
+            canale.setAttribute('disabled', 'disabled');
+            canaleHidden.value = 'omaggio'; // oppure stringa vuota se preferisci
+        } else {
+            canale.removeAttribute('disabled');
+            canaleHidden.value = canale.value;
+        }
+    }
+
+    // Quando cambia il tipo ordine
+    tipoOrdine.addEventListener('change', toggleCanale);
+
+    // Quando cambia il canale (se non disabilitato)
+    canale.addEventListener('change', function () {
+        if (!canale.disabled) {
+            canaleHidden.value = canale.value;
+        }
+    });
+
+    // Esegui subito all'avvio
+    toggleCanale();
+});
+
+</script>
+@endpush
+
+

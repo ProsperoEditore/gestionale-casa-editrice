@@ -120,11 +120,22 @@ class LibroController extends Controller
         $term = $request->input('term');
     
         $libri = Libro::where('titolo', 'LIKE', "%{$term}%")
-            ->limit(10)
-            ->get(['titolo', 'isbn', 'prezzo']);
+                      ->orWhere('isbn', 'LIKE', "%{$term}%")
+                      ->limit(10)
+                      ->get(['isbn', 'titolo', 'prezzo']);
     
-        return response()->json($libri);
-    }    
+        // Formatta la risposta per Select2
+        $formatted_libri = $libri->map(function($libro) {
+            return [
+                'id' => $libro->isbn,
+                'text' => $libro->titolo,
+                'prezzo' => $libro->prezzo,
+            ];
+        });
+    
+        return response()->json($formatted_libri);
+    }
+     
 
     public function import(Request $request)
     {
