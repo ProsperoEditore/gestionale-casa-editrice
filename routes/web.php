@@ -138,8 +138,6 @@ Route::post('report/{reportId}/dettagli/pdf', [ReportDettaglioController::class,
 // Scarichi
 Route::resource('scarichi', ScaricoController::class)->except(['show']);
 Route::patch('/scarichi/{id}/update-info', [ScaricoController::class, 'updateInfoSpedizione'])->name('scarichi.updateInfoSpedizione');
-Route::delete('/scarichi/{id}', [ScaricoController::class, 'destroy'])->name('scarichi.destroy');
-Route::put('/scarichi/{id}', [ScaricoController::class, 'update'])->name('scarichi.update');
 Route::get('/scarichi/autocomplete-ordini', [\App\Http\Controllers\ScaricoController::class, 'autocompleteOrdini'])
     ->name('scarichi.autocomplete-ordini');
 Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStato'])->name('scarichi.updateStato');
