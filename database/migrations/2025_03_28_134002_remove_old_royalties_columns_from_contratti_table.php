@@ -9,15 +9,30 @@ class RemoveOldRoyaltiesColumnsFromContrattiTable extends Migration
     public function up()
     {
         Schema::table('contratti', function (Blueprint $table) {
-            // Rimuovi le colonne obsolete (correggi i nomi delle colonne)
-            $table->dropColumn([
-                'royalties_indirette_soglia_1',
-                'royalties_indirette_percentuale_1',
-                'royalties_indirette_soglia_2',
-                'royalties_indirette_percentuale_2',
-                'royalties_indirette_soglia_3',
-                'royalties_indirette_percentuale_3',
-            ]);
+
+            if (Schema::hasColumn('contratti', 'royalties_indirette_soglia_1')) {
+                $table->dropColumn('royalties_indirette_soglia_1');
+            }
+
+            if (Schema::hasColumn('contratti', 'royalties_indirette_percentuale_1')) {
+                $table->dropColumn('royalties_indirette_percentuale_1');
+            }
+
+            if (Schema::hasColumn('contratti', 'royalties_indirette_soglia_2')) {
+                $table->dropColumn('royalties_indirette_soglia_2');
+            }
+
+            if (Schema::hasColumn('contratti', 'royalties_indirette_percentuale_2')) {
+                $table->dropColumn('royalties_indirette_percentuale_2');
+            }
+
+            if (Schema::hasColumn('contratti', 'royalties_indirette_soglia_3')) {
+                $table->dropColumn('royalties_indirette_soglia_3');
+            }
+
+            if (Schema::hasColumn('contratti', 'royalties_indirette_percentuale_3')) {
+                $table->dropColumn('royalties_indirette_percentuale_3');
+            }
         });
     }
 
