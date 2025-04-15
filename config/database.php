@@ -6,7 +6,7 @@ $DATABASE_URL = parse_url(env('DATABASE_URL'));
 
 return [
 
-    'default' => env('DB_CONNECTION', 'pgsql'),
+    'default' => 'pgsql',
 
     'connections' => [
 
