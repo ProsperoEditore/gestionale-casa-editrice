@@ -24,5 +24,12 @@ export default defineConfig({
             }
         }
     ],
-    base: '/build/',
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+        rollupOptions: {
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+        },
+    },
+    base: '/build/', // 🔐 Forza URL relativi corretti
 });
