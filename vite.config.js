@@ -31,5 +31,5 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
         },
     },
-    base: '/build/', // 🔐 Forza URL relativi corretti
+    base: 'https://gestionale-prospero-3388dd2e8044.herokuapp.com/build/',
 });
