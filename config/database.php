@@ -58,8 +58,6 @@ return [
             ]) : [],
         ],
 
-        $DATABASE_URL = parse_url(env('DATABASE_URL'));
-
         'pgsql' => [
             'driver' => 'pgsql',
             'host' => $DATABASE_URL['host'] ?? '127.0.0.1',
