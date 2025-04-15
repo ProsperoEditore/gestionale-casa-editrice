@@ -1,34 +1,27 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import fs from 'fs';
 import path from 'path';
 
 export default defineConfig({
-    build: {
-        manifest: true,
-        outDir: 'public/build', // Dove generare i file
-        rollupOptions: {
-            input: {
-                app: 'resources/js/app.js',
-                style: 'resources/css/app.css',
-            },
-            output: {
-                // NIENTE .vite! Qui forziamo tutto in public/build
-                assetFileNames: 'assets/[name]-[hash][extname]',
-                chunkFileNames: 'assets/[name]-[hash].js',
-                entryFileNames: 'assets/[name]-[hash].js',
-            },
-        },
-        emptyOutDir: true,
-    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
         }),
+        {
+            name: 'copy-manifest',
+            closeBundle() {
+                const src = path.resolve(__dirname, 'public/build/.vite/manifest.json');
+                const dest = path.resolve(__dirname, 'public/build/manifest.json');
+
+                if (fs.existsSync(src)) {
+                    fs.copyFileSync(src, dest);
+                    console.log('✅ Copiato manifest.json nella root di build/');
+                } else {
+                    console.warn('⚠️  manifest.json non trovato in .vite');
+                }
+            }
+        }
     ],
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, 'resources/js'),
-        },
-    },
 });
