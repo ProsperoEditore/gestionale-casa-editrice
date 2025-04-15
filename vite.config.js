@@ -8,4 +8,11 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        https: true,
+    },
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+    },
 });
