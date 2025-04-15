@@ -2,9 +2,11 @@
 
 use Illuminate\Support\Str;
 
-$DATABASE_URL = parse_url(env('DATABASE_URL'));
+$rawUrl = env('DATABASE_URL');
+$DATABASE_URL = $rawUrl ? parse_url($rawUrl) : [];
 
 return [
+
 
     'default' => 'pgsql',
 
