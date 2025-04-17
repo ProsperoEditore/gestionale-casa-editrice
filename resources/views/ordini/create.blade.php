@@ -39,7 +39,7 @@
                             <option value="acquisto autore">Acquisto Autore</option> {{-- opzionale --}}
                             <option value="omaggio">Omaggio</option> {{-- opzionale --}}
                         </select>
-                        <input type="hidden" name="canale_hidden" id="canale_hidden">
+                        <input type="hidden" name="canale" id="canale_hidden">
                     </div>
 
                 </div>
@@ -105,7 +105,7 @@ $(document).ready(function () {
 document.addEventListener('DOMContentLoaded', function () {
     const tipoOrdine = document.querySelector('select[name="tipo_ordine"]');
     const canale = document.querySelector('select[name="canale"]');
-    const canaleHidden = document.querySelector('input[name="canale_hidden"]');
+    const canaleHidden = document.querySelector('input[name="canale"]');
 
     function toggleCanale() {
         if (tipoOrdine.value === 'omaggio') {
