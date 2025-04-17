@@ -51,10 +51,16 @@ class OrdineController extends Controller
 
     public function store(Request $request)
     {
-        // Recupera sempre il valore effettivo dal campo hidden "canale"
-        $request->merge(['canale' => $request->input('canale_hidden')]);
+        $tipo = $request->input('tipo_ordine');
     
-        // Regole base di validazione
+        // Se il tipo è "acquisto", recupera il valore del campo nascosto 'canale'
+        if ($tipo === 'acquisto') {
+            $request->merge(['canale' => $request->input('canale_hidden')]);
+        } else {
+            $request->merge(['canale' => null]);
+        }
+    
+        // Regole di validazione
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
@@ -62,21 +68,17 @@ class OrdineController extends Controller
             'tipo_ordine' => 'required|string',
         ];
     
-        // Aggiunge la regola per 'canale' solo se tipo_ordine è 'acquisto'
-        if ($request->input('tipo_ordine') === 'acquisto') {
+        // Aggiungi validazione canale solo se tipo ordine è "acquisto"
+        if ($tipo === 'acquisto') {
             $rules['canale'] = 'required|string|in:vendite indirette,vendite dirette,evento';
-        } else {
-            // In tutti gli altri casi, azzera il campo canale
-            $request->merge(['canale' => null]);
         }
     
-        // Validazione dei dati
         $validatedData = $request->validate($rules);
     
         // Creazione dell'ordine
         $ordine = Ordine::create($validatedData);
     
-        // Se è un ordine di tipo "conto deposito", crea il magazzino (se non esiste)
+        // Se è un ordine "conto deposito", crea il magazzino (se non esiste)
         if ($ordine->tipo_ordine === 'conto deposito') {
             $magazzinoEsistente = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
@@ -90,8 +92,6 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
-    
-    
     
     
     
