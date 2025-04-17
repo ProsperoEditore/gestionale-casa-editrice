@@ -51,10 +51,8 @@ class OrdineController extends Controller
 
     public function store(Request $request)
     {
-        // ✅ Se è omaggio, imposta il campo 'canale' manualmente prima della validazione
-        if ($request->input('tipo_ordine') === 'omaggio') {
-            $request->merge(['canale' => 'omaggio']);
-        }
+        // Recupera sempre il valore del campo hidden
+        $request->merge(['canale' => $request->input('canale')]);
     
         // Definizione regole di validazione
         $rules = [

@@ -32,7 +32,7 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Canale</label>
-                        <select name="canale" id="canale" class="form-control" required>
+                        <select id="canale" class="form-control">
                             <option value="vendite indirette">Vendite Indirette</option>
                             <option value="vendite dirette">Vendite Dirette</option>
                             <option value="eventi">Eventi</option>
