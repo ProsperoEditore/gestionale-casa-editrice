@@ -54,10 +54,12 @@ class OrdineController extends Controller
         $tipo = $request->input('tipo_ordine');
     
         // Prepara il valore del campo canale
+        $canale = null;
+    
         if ($tipo === 'acquisto') {
-            $request->merge(['canale' => $request->input('canale_hidden')]);
+            $canale = $request->input('canale_hidden');
         } else {
-            $request->merge(['canale' => 'n/a']); // valore neutro obbligatorio per postgres
+            $canale = 'n/a'; // valore predefinito
         }
     
         // Regole di validazione
@@ -66,21 +68,23 @@ class OrdineController extends Controller
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
-            'canale' => 'required|string'
         ];
     
-        // Se è acquisto, validazione più restrittiva sul canale
+        // Aggiungi validazione solo se necessario
         if ($tipo === 'acquisto') {
-            $rules['canale'] .= '|in:vendite indirette,vendite dirette,evento';
+            $rules['canale'] = 'required|string|in:vendite indirette,vendite dirette,evento';
         }
     
         // Validazione
         $validatedData = $request->validate($rules);
     
-        // Ora contiene SEMPRE un campo 'canale' valido
+        // ✅ Aggiungiamo comunque il campo canale manualmente
+        $validatedData['canale'] = $canale;
+    
+        // Creazione dell'ordine
         $ordine = Ordine::create($validatedData);
     
-        // Crea magazzino per conto deposito
+        // Gestione magazzino per "conto deposito"
         if ($ordine->tipo_ordine === 'conto deposito') {
             $magazzinoEsistente = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
