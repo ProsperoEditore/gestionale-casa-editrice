@@ -53,33 +53,34 @@ class OrdineController extends Controller
     {
         $tipo = $request->input('tipo_ordine');
     
-        // Se è acquisto, usa il canale selezionato, altrimenti imposta un valore neutro
+        // Recupera valore del canale solo se è 'acquisto'
         if ($tipo === 'acquisto') {
             $request->merge(['canale' => $request->input('canale_hidden')]);
         } else {
-            $request->merge(['canale' => 'n/a']); // ← valore fittizio valido per il DB
+            // Se non è acquisto, rimuovi il campo 'canale' per evitare errori di constraint
+            $request->request->remove('canale');
         }
-
-        // Validazione
+    
+        // Validazione base
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
-            'canale' => 'required|string',
         ];
     
-        // Aggiungi validazione canale solo se tipo ordine è "acquisto"
+        // Aggiungi validazione per il canale solo se 'acquisto'
         if ($tipo === 'acquisto') {
             $rules['canale'] = 'required|string|in:vendite indirette,vendite dirette,evento';
         }
     
+        // Validazione
         $validatedData = $request->validate($rules);
     
-        // Creazione dell'ordine
+        // Creazione ordine (senza campo canale se non è richiesto)
         $ordine = Ordine::create($validatedData);
     
-        // Se è un ordine "conto deposito", crea il magazzino (se non esiste)
+        // Crea magazzino per conto deposito
         if ($ordine->tipo_ordine === 'conto deposito') {
             $magazzinoEsistente = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
@@ -93,6 +94,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
     
     
     
