@@ -71,23 +71,36 @@
 </div>
 
 
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const tipoOrdine = document.querySelector('select[name="tipo_ordine"]');
-    const canale = document.querySelector('select[name="canale"]');
+    const tipoOrdine = document.querySelector('#tipo_ordine');
+    const canale = document.querySelector('#canale');
+    const canaleHidden = document.querySelector('#canale_hidden');
 
     function toggleCanale() {
         if (tipoOrdine.value === 'omaggio') {
             canale.setAttribute('disabled', 'disabled');
+            canaleHidden.value = 'omaggio';
         } else {
             canale.removeAttribute('disabled');
+            canaleHidden.value = canale.value;
         }
     }
 
     tipoOrdine.addEventListener('change', toggleCanale);
-    toggleCanale(); // esegui al primo caricamento
+
+    canale.addEventListener('change', function () {
+        if (!canale.disabled) {
+            canaleHidden.value = canale.value;
+        }
+    });
+
+    toggleCanale();
 });
 </script>
+@endpush
+
 
 
 @endsection
