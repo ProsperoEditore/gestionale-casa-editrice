@@ -53,31 +53,31 @@ class OrdineController extends Controller
     {
         $tipo = $request->input('tipo_ordine');
     
-        // Recupera valore del canale solo se è 'acquisto'
+        // Prepara il valore del campo canale
         if ($tipo === 'acquisto') {
             $request->merge(['canale' => $request->input('canale_hidden')]);
         } else {
-            // Se non è acquisto, rimuovi il campo 'canale' per evitare errori di constraint
-            $request->request->remove('canale');
+            $request->merge(['canale' => 'n/a']); // valore neutro obbligatorio per postgres
         }
     
-        // Validazione base
+        // Regole di validazione
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
+            'canale' => 'required|string'
         ];
     
-        // Aggiungi validazione per il canale solo se 'acquisto'
+        // Se è acquisto, validazione più restrittiva sul canale
         if ($tipo === 'acquisto') {
-            $rules['canale'] = 'required|string|in:vendite indirette,vendite dirette,evento';
+            $rules['canale'] .= '|in:vendite indirette,vendite dirette,evento';
         }
     
         // Validazione
         $validatedData = $request->validate($rules);
     
-        // Creazione ordine (senza campo canale se non è richiesto)
+        // Ora contiene SEMPRE un campo 'canale' valido
         $ordine = Ordine::create($validatedData);
     
         // Crea magazzino per conto deposito
@@ -94,6 +94,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
     
     
     
