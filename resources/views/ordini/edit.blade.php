@@ -37,22 +37,26 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Canale</label>
-                        <select name="canale" class="form-control" required>
-                            <option value="vendite indirette" {{ $ordine->canale == 'vendite indirette' ? 'selected' : '' }}>Vendite Indirette</option>
-                            <option value="vendite dirette" {{ $ordine->canale == 'vendite dirette' ? 'selected' : '' }}>Vendite Dirette</option>
-                            <option value="eventi" {{ $ordine->canale == 'eventi' ? 'selected' : '' }}>Eventi</option>
+                        <select id="canale" class="form-control" {{ $ordine->tipo_ordine === 'omaggio' ? 'disabled' : '' }}>
+                            <option value="vendite indirette" {{ $ordine->canale === 'vendite indirette' ? 'selected' : '' }}>Vendite Indirette</option>
+                            <option value="vendite dirette" {{ $ordine->canale === 'vendite dirette' ? 'selected' : '' }}>Vendite Dirette</option>
+                            <option value="eventi" {{ $ordine->canale === 'eventi' ? 'selected' : '' }}>Eventi</option>
+                            <option value="acquisto autore" {{ $ordine->canale === 'acquisto autore' ? 'selected' : '' }}>Acquisto Autore</option>
+                            <option value="omaggio" {{ $ordine->canale === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
                         </select>
+                        <input type="hidden" name="canale" id="canale_hidden" value="{{ $ordine->canale }}">
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Tipo Ordine</label>
-                        <select name="tipo_ordine" class="form-control" required>
-                            <option value="acquisto" {{ $ordine->tipo_ordine == 'acquisto' ? 'selected' : '' }}>Acquisto</option>
-                            <option value="conto deposito" {{ $ordine->tipo_ordine == 'conto deposito' ? 'selected' : '' }}>Conto Deposito</option>
-                            <option value="omaggio" {{ old('tipo_ordine', $ordine->tipo_ordine) === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
+                        <select name="tipo_ordine" id="tipo_ordine" class="form-control" required>
+                            <option value="acquisto" {{ $ordine->tipo_ordine === 'acquisto' ? 'selected' : '' }}>Acquisto</option>
+                            <option value="conto deposito" {{ $ordine->tipo_ordine === 'conto deposito' ? 'selected' : '' }}>Conto Deposito</option>
+                            <option value="omaggio" {{ $ordine->tipo_ordine === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
                         </select>
+
                     </div>
                 </div>
 

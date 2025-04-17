@@ -71,7 +71,6 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
-
 <script>
 $(document).ready(function () {
     $("#anagrafica_autocomplete").autocomplete({
@@ -103,35 +102,29 @@ $(document).ready(function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const tipoOrdine = document.querySelector('select[name="tipo_ordine"]');
-    const canale = document.querySelector('select[name="canale"]');
-    const canaleHidden = document.querySelector('input[name="canale"]');
+    const tipoOrdine = document.querySelector('#tipo_ordine');
+    const canale = document.querySelector('#canale');
+    const canaleHidden = document.querySelector('#canale_hidden');
 
     function toggleCanale() {
         if (tipoOrdine.value === 'omaggio') {
             canale.setAttribute('disabled', 'disabled');
-            canaleHidden.value = 'omaggio'; // oppure stringa vuota se preferisci
+            canaleHidden.value = 'omaggio';
         } else {
             canale.removeAttribute('disabled');
             canaleHidden.value = canale.value;
         }
     }
 
-    // Quando cambia il tipo ordine
     tipoOrdine.addEventListener('change', toggleCanale);
 
-    // Quando cambia il canale (se non disabilitato)
     canale.addEventListener('change', function () {
         if (!canale.disabled) {
             canaleHidden.value = canale.value;
         }
     });
 
-    // Esegui subito all'avvio
     toggleCanale();
 });
-
 </script>
 @endpush
-
-

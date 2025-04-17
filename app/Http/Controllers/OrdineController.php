@@ -51,8 +51,8 @@ class OrdineController extends Controller
 
     public function store(Request $request)
     {
-        // Recupera sempre il valore del campo hidden
-        $request->merge(['canale' => $request->input('canale')]);
+        // Recupera sempre il valore effettivo dal campo hidden "canale"
+        $request->merge(['canale' => $request->input('canale_hidden')]);
     
         // Definizione regole di validazione
         $rules = [
@@ -60,7 +60,7 @@ class OrdineController extends Controller
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
-            'canale' => 'required|string', // anche per 'omaggio' ora è presente
+            'canale' => 'required|string', // ora è sempre presente
         ];
     
         $validatedData = $request->validate($rules);
@@ -82,6 +82,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
     
     
     
