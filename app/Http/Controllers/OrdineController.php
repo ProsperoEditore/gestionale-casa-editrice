@@ -52,7 +52,7 @@ class OrdineController extends Controller
     public function store(Request $request)
     {
         $tipo = $request->input('tipo_ordine');
-        $canale = $request->input('canale_hidden') ?? 'n/a';
+        $canale = $request->filled('canale_hidden') ? $request->input('canale_hidden') : 'n/a';
     
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
