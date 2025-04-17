@@ -52,17 +52,8 @@ class OrdineController extends Controller
     public function store(Request $request)
     {
         $tipo = $request->input('tipo_ordine');
+        $canale = $request->input('canale_hidden') ?? 'n/a';
     
-        // Prepara il valore del campo canale
-        $canale = null;
-    
-        if ($tipo === 'acquisto') {
-            $canale = $request->input('canale_hidden');
-        } else {
-            $canale = 'n/a'; // valore predefinito
-        }
-    
-        // Regole di validazione
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
@@ -70,21 +61,15 @@ class OrdineController extends Controller
             'tipo_ordine' => 'required|string',
         ];
     
-        // Aggiungi validazione solo se necessario
         if ($tipo === 'acquisto') {
             $rules['canale'] = 'required|string|in:vendite indirette,vendite dirette,evento';
         }
     
-        // Validazione
         $validatedData = $request->validate($rules);
+        $validatedData['canale'] = $canale; // ← Ora sarà SEMPRE valorizzato
     
-        // ✅ Aggiungiamo comunque il campo canale manualmente
-        $validatedData['canale'] = $canale;
-    
-        // Creazione dell'ordine
         $ordine = Ordine::create($validatedData);
     
-        // Gestione magazzino per "conto deposito"
         if ($ordine->tipo_ordine === 'conto deposito') {
             $magazzinoEsistente = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
