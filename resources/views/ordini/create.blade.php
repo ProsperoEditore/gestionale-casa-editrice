@@ -36,6 +36,7 @@
                             <option value="vendite indirette">Vendite Indirette</option>
                             <option value="vendite dirette">Vendite Dirette</option>
                             <option value="eventi">Eventi</option>
+                            <option value="acquisto autore">Acquisto Autore</option> {{-- opzionale --}}
                             <option value="omaggio">Omaggio</option> {{-- opzionale --}}
                         </select>
                         <input type="hidden" name="canale_hidden" id="canale_hidden">
