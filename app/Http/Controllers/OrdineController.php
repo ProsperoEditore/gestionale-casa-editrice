@@ -54,15 +54,23 @@ class OrdineController extends Controller
         // Recupera sempre il valore effettivo dal campo hidden "canale"
         $request->merge(['canale' => $request->input('canale_hidden')]);
     
-        // Definizione regole di validazione
+        // Regole base di validazione
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
-            'canale' => 'required|string', // ora è sempre presente
         ];
     
+        // Aggiunge la regola per 'canale' solo se tipo_ordine è 'acquisto'
+        if ($request->input('tipo_ordine') === 'acquisto') {
+            $rules['canale'] = 'required|string|in:vendite indirette,vendite dirette,evento';
+        } else {
+            // In tutti gli altri casi, azzera il campo canale
+            $request->merge(['canale' => null]);
+        }
+    
+        // Validazione dei dati
         $validatedData = $request->validate($rules);
     
         // Creazione dell'ordine
@@ -82,6 +90,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
     
     
     

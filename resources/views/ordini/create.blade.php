@@ -30,30 +30,29 @@
                         <input type="text" name="codice" class="form-control" required>
                     </div>
 
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tipo Ordine</label>
+                    <select name="tipo_ordine" id="tipo_ordine" class="form-control" required>
+                        <option value="acquisto">Acquisto</option>
+                        <option value="conto deposito">Conto Deposito</option>
+                        <option value="omaggio">Omaggio</option>
+                        <option value="acquisto autore">Acquisto Autore</option>
+                    </select>
+                </div>
+
+                <div class="row" id="canale_container" style="display:none;">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Canale</label>
-                        <select name="canale" id="canale" class="form-control">
+                        <select id="canale_select" class="form-control">
                             <option value="vendite indirette">Vendite Indirette</option>
                             <option value="vendite dirette">Vendite Dirette</option>
-                            <option value="eventi">Eventi</option>
-                            <option value="acquisto autore">Acquisto Autore</option> {{-- opzionale --}}
-                            <option value="omaggio">Omaggio</option> {{-- opzionale --}}
+                            <option value="evento">Evento</option>
                         </select>
                         <input type="hidden" name="canale" id="canale_hidden">
                     </div>
-
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tipo Ordine</label>
-                        <select name="tipo_ordine" class="form-control" required>
-                            <option value="acquisto">Acquisto</option>
-                            <option value="conto deposito">Conto Deposito</option>
-                            <option value="omaggio" {{ old('tipo_ordine') === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
-                        </select>
-                    </div>
-                </div>
 
                 <!-- Tasti SALVA e ANNULLA -->
                 <div class="d-flex justify-content-between mt-4">
@@ -103,35 +102,28 @@ $(document).ready(function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const tipoOrdine = document.querySelector('select[name="tipo_ordine"]');
-    const canale = document.querySelector('select[name="canale"]');
-    const canaleHidden = document.querySelector('input[name="canale"]');
+    const tipoOrdine = document.getElementById('tipo_ordine');
+    const canaleContainer = document.getElementById('canale_container');
+    const canaleSelect = document.getElementById('canale_select');
+    const canaleHidden = document.getElementById('canale_hidden');
 
     function toggleCanale() {
-        if (tipoOrdine.value === 'omaggio') {
-            canale.setAttribute('disabled', 'disabled');
-            canaleHidden.value = 'omaggio'; // oppure stringa vuota se preferisci
+        if (tipoOrdine.value === 'acquisto') {
+            canaleContainer.style.display = 'block';
+            canaleHidden.value = canaleSelect.value;
         } else {
-            canale.removeAttribute('disabled');
-            canaleHidden.value = canale.value;
+            canaleContainer.style.display = 'none';
+            canaleHidden.value = '';
         }
     }
 
-    // Quando cambia il tipo ordine
     tipoOrdine.addEventListener('change', toggleCanale);
-
-    // Quando cambia il canale (se non disabilitato)
-    canale.addEventListener('change', function () {
-        if (!canale.disabled) {
-            canaleHidden.value = canale.value;
-        }
+    canaleSelect.addEventListener('change', function () {
+        canaleHidden.value = this.value;
     });
 
-    // Esegui subito all'avvio
-    toggleCanale();
+    toggleCanale(); // eseguito all'avvio
 });
-
 </script>
+
 @endpush
-
-

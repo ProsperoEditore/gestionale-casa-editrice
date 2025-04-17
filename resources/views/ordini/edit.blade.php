@@ -36,27 +36,25 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Canale</label>
-                        <select id="canale" class="form-control" {{ $ordine->tipo_ordine === 'omaggio' ? 'disabled' : '' }}>
-                            <option value="vendite indirette" {{ $ordine->canale === 'vendite indirette' ? 'selected' : '' }}>Vendite Indirette</option>
-                            <option value="vendite dirette" {{ $ordine->canale === 'vendite dirette' ? 'selected' : '' }}>Vendite Dirette</option>
-                            <option value="eventi" {{ $ordine->canale === 'eventi' ? 'selected' : '' }}>Eventi</option>
-                            <option value="acquisto autore" {{ $ordine->canale === 'acquisto autore' ? 'selected' : '' }}>Acquisto Autore</option>
-                            <option value="omaggio" {{ $ordine->canale === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
-                        </select>
-                        <input type="hidden" name="canale" id="canale_hidden" value="{{ $ordine->canale }}">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
                         <label class="form-label">Tipo Ordine</label>
                         <select name="tipo_ordine" id="tipo_ordine" class="form-control" required>
                             <option value="acquisto" {{ $ordine->tipo_ordine === 'acquisto' ? 'selected' : '' }}>Acquisto</option>
                             <option value="conto deposito" {{ $ordine->tipo_ordine === 'conto deposito' ? 'selected' : '' }}>Conto Deposito</option>
                             <option value="omaggio" {{ $ordine->tipo_ordine === 'omaggio' ? 'selected' : '' }}>Omaggio</option>
+                            <option value="acquisto autore" {{ $ordine->tipo_ordine === 'acquisto autore' ? 'selected' : '' }}>Acquisto Autore</option>
                         </select>
+                    </div>
+                </div>
 
+                <div class="row" id="canale_container" style="display:none;">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Canale</label>
+                        <select id="canale_select" class="form-control">
+                            <option value="vendite indirette" {{ $ordine->canale === 'vendite indirette' ? 'selected' : '' }}>Vendite Indirette</option>
+                            <option value="vendite dirette" {{ $ordine->canale === 'vendite dirette' ? 'selected' : '' }}>Vendite Dirette</option>
+                            <option value="evento" {{ $ordine->canale === 'evento' ? 'selected' : '' }}>Evento</option>
+                        </select>
+                        <input type="hidden" name="canale" id="canale_hidden" value="{{ $ordine->canale }}">
                     </div>
                 </div>
 
@@ -70,37 +68,31 @@
     </div>
 </div>
 
-
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const tipoOrdine = document.querySelector('#tipo_ordine');
-    const canale = document.querySelector('#canale');
-    const canaleHidden = document.querySelector('#canale_hidden');
+    const tipoOrdine = document.getElementById('tipo_ordine');
+    const canaleContainer = document.getElementById('canale_container');
+    const canaleSelect = document.getElementById('canale_select');
+    const canaleHidden = document.getElementById('canale_hidden');
 
     function toggleCanale() {
-        if (tipoOrdine.value === 'omaggio') {
-            canale.setAttribute('disabled', 'disabled');
-            canaleHidden.value = 'omaggio';
+        if (tipoOrdine.value === 'acquisto') {
+            canaleContainer.style.display = 'block';
+            canaleHidden.value = canaleSelect.value;
         } else {
-            canale.removeAttribute('disabled');
-            canaleHidden.value = canale.value;
+            canaleContainer.style.display = 'none';
+            canaleHidden.value = '';
         }
     }
 
     tipoOrdine.addEventListener('change', toggleCanale);
-
-    canale.addEventListener('change', function () {
-        if (!canale.disabled) {
-            canaleHidden.value = canale.value;
-        }
+    canaleSelect.addEventListener('change', function () {
+        canaleHidden.value = this.value;
     });
 
-    toggleCanale();
+    toggleCanale(); // inizializzazione
 });
 </script>
 @endpush
-
-
-
 @endsection
