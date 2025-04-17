@@ -53,19 +53,20 @@ class OrdineController extends Controller
     {
         $tipo = $request->input('tipo_ordine');
     
-        // Se il tipo è "acquisto", recupera il valore del campo nascosto 'canale'
+        // Se è acquisto, usa il canale selezionato, altrimenti imposta un valore neutro
         if ($tipo === 'acquisto') {
             $request->merge(['canale' => $request->input('canale_hidden')]);
         } else {
-            $request->merge(['canale' => null]);
+            $request->merge(['canale' => 'n/a']); // ← valore fittizio valido per il DB
         }
-    
-        // Regole di validazione
+
+        // Validazione
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
+            'canale' => 'required|string',
         ];
     
         // Aggiungi validazione canale solo se tipo ordine è "acquisto"
