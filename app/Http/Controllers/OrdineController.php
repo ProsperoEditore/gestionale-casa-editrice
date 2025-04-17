@@ -51,30 +51,20 @@ class OrdineController extends Controller
 
     public function store(Request $request)
     {
-
-        // Se è omaggio, imposta comunque un valore per evitare problemi di database
-            if ($request->input('tipo_ordine') === 'omaggio') {
-                $request->merge(['canale' => 'omaggio']);
-            }
-
-        // Definizione regole di validazione di base
+        // ✅ Se è omaggio, imposta il campo 'canale' manualmente prima della validazione
+        if ($request->input('tipo_ordine') === 'omaggio') {
+            $request->merge(['canale' => 'omaggio']);
+        }
+    
+        // Definizione regole di validazione
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
-            'canale' => 'required|string',
+            'canale' => 'required|string', // anche per 'omaggio' ora è presente
         ];
     
-        // Se NON è un omaggio, il campo 'canale' è obbligatorio
-        if ($request->input('tipo_ordine') !== 'omaggio') {
-            $rules['canale'] = 'required|string';
-        } else {
-            // Se è omaggio, imposta comunque un valore per evitare problemi di database
-            $request->merge(['canale' => 'omaggio']);
-        }
-
-        // Validazione
         $validatedData = $request->validate($rules);
     
         // Creazione dell'ordine
@@ -94,6 +84,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
     
     
 
