@@ -4,8 +4,18 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Magazzini</h3>
 
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
         <a href="{{ route('magazzini.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
+
+        <form action="{{ route('magazzini.index') }}" method="GET" class="d-flex flex-wrap gap-2">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per nome...">
+            <select name="categoria" class="form-select">
+                <option value="">Cerca per categoria...</option>
+                <option value="magazzino editore" {{ request('categoria') == 'magazzino editore' ? 'selected' : '' }}>Magazzino Editore</option>
+                <option value="libreria cliente" {{ request('categoria') == 'libreria cliente' ? 'selected' : '' }}>Libreria Cliente</option>
+            </select>
+            <button class="btn btn-outline-primary">Cerca</button>
+        </form>
     </div>
 
     <div class="card">
@@ -53,10 +63,8 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Colora tutte le date esistenti
     document.querySelectorAll('.scadenza-input').forEach(input => {
         colorizeDate(input);
-
         input.addEventListener('change', () => {
             updateScadenza(input.dataset.id, input);
         });
@@ -71,8 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
         scadenzaDate.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
 
-        const diffTime = scadenzaDate - today;
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.round((scadenzaDate - today) / (1000 * 60 * 60 * 24));
 
         input.style.backgroundColor = '';
         input.style.color = '';
@@ -89,8 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let timeout;
 
     function updateScadenza(id, input) {
-        console.log("SALVATAGGIO SCADENZA ID:", id); // 👈 debug visibile in console
-
         clearTimeout(timeout);
         const nuovaScadenza = input.value;
 
@@ -119,7 +124,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
-
-
-
 @endsection

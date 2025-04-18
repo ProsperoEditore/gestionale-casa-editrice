@@ -8,11 +8,24 @@ use App\Models\Anagrafica;
 
 class MagazzinoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $magazzini = Magazzino::with('anagrafica')->get();
+        $magazzini = Magazzino::with('anagrafica')
+            ->when($request->search, function ($query) use ($request) {
+                $query->whereHas('anagrafica', function ($q) use ($request) {
+                    $q->where('nome', 'like', '%' . $request->search . '%');
+                });
+            })
+            ->when($request->categoria, function ($query) use ($request) {
+                $query->whereHas('anagrafica', function ($q) use ($request) {
+                    $q->where('categoria', $request->categoria);
+                });
+            })
+            ->get();
+    
         return view('magazzini.index', compact('magazzini'));
     }
+    
 
     public function create()
     {
