@@ -119,23 +119,29 @@ class LibroController extends Controller
     {
         $term = $request->input('term');
     
-        $libri = Libro::where('titolo', 'LIKE', "%{$term}%")
-                      ->orWhere('isbn', 'LIKE', "%{$term}%")
-                      ->limit(10)
-                      ->get(['id', 'isbn', 'titolo', 'prezzo']);
+        try {
+            $libri = Libro::where('titolo', 'LIKE', "%{$term}%")
+                          ->orWhere('isbn', 'LIKE', "%{$term}%")
+                          ->limit(10)
+                          ->get(['id', 'isbn', 'titolo', 'prezzo']);
     
-        // Formatta la risposta per Select2
-        $formatted_libri = $libri->map(function($libro) {
-            return [
-                'id' => $libro->id,
-                'text' => $libro->titolo,
-                'isbn' => $libro->isbn,
-                'prezzo' => $libro->prezzo,
-            ];
-        });
+            $formatted = $libri->map(function($libro) {
+                return [
+                    'id' => $libro->id,         // richiesto da Select2
+                    'text' => $libro->titolo,   // campo mostrato
+                    'isbn' => $libro->isbn,     // campo per autocompletamento
+                    'prezzo' => $libro->prezzo  // campo usato nel form
+                ];
+            });
     
-        return response()->json($formatted_libri);
+            return response()->json($formatted);
+        } catch (\Exception $e) {
+            // Log per capire l'errore
+            \Log::error('Errore in autocomplete: ' . $e->getMessage());
+            return response()->json(['error' => 'Errore server.'], 500);
+        }
     }
+    
      
 
     public function import(Request $request)
