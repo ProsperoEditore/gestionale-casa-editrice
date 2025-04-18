@@ -316,7 +316,7 @@ class OrdineController extends Controller
         $ordine->libri()->detach();
     
         if ($request->has('titolo') && is_array($request->titolo)) {
-            foreach ($request->titolo as $index => $libro_id) {
+            foreach ($request->libro_id as $index => $libro_id) {
                 if (!empty($libro_id)) {
                     $quantita = $request->quantita[$index] ?? 0;
                     $prezzo = $request->prezzo[$index] ?? 0.00;
@@ -362,7 +362,7 @@ class OrdineController extends Controller
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
                 if ($magazzino) {
-                    foreach ($request->titolo as $index => $libro_id) {
+                    foreach ($request->libro_id as $index => $libro_id) {
                         $libro = \App\Models\Libro::find($libro_id);
     
                         $giacenza = \App\Models\Giacenza::firstOrNew([
@@ -396,7 +396,7 @@ class OrdineController extends Controller
                 'ordine_id' => $ordine->id,
             ]);
     
-            foreach ($request->titolo as $index => $libro_id) {
+            foreach ($request->libro_id as $index => $libro_id) {
                 $libro = \App\Models\Libro::find($libro_id);
     
                 \App\Models\RegistroVenditeDettaglio::create([
