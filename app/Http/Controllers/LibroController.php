@@ -117,13 +117,11 @@ class LibroController extends Controller
 
     public function autocomplete(Request $request)
     {
-        \Log::error('DEBUG: Sono entrato nella funzione autocomplete');
-    
         $term = $request->input('term');
     
         try {
-            $libri = Libro::where('titolo', 'LIKE', "%{$term}%")
-                          ->orWhere('isbn', 'LIKE', "%{$term}%")
+            $libri = Libro::whereRaw("LOWER(titolo) LIKE ?", ['%' . strtolower($term) . '%'])
+                          ->orWhereRaw("LOWER(isbn) LIKE ?", ['%' . strtolower($term) . '%'])
                           ->limit(10)
                           ->get(['id', 'isbn', 'titolo', 'prezzo']);
     
@@ -137,11 +135,13 @@ class LibroController extends Controller
             });
     
             return response()->json($formatted);
+    
         } catch (\Exception $e) {
-            \Log::error('ERRORE AUTOCOMPLETE: ' . $e->getMessage());
+            \Log::error('Errore in autocomplete: ' . $e->getMessage());
             return response()->json(['error' => 'Errore server.'], 500);
         }
     }
+    
     
     
     
