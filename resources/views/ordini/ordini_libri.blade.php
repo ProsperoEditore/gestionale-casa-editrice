@@ -1,3 +1,5 @@
+codice in orini_libri:
+
 @extends('layouts.app')
 
 @section('content')
@@ -47,8 +49,8 @@
         </div>
         @endif
 
-        {{-- Se tipo ordine = Acquisto o Acquisto autore --}}
-        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+        {{-- Se tipo ordine = Acquisto, mostra specifiche e condizioni --}}
+        @if($ordine->tipo_ordine === 'acquisto', 'acquisto autore')
         <div class="mb-3 mt-4">
             <label for="specifiche_iva" class="form-label"><strong>Specifiche IVA</strong></label>
             <input type="text" name="specifiche_iva" maxlength="255" class="form-control" value="{{ old('specifiche_iva', $ordine->specifiche_iva ?? "IVA assolta all'origine dall'editore, ai sensi dell'art.74 co. 1 lett. c del DPR 633/72") }}">
@@ -75,11 +77,14 @@
         </div>
         @endif
 
-        {{-- Tabella elenco libri (con Select2) --}}
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <button type="button" class="btn btn-success" id="addRow">Aggiungi Riga</button>
-            <button type="submit" class="btn btn-primary">Salva</button>
-        </div>
+        <form action="{{ route('ordini.libri.store', $ordine->id) }}" method="POST">
+    @csrf
+
+    {{-- Aggiungi Riga e Salva --}}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button type="button" class="btn btn-success" id="addRow">Aggiungi Riga</button>
+        <button type="submit" class="btn btn-primary">Salva</button>
+    </div>
 
         <h5 class="mt-5">Elenco Libri</h5>
         <table class="table table-bordered">
@@ -97,59 +102,56 @@
                 </tr>
             </thead>
             <tbody id="ordiniBody">
-                {{-- le righe verranno inserite via JS --}}
+                @foreach($ordine->libri as $libro)
+                <tr>
+                    <td><input type="text" name="isbn[]" class="form-control isbn-field" value="{{ $libro->isbn }}" readonly></td>
+                    <td>
+                        <select name="titolo[]" class="form-control titolo-select">
+                            <option value="{{ $libro->id }}" selected>{{ $libro->titolo }}</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}"></td>
+                    <td><input type="text" name="prezzo[]" class="form-control prezzo-field" value="{{ $libro->prezzo }}" readonly></td>
+                    <td><input type="text" name="valore_vendita_lordo[]" class="form-control valore-vendita_lordo" value="{{ $libro->pivot->valore_vendita_lordo }}" readonly></td>
+                    <td><input type="text" name="sconto[]" class="form-control sconto-field" value="{{ $libro->pivot->sconto }}"></td>
+                    <td><input type="text" name="netto_a_pagare[]" class="form-control netto_a_pagare" value="{{ $libro->pivot->netto_a_pagare }}" readonly></td>
+                    <td>
+                        <select name="info_spedizione[]" class="form-control">
+                            <option value="">Seleziona...</option>
+                            <option value="spedito da magazzino editore" {{ $libro->pivot->info_spedizione == 'spedito da magazzino editore' ? 'selected' : '' }}>Spedito da magazzino editore</option>
+                            <option value="spedito da tipografia" {{ $libro->pivot->info_spedizione == 'spedito da tipografia' ? 'selected' : '' }}>Spedito da tipografia</option>
+                            <option value="spedito da magazzino terzo" {{ $libro->pivot->info_spedizione == 'spedito da magazzino terzo' ? 'selected' : '' }}>Spedito da magazzino terzo</option>
+                            <option value="fuori catalogo" {{ $libro->pivot->info_spedizione == 'fuori catalogo' ? 'selected' : '' }}>Fuori catalogo</option>
+                            <option value="momentaneamente non disponibile" {{ $libro->pivot->info_spedizione == 'momentaneamente non disponibile' ? 'selected' : '' }}>Momentaneamente non disponibile</option>
+                        </select>
+                    </td>
+                    <td><button type="button" class="btn btn-danger removeRow">Elimina</button></td>
+                </tr>
+                @endforeach
             </tbody>
         </table>
     </form>
 </div>
 
-@push('scripts')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    function initSelect2(select) {
-        $(select).select2({
-            placeholder: "Cerca titolo...",
-            ajax: {
-                url: '{{ route("libri.autocomplete") }}',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        term: params.term
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(function (item) {
-                            return {
-                                id: item.id,
-                                text: item.text,
-                                isbn: item.id,
-                                prezzo: item.prezzo
-                            };
-                        })
-                    };
-                },
-                cache: true
-            }
-        }).on('select2:select', function (e) {
-            const selected = e.params.data;
-            const row = this.closest('tr');
-            row.querySelector(".isbn-field").value = selected.isbn;
-            row.querySelector(".prezzo-field").value = selected.prezzo;
-        });
-    }
-
-    document.getElementById("addRow").addEventListener("click", function () {
-        const table = document.getElementById("ordiniBody");
-        const row = document.createElement("tr");
+document.addEventListener("DOMContentLoaded", function() {
+    // Aggiunta nuova riga
+    document.getElementById("addRow").addEventListener("click", function() {
+        let table = document.getElementById("ordiniBody");
+        let row = document.createElement("tr");
         row.innerHTML = `
             <td><input type="text" name="isbn[]" class="form-control isbn-field" readonly></td>
-            <td><select name="titolo[]" class="form-control titolo-select"></select></td>
+            <td>
+                <select name="titolo[]" class="form-control titolo-select">
+                    <option value="">Seleziona un libro...</option>
+                    @foreach($libri as $libro)
+                        <option value="{{ $libro->id }}" data-isbn="{{ $libro->isbn }}" data-prezzo="{{ $libro->prezzo }}">
+                            {{ $libro->titolo }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
             <td><input type="number" name="quantita[]" class="form-control quantita-field"></td>
             <td><input type="text" name="prezzo[]" class="form-control prezzo-field" readonly></td>
             <td><input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" readonly></td>
@@ -167,33 +169,40 @@ document.addEventListener("DOMContentLoaded", function () {
             </td>
             <td><button type="button" class="btn btn-danger removeRow">Elimina</button></td>
         `;
-        table.appendChild(row);
-        initSelect2(row.querySelector(".titolo-select"));
+        table.insertBefore(row, table.firstChild);
     });
 
-    document.addEventListener("click", function (event) {
-        if (event.target.classList.contains("removeRow")) {
-            event.target.closest("tr").remove();
-        }
-    });
+    // Calcoli automatici
+    document.addEventListener("input", function(event) {
+        if (event.target.classList.contains("quantita-field") || event.target.classList.contains("sconto-field")) {
+            let row = event.target.closest("tr");
+            let quantita = parseFloat(row.querySelector(".quantita-field").value) || 0;
+            let prezzo = parseFloat(row.querySelector(".prezzo-field").value) || 0;
+            let valoreLordo = quantita * prezzo;
+            row.querySelector(".valore_vendita_lordo").value = valoreLordo.toFixed(2);
 
-    document.addEventListener("input", function (event) {
-        const row = event.target.closest("tr");
-        if (row && (event.target.classList.contains("quantita-field") || event.target.classList.contains("sconto-field"))) {
-            const quantita = parseFloat(row.querySelector(".quantita-field").value) || 0;
-            const prezzo = parseFloat(row.querySelector(".prezzo-field").value) || 0;
-            const lordo = quantita * prezzo;
-            row.querySelector(".valore_vendita_lordo").value = lordo.toFixed(2);
-
-            const sconto = parseFloat(row.querySelector(".sconto-field").value) || 0;
-            const netto = lordo - (lordo * sconto / 100);
+            let sconto = parseFloat(row.querySelector(".sconto-field").value) || 0;
+            let netto = valoreLordo - (valoreLordo * sconto / 100);
             row.querySelector(".netto_a_pagare").value = netto.toFixed(2);
         }
     });
 
-    // Aggiunge una riga iniziale vuota all'avvio
-    document.getElementById("addRow").click();
+    // Autocompletamento ISBN e prezzo
+    document.addEventListener("change", function(event) {
+        if (event.target.classList.contains("titolo-select")) {
+            let selected = event.target.selectedOptions[0];
+            let row = event.target.closest("tr");
+            row.querySelector(".isbn-field").value = selected.dataset.isbn;
+            row.querySelector(".prezzo-field").value = selected.dataset.prezzo;
+        }
+    });
+
+    // Elimina riga
+    document.addEventListener("click", function(event) {
+        if (event.target.classList.contains("removeRow")) {
+            event.target.closest("tr").remove();
+        }
+    });
 });
 </script>
-@endpush
 @endsection
