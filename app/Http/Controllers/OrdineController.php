@@ -394,6 +394,7 @@ class OrdineController extends Controller
                 'periodo' => date('Y'),
                 'origine' => 'ordine',
                 'ordine_id' => $ordine->id,
+                'canale_vendita' => $ordine->canale,
             ]);
     
             foreach ($request->libro_id as $index => $libro_id) {
