@@ -99,17 +99,38 @@
 
         <div class="cliente-info">
             <h4>Dati Cliente</h4>
-            <strong>Nome:</strong> {{ $ordine->anagrafica->nome }}<br>
-            <strong>Categoria:</strong> {{ $ordine->anagrafica->categoria }}<br>
-            <strong>Indirizzo Fatturazione:</strong> {{ $ordine->anagrafica->indirizzo_fatturazione }}<br>
-            <strong>Indirizzo Spedizione:</strong> {{ $ordine->anagrafica->indirizzo_spedizione }}<br>
-            <strong>Partita IVA:</strong> {{ $ordine->anagrafica->partita_iva }}<br>
-            <strong>Codice Fiscale:</strong> {{ $ordine->anagrafica->codice_fiscale }}<br>
-            <strong>Codice Univoco:</strong> {{ $ordine->anagrafica->codice_univoco }}<br>
-            <strong>Email:</strong> {{ $ordine->anagrafica->email }}<br>
-            <strong>PEC:</strong> {{ $ordine->anagrafica->pec }}<br>
-            <strong>Telefono:</strong> {{ $ordine->anagrafica->telefono }}
+            @if(!empty($ordine->anagrafica->nome))
+                <strong>Nome:</strong> {{ $ordine->anagrafica->nome }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->categoria))
+                <strong>Categoria:</strong> {{ $ordine->anagrafica->categoria }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->indirizzo_fatturazione))
+                <strong>Indirizzo Fatturazione:</strong> {{ $ordine->anagrafica->indirizzo_fatturazione }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->indirizzo_spedizione))
+                <strong>Indirizzo Spedizione:</strong> {{ $ordine->anagrafica->indirizzo_spedizione }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->partita_iva))
+                <strong>Partita IVA:</strong> {{ $ordine->anagrafica->partita_iva }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->codice_fiscale))
+                <strong>Codice Fiscale:</strong> {{ $ordine->anagrafica->codice_fiscale }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->codice_univoco))
+                <strong>Codice Univoco:</strong> {{ $ordine->anagrafica->codice_univoco }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->email))
+                <strong>Email:</strong> {{ $ordine->anagrafica->email }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->pec))
+                <strong>PEC:</strong> {{ $ordine->anagrafica->pec }}<br>
+            @endif
+            @if(!empty($ordine->anagrafica->telefono))
+                <strong>Telefono:</strong> {{ $ordine->anagrafica->telefono }}<br>
+            @endif
         </div>
+
     </div>
 
     <h2 style="margin-top: 40px;">Dettagli Ordine #{{ $ordine->codice }}</h2>
