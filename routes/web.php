@@ -66,6 +66,7 @@ Route::resource('libri', LibroController::class);
 Route::post('/libri/import', [LibroController::class, 'import'])->name('libri.import');
 Route::get('/libri/autocomplete', [LibroController::class, 'autocomplete'])->name('libri.autocomplete');
 
+
 // Magazzini
 Route::get('/magazzini', [MagazzinoController::class, 'index'])->name('magazzini.index');
 Route::get('/magazzini/create', [MagazzinoController::class, 'create'])->name('magazzini.create');

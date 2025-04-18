@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Ordine;
+use App\Models\MarchioEditoriale;
+use App\Models\Magazzino;
+use App\Models\Giacenza;
+
 
 class Libro extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'libri';
 
@@ -41,7 +45,7 @@ class Libro extends Model
     
 
 
-    use SoftDeletes;
+
 
     protected static function boot()
     {
