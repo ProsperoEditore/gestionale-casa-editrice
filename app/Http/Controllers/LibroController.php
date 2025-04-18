@@ -127,20 +127,21 @@ class LibroController extends Controller
     
             $formatted = $libri->map(function($libro) {
                 return [
-                    'id' => $libro->id,         // richiesto da Select2
-                    'text' => $libro->titolo,   // campo mostrato
-                    'isbn' => $libro->isbn,     // campo per autocompletamento
-                    'prezzo' => $libro->prezzo  // campo usato nel form
+                    'id' => $libro->id,
+                    'text' => $libro->titolo,
+                    'isbn' => $libro->isbn,
+                    'prezzo' => $libro->prezzo,
                 ];
             });
     
             return response()->json($formatted);
         } catch (\Exception $e) {
-            // Log per capire l'errore
-            \Log::error('Errore in autocomplete: ' . $e->getMessage());
+            \Log::error('❌ Errore in autocomplete: ' . $e->getMessage());
             return response()->json(['error' => 'Errore server.'], 500);
         }
     }
+    
+    
     
      
 
