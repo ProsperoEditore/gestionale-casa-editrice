@@ -301,8 +301,8 @@ class OrdineController extends Controller
 
     public function storeLibri(Request $request, $id)
     {
-        $ordine = Ordine::select('id', 'anagrafica_id', 'data', 'canale', 'codice', 'tipo_ordine')
-    ->findOrFail($id);
+        $ordine = Ordine::select('id', 'anagrafica_id', 'data', 'canale', 'codice', 'tipo_ordine')->findOrFail($id);
+
         $ordine->update([
             'causale' => $request->input('causale'),
             'condizioni_conto_deposito' => $request->input('condizioni_conto_deposito'),
@@ -313,8 +313,9 @@ class OrdineController extends Controller
             'costo_spedizione' => $request->input('costo_spedizione'),
             'altre_specifiche_iva' => $request->input('altre_specifiche_iva'),
         ]);
-    
-        $ordine->libri()->detach();
+        
+        $ordine->refresh(); // ✅ ORA `$ordine->canale` sarà valorizzato correttamente
+        
     
         if ($request->has('titolo') && is_array($request->titolo)) {
             foreach ($request->libro_id as $index => $libro_id) {
