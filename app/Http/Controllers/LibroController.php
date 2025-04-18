@@ -117,15 +117,17 @@ class LibroController extends Controller
 
     public function autocomplete(Request $request)
     {
-        $term = $request->input('term');
+        $term = strtolower($request->input('term'));
     
         try {
-            $libri = Libro::whereRaw("LOWER(titolo) LIKE ?", ['%' . strtolower($term) . '%'])
-                          ->orWhereRaw("LOWER(isbn) LIKE ?", ['%' . strtolower($term) . '%'])
-                          ->limit(10)
-                          ->get(['id', 'isbn', 'titolo', 'prezzo']);
+            $libri = Libro::where(function ($query) use ($term) {
+                    $query->whereRaw("LOWER(titolo) LIKE ?", ['%' . $term . '%'])
+                          ->orWhereRaw("LOWER(isbn) LIKE ?", ['%' . $term . '%']);
+                })
+                ->limit(20)
+                ->get(['id', 'isbn', 'titolo', 'prezzo']);
     
-            $formatted = $libri->map(function($libro) {
+            $formatted = $libri->map(function ($libro) {
                 return [
                     'id' => $libro->id,
                     'text' => $libro->titolo,
@@ -141,6 +143,7 @@ class LibroController extends Controller
             return response()->json(['error' => 'Errore server.'], 500);
         }
     }
+    
     
     
     

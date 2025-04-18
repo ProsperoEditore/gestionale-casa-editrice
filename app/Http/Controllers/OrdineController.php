@@ -240,10 +240,12 @@ class OrdineController extends Controller
 
     public function gestioneLibri($id)
     {
-    $ordine = Ordine::with('libri')->findOrFail($id);
-    $libri = Libro::all();
-    return view('ordini.ordini_libri', compact('ordine', 'libri'));
+        $ordine = Ordine::with('libri')->findOrFail($id);
+        $libri = Libro::with('marchio_editoriale')->select('id', 'titolo', 'isbn', 'prezzo')->get();
+    
+        return view('ordini.ordini_libri', compact('ordine', 'libri'));
     }
+    
 
     public function importLibri(Request $request, $id)
     {
@@ -420,15 +422,24 @@ class OrdineController extends Controller
     
     public function search(Request $request)
     {
-    $query = $request->input('query');
-
-    $libri = Libro::where('titolo', 'LIKE', "%{$query}%")
-                    ->orWhere('isbn', 'LIKE', "%{$query}%")
-                    ->limit(10)
-                    ->get(['id', 'isbn', 'titolo', 'prezzo_copertina']);
-
-    return response()->json($libri);
+        $query = $request->input('term');
+    
+        $libri = Libro::where('titolo', 'LIKE', "%{$query}%")
+            ->orWhere('isbn', 'LIKE', "%{$query}%")
+            ->limit(10)
+            ->get();
+    
+        return response()->json($libri->map(function ($libro) {
+            return [
+                'id' => $libro->id,
+                'label' => $libro->titolo,
+                'value' => $libro->titolo,
+                'isbn' => $libro->isbn,
+                'prezzo' => $libro->prezzo_copertina,
+            ];
+        }));
     }
-
+    
+    
 
 }
