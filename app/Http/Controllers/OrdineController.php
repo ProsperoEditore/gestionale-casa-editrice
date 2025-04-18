@@ -301,7 +301,8 @@ class OrdineController extends Controller
 
     public function storeLibri(Request $request, $id)
     {
-        $ordine = Ordine::findOrFail($id);
+        $ordine = Ordine::select('id', 'anagrafica_id', 'data', 'canale', 'codice', 'tipo_ordine')
+    ->findOrFail($id);
         $ordine->update([
             'causale' => $request->input('causale'),
             'condizioni_conto_deposito' => $request->input('condizioni_conto_deposito'),
