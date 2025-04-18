@@ -127,9 +127,9 @@ class LibroController extends Controller
         // Formatta la risposta per Select2
         $formatted_libri = $libri->map(function($libro) {
             return [
-                'id' => $libro->id, 
+                'id' => $libro->id,
+                'text' => $libro->titolo,
                 'isbn' => $libro->isbn,
-                'libro' => $libro->titolo,
                 'prezzo' => $libro->prezzo,
             ];
         });
