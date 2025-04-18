@@ -117,29 +117,32 @@ class LibroController extends Controller
 
     public function autocomplete(Request $request)
     {
+        \Log::error('DEBUG: Sono entrato nella funzione autocomplete');
+    
         $term = $request->input('term');
     
         try {
-            $libri = \App\Models\Libro::where('titolo', 'LIKE', "%{$term}%")
-                        ->orWhere('isbn', 'LIKE', "%{$term}%")
-                        ->limit(10)
-                        ->get(['id', 'isbn', 'titolo', 'prezzo']);
+            $libri = Libro::where('titolo', 'LIKE', "%{$term}%")
+                          ->orWhere('isbn', 'LIKE', "%{$term}%")
+                          ->limit(10)
+                          ->get(['id', 'isbn', 'titolo', 'prezzo']);
     
-            return response()->json($libri->map(function($libro) {
+            $formatted = $libri->map(function($libro) {
                 return [
                     'id' => $libro->id,
                     'text' => $libro->titolo,
                     'isbn' => $libro->isbn,
                     'prezzo' => $libro->prezzo
                 ];
-            }));
+            });
+    
+            return response()->json($formatted);
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => true,
-                'message' => $e->getMessage(), // MOSTRA ERRORE COMPLETO
-            ], 500);
+            \Log::error('ERRORE AUTOCOMPLETE: ' . $e->getMessage());
+            return response()->json(['error' => 'Errore server.'], 500);
         }
     }
+    
     
     
     
