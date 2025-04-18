@@ -48,7 +48,7 @@
         </div>
 
         <button type="submit" class="btn btn-success">Salva</button>
-        <a href="{{ route('registro-tirature.dettagli.index', $registro->id) }}" class="btn btn-secondary">Annulla</a>
+        <a href="{{ route('registro-tirature.show', $registro->id) }}" class="btn btn-secondary">Annulla</a>
     </form>
 </div>
 
