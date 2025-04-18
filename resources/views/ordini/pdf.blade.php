@@ -73,8 +73,10 @@
     }
 
     .totale-row {
-        font-weight: bold;
-        background-color: #f2
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+</style>
 
 
 </head>
@@ -162,7 +164,7 @@
     </table>
 
     {{-- Totale e metodi di pagamento solo per Acquisto --}}
-    @if($ordine->tipo_ordine === 'acquisto' && $ordine->totale_netto_compilato)
+    @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
     <div style="margin: 30px 0; text-align: center;">
         <p style="font-size: 16px; font-weight: bold; margin: 10px 0;">
             Totale a pagare: {{ number_format($ordine->totale_netto_compilato, 2) }} €
