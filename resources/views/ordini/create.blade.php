@@ -43,14 +43,14 @@
                 <div class="row" id="canale_container" style="display:none;">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Canale</label>
-                        <select id="canale_select" class="form-control">
+                        <select name="canale" id="canale" class="form-control">
                             <option value="vendite indirette">Vendite Indirette</option>
                             <option value="vendite dirette">Vendite Dirette</option>
                             <option value="evento">Evento</option>
                         </select>
-                        <input type="hidden" name="canale" id="canale_hidden">
                     </div>
                 </div>
+
             </div>
 
 
@@ -104,26 +104,19 @@ $(document).ready(function () {
 document.addEventListener('DOMContentLoaded', function () {
     const tipoOrdine = document.getElementById('tipo_ordine');
     const canaleContainer = document.getElementById('canale_container');
-    const canaleSelect = document.getElementById('canale_select');
-    const canaleHidden = document.getElementById('canale_hidden');
 
     function toggleCanale() {
         if (tipoOrdine.value === 'acquisto') {
             canaleContainer.style.display = 'block';
-            canaleHidden.value = canaleSelect.value;
         } else {
             canaleContainer.style.display = 'none';
-            canaleHidden.value = '';
         }
     }
 
     tipoOrdine.addEventListener('change', toggleCanale);
-    canaleSelect.addEventListener('change', function () {
-        canaleHidden.value = this.value;
-    });
-
     toggleCanale(); // eseguito all'avvio
 });
 </script>
+
 
 @endpush

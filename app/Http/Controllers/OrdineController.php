@@ -52,7 +52,6 @@ class OrdineController extends Controller
     public function store(Request $request)
     {
         $tipo = $request->input('tipo_ordine');
-        $canale = $request->filled('canale_hidden') ? $request->input('canale_hidden') : 'n/a';
     
         $rules = [
             'codice' => 'required|string|unique:ordines,codice',
@@ -66,7 +65,11 @@ class OrdineController extends Controller
         }
     
         $validatedData = $request->validate($rules);
-        $validatedData['canale'] = $canale; // ← Ora sarà SEMPRE valorizzato
+    
+        // ✅ Se non è acquisto, metti un valore valido placeholder per evitare errori di constraint
+        if ($tipo !== 'acquisto') {
+            $validatedData['canale'] = 'evento';
+        }
     
         $ordine = Ordine::create($validatedData);
     
@@ -83,6 +86,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.index')->with('success', 'Ordine aggiunto con successo.');
     }
+    
     
     
     
