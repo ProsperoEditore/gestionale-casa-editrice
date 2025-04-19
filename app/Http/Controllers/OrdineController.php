@@ -395,7 +395,6 @@ class OrdineController extends Controller
                 'anagrafica_id' => $ordine->anagrafica_id,
             ]);
             
-            $registro->origine = 'ordine';
             $registro->ordine_id = $ordine->id;
             $registro->canale_vendita = $ordine->canale;
             $registro->save();
