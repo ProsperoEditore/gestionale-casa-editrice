@@ -370,11 +370,10 @@ class OrdineController extends Controller
     
         // 🔄 Registro righe attuali dell'ordine prima della modifica
         $righePrecedenti = \App\Models\RegistroVenditeDettaglio::where('ordine_id', $ordine->id)->get()->keyBy('isbn');
-        $righePresenti = [];
+        $righeAttuali = [];
     
         if ($request->has('libro_id') && is_array($request->libro_id)) {
-            // ✅ Rimuove i libri esistenti prima di reinserirli
-            $ordine->libri()->detach();
+            $libriSync = [];
     
             foreach ($request->libro_id as $index => $libro_id) {
                 if (!empty($libro_id)) {
@@ -385,14 +384,14 @@ class OrdineController extends Controller
                     $netto = $request->netto_a_pagare[$index] ?? 0.00;
                     $info = $request->info_spedizione[$index] ?? null;
     
-                    $ordine->libri()->attach($libro_id, [
+                    $libriSync[$libro_id] = [
                         'quantita' => $quantita,
                         'prezzo_copertina' => $prezzo,
                         'valore_vendita_lordo' => $valore_lordo,
                         'sconto' => $sconto,
                         'netto_a_pagare' => $netto,
                         'info_spedizione' => $info,
-                    ]);
+                    ];
     
                     // 🔄 SOTTRAZIONE da magazzino editore solo se specificato
                     $info_normalized = strtolower(trim($info));
@@ -416,6 +415,8 @@ class OrdineController extends Controller
                     }
                 }
             }
+    
+            $ordine->libri()->sync($libriSync);
     
             if ($ordine->tipo_ordine === 'conto deposito') {
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
@@ -474,8 +475,6 @@ class OrdineController extends Controller
     
             $registro->save();
     
-            $righeAttuali = [];
-    
             foreach ($request->libro_id as $index => $libro_id) {
                 $libro = \App\Models\Libro::find($libro_id);
                 $isbn = $libro->isbn;
@@ -501,7 +500,6 @@ class OrdineController extends Controller
                 );
             }
     
-            // Elimina le righe che non sono più presenti
             foreach ($righePrecedenti as $isbn => $riga) {
                 if (!isset($righeAttuali[$isbn])) {
                     $riga->delete();
@@ -511,6 +509,7 @@ class OrdineController extends Controller
     
         return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri salvati con successo.');
     }
+    
 
     
     
