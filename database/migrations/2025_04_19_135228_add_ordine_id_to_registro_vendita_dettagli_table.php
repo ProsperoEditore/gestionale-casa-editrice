@@ -1,24 +1,30 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        Schema::table('registro_vendita_dettagli', function (Blueprint $table) {
-            $table->unsignedBigInteger('ordine_id')->nullable()->after('registro_vendita_id');
+        // Rimuove il vecchio vincolo (se esiste)
+        DB::statement("ALTER TABLE ordines DROP CONSTRAINT IF EXISTS ordines_canale_check");
 
-            $table->foreign('ordine_id')->references('id')->on('ordines')->onDelete('cascade');
-        });
+        // Aggiunge il nuovo vincolo corretto
+        DB::statement("
+            ALTER TABLE ordines 
+            ADD CONSTRAINT ordines_canale_check 
+            CHECK (canale IN (
+                'vendite dirette', 
+                'vendite indirette', 
+                'evento'
+            ))
+        ");
     }
 
     public function down(): void
     {
-        Schema::table('registro_vendita_dettagli', function (Blueprint $table) {
-            $table->dropForeign(['ordine_id']);
-            $table->dropColumn('ordine_id');
-        });
+        // Rimuove il vincolo in caso di rollback
+        DB::statement("ALTER TABLE ordines DROP CONSTRAINT IF EXISTS ordines_canale_check");
     }
 };
