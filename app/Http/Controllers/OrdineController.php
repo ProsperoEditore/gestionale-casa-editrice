@@ -391,13 +391,17 @@ class OrdineController extends Controller
     
         // ✅ Se è "acquisto", crea automaticamente un registro vendite
         if ($ordine->tipo_ordine === 'acquisto' && !in_array($ordine->canale, ['omaggio', 'acquisto autore'])) {
-            $registro = \App\Models\RegistroVendite::create([
+            $registro = \App\Models\RegistroVendite::firstOrNew([
                 'anagrafica_id' => $ordine->anagrafica_id,
                 'periodo' => date('Y'),
-                'origine' => 'ordine',
-                'ordine_id' => $ordine->id,
-                'canale_vendita' => $ordine->canale,
             ]);
+            
+            $registro->origine = 'ordine';
+            $registro->ordine_id = $ordine->id;
+            $registro->canale_vendita = $ordine->canale;
+            $registro->save();
+            
+            
     
             foreach ($request->libro_id as $index => $libro_id) {
                 $libro = \App\Models\Libro::find($libro_id);
