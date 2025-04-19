@@ -44,11 +44,13 @@
                                        onchange="updateScadenza({{ $magazzino->id }}, this)">
                             </td>
                             <td>
-                                <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">Elimina</button>
-                                </form>
+                                @if(auth()->user()->ruolo !== 'utente')
+                                    <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">Elimina</button>
+                                    </form>
+                                @endif
                             </td>
                             <td>
                                 <a href="{{ route('giacenze.create', ['magazzino' => $magazzino->id]) }}" class="btn btn-secondary btn-sm">Vedi Giacenze</a>
