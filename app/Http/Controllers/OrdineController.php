@@ -406,6 +406,7 @@ class OrdineController extends Controller
     
                 \App\Models\RegistroVenditeDettaglio::create([
                     'registro_vendita_id' => $registro->id,
+                    'ordine_id' => $ordine->id, 
                     'data' => $ordine->data,
                     'periodo' => date('Y'),
                     'isbn' => $libro->isbn,
