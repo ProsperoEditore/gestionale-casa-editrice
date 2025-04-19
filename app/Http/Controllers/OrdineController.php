@@ -216,7 +216,21 @@ class OrdineController extends Controller
             ]);
     
             $registro->ordine_id = $ordine->id;
-            $registro->canale_vendita = ucwords($ordine->canale);
+            switch ($ordine->canale) {
+                case 'vendite indirette':
+                    $registro->canale_vendita = 'Vendite indirette';
+                    break;
+                case 'vendite dirette':
+                    $registro->canale_vendita = 'Vendite dirette';
+                    break;
+                case 'evento':
+                    $registro->canale_vendita = 'Evento';
+                    break;
+                default:
+                    $registro->canale_vendita = 'Altro';
+                    break;
+            }
+            
             $registro->save();
     
             foreach ($ordine->libri as $libro) {
@@ -430,7 +444,23 @@ class OrdineController extends Controller
             ]);
     
             $registro->ordine_id = $ordine->id;
-            $registro->canale_vendita = ucwords($ordine->canale);
+
+            // Normalizza il canale_vendita per rispettare il CHECK del database
+            switch (strtolower(trim($ordine->canale))) {
+                case 'vendite indirette':
+                    $registro->canale_vendita = 'Vendite indirette';
+                    break;
+                case 'vendite dirette':
+                    $registro->canale_vendita = 'Vendite dirette';
+                    break;
+                case 'evento':
+                    $registro->canale_vendita = 'Evento';
+                    break;
+                default:
+                    $registro->canale_vendita = 'Altro';
+                    break;
+            }            
+            
             $registro->save();
     
             foreach ($request->libro_id as $index => $libro_id) {
