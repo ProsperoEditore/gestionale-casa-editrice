@@ -13,13 +13,9 @@
         </div>
 
         <div class="mb-3">
-            <label for="titolo_id" class="form-label">Titolo e testata</label>
-            <select name="titolo_id" id="titolo_id" class="form-control" required>
-                <option value="">-- Seleziona un titolo --</option>
-                @foreach($libri as $libro)
-                    <option value="{{ $libro->id }}" data-prezzo="{{ $libro->prezzo }}">{{ $libro->titolo }}</option>
-                @endforeach
-            </select>
+            <label for="titolo_autocomplete" class="form-label">Titolo e testata</label>
+            <input type="text" id="titolo_autocomplete" class="form-control" placeholder="Digita il titolo..." required>
+            <input type="hidden" name="titolo_id" id="titolo_id">
         </div>
 
         <div class="mb-3">
@@ -52,8 +48,13 @@
     </form>
 </div>
 
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css">
+
 <script>
-    const titoloSelect = document.getElementById('titolo_id');
+    const libri = @json($libri);
     const prezzoVenditaInput = document.getElementById('prezzo_vendita_iva');
     const copieStampateInput = document.getElementById('copie_stampate');
     const imponibileRelativoInput = document.getElementById('imponibile_relativo');
@@ -77,11 +78,16 @@
         iva4Input.value = formattaValore(iva);
     }
 
-    titoloSelect.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const prezzo = selectedOption.getAttribute('data-prezzo');
-        if (prezzo) {
-            prezzoVenditaInput.value = formattaValore(parseFloat(prezzo));
+    $('#titolo_autocomplete').autocomplete({
+        source: libri.map(libro => ({
+            label: libro.titolo,
+            value: libro.titolo,
+            id: libro.id,
+            prezzo: libro.prezzo
+        })),
+        select: function (event, ui) {
+            $('#titolo_id').val(ui.item.id);
+            $('#prezzo_vendita_iva').val(formattaValore(parseFloat(ui.item.prezzo)));
             calcola();
         }
     });
