@@ -144,7 +144,8 @@ class OrdineController extends Controller
             $ordine->libri()->sync($libriSync);
         }
     
-        // Ricarica i libri con pivot aggiornata
+        $ordine->refresh();
+    
         $ordine->load(['libri' => function ($query) {
             $query->withPivot(['quantita', 'sconto', 'info_spedizione']);
         }]);
@@ -159,7 +160,6 @@ class OrdineController extends Controller
                 continue;
             }
     
-            // ✅ Se l'ordine è "conto deposito", aggiorna la giacenza nel magazzino del cliente
             if ($ordine->tipo_ordine === 'conto deposito') {
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
@@ -181,7 +181,6 @@ class OrdineController extends Controller
                 }
             }
     
-            // ✅ Indipendentemente dal tipo ordine, aggiorna magazzino editore se necessario
             $info = strtolower(trim($libro->pivot->info_spedizione ?? ''));
     
             if ($info === 'spedito da magazzino editore' && $quantitaNuova > $quantitaPrecedente) {
@@ -202,6 +201,36 @@ class OrdineController extends Controller
                         $giacenzaEditore->save();
                     }
                 }
+            }
+        }
+    
+        // ✅ Registro vendite (solo se "acquisto" e non "acquisto autore")
+        if ($ordine->tipo_ordine === 'acquisto' && $ordine->canale !== 'acquisto autore') {
+            $registro = \App\Models\RegistroVendite::firstOrNew([
+                'anagrafica_id' => $ordine->anagrafica_id,
+                'periodo' => date('Y'),
+            ]);
+    
+            $registro->ordine_id = $ordine->id;
+            $registro->canale_vendita = $ordine->canale;
+            $registro->save();
+    
+            foreach ($ordine->libri as $libro) {
+                \App\Models\RegistroVenditeDettaglio::updateOrCreate(
+                    [
+                        'registro_vendita_id' => $registro->id,
+                        'ordine_id' => $ordine->id,
+                        'isbn' => $libro->isbn,
+                    ],
+                    [
+                        'data' => $ordine->data,
+                        'periodo' => date('Y'),
+                        'titolo' => $libro->titolo,
+                        'quantita' => $libro->pivot->quantita,
+                        'prezzo' => $libro->prezzo,
+                        'valore_lordo' => $libro->pivot->valore_vendita_lordo ?? ($libro->prezzo * $libro->pivot->quantita),
+                    ]
+                );
             }
         }
     
@@ -302,7 +331,7 @@ class OrdineController extends Controller
     public function storeLibri(Request $request, $id)
     {
         $ordine = Ordine::select('id', 'anagrafica_id', 'data', 'canale', 'codice', 'tipo_ordine')->findOrFail($id);
-
+    
         $ordine->update([
             'causale' => $request->input('causale'),
             'condizioni_conto_deposito' => $request->input('condizioni_conto_deposito'),
@@ -313,9 +342,8 @@ class OrdineController extends Controller
             'costo_spedizione' => $request->input('costo_spedizione'),
             'altre_specifiche_iva' => $request->input('altre_specifiche_iva'),
         ]);
-        
-        $ordine->refresh(); // ✅ ORA `$ordine->canale` sarà valorizzato correttamente
-        
+    
+        $ordine->refresh(); // Assicura che l'oggetto sia aggiornato
     
         if ($request->has('titolo') && is_array($request->titolo)) {
             foreach ($request->libro_id as $index => $libro_id) {
@@ -336,7 +364,7 @@ class OrdineController extends Controller
                         'info_spedizione' => $info,
                     ]);
     
-                    // ✅ Aggiorna magazzino editore se richiesto
+                    // 🔄 SOTTRAZIONE da magazzino editore solo se specificato
                     $info_normalized = strtolower(trim($info));
                     if ($info_normalized === 'spedito da magazzino editore') {
                         $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
@@ -359,22 +387,21 @@ class OrdineController extends Controller
                 }
             }
     
-            // ✅ Se è "conto deposito", aggiorna il magazzino cliente
+            // ➕ Se è "conto deposito", aggiorna il magazzino del cliente
             if ($ordine->tipo_ordine === 'conto deposito') {
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
     
                 if ($magazzino) {
                     foreach ($request->libro_id as $index => $libro_id) {
                         $libro = \App\Models\Libro::find($libro_id);
+                        $quantita = $request->quantita[$index] ?? 0;
     
                         $giacenza = \App\Models\Giacenza::firstOrNew([
                             'libro_id' => $libro_id,
                             'magazzino_id' => $magazzino->id,
                         ]);
     
-                        $quantita_ordine = $request->quantita[$index] ?? 0;
-                        $giacenza->quantita = ($giacenza->quantita ?? 0) + $quantita_ordine;
-    
+                        $giacenza->quantita = ($giacenza->quantita ?? 0) + $quantita;
                         $giacenza->titolo = $libro->titolo;
                         $giacenza->sconto = $request->sconto[$index] ?? 0;
                         $giacenza->isbn = $libro->isbn;
@@ -382,36 +409,39 @@ class OrdineController extends Controller
                         $giacenza->costo_produzione = $libro->costo_produzione;
                         $giacenza->data_ultimo_aggiornamento = now();
                         $giacenza->note = 'Aggiornato da ordine ' . $ordine->codice;
-    
                         $giacenza->save();
                     }
                 }
             }
         }
     
-        // ✅ Se è "acquisto", crea automaticamente un registro vendite
-        if ($ordine->tipo_ordine === 'acquisto' && !in_array($ordine->canale, ['omaggio', 'acquisto autore'])) {
+        // 🧾 CREA registro vendite SOLO per acquisti validi
+        if (
+            $ordine->tipo_ordine === 'acquisto' &&
+            !in_array($ordine->canale, ['omaggio', 'acquisto autore'])
+        ) {
             $registro = \App\Models\RegistroVendite::firstOrNew([
                 'anagrafica_id' => $ordine->anagrafica_id,
+                'periodo' => date('Y'),
             ]);
-            
+    
             $registro->ordine_id = $ordine->id;
             $registro->canale_vendita = $ordine->canale;
             $registro->save();
-            
-            
     
             foreach ($request->libro_id as $index => $libro_id) {
                 $libro = \App\Models\Libro::find($libro_id);
+                $quantita = $request->quantita[$index] ?? 0;
+                $valore_lordo = $request->valore_vendita_lordo[$index] ?? 0.00;
     
                 \App\Models\RegistroVenditeDettaglio::create([
                     'registro_vendita_id' => $registro->id,
-                    'ordine_id' => $ordine->id, 
+                    'ordine_id' => $ordine->id,
                     'data' => $ordine->data,
                     'periodo' => date('Y'),
                     'isbn' => $libro->isbn,
                     'titolo' => $libro->titolo,
-                    'quantita' => $request->quantita[$index],
+                    'quantita' => $quantita,
                     'prezzo' => $libro->prezzo,
                     'valore_lordo' => $valore_lordo,
                 ]);
