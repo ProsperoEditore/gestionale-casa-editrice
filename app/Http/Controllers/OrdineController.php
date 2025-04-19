@@ -211,9 +211,12 @@ class OrdineController extends Controller
         // ✅ Registro vendite (solo se "acquisto" e non "acquisto autore")
         if ($ordine->tipo_ordine === 'acquisto' && $ordine->canale !== 'acquisto autore') {
             $registro = \App\Models\RegistroVendite::firstOrNew([
+                'ordine_id' => $ordine->id,
+            ], [
                 'anagrafica_id' => $ordine->anagrafica_id,
                 'periodo' => date('Y'),
             ]);
+            
     
             $registro->ordine_id = $ordine->id;
             switch ($ordine->canale) {
@@ -439,9 +442,12 @@ class OrdineController extends Controller
             !in_array($ordine->canale, ['omaggio', 'acquisto autore'])
         ) {
             $registro = \App\Models\RegistroVendite::firstOrNew([
+                'ordine_id' => $ordine->id,
+            ], [
                 'anagrafica_id' => $ordine->anagrafica_id,
                 'periodo' => date('Y'),
             ]);
+            
     
             $registro->ordine_id = $ordine->id;
 
