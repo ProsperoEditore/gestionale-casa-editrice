@@ -393,7 +393,6 @@ class OrdineController extends Controller
         if ($ordine->tipo_ordine === 'acquisto' && !in_array($ordine->canale, ['omaggio', 'acquisto autore'])) {
             $registro = \App\Models\RegistroVendite::firstOrNew([
                 'anagrafica_id' => $ordine->anagrafica_id,
-                'periodo' => date('Y'),
             ]);
             
             $registro->origine = 'ordine';
