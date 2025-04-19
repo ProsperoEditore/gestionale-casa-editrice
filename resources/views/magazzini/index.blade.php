@@ -27,7 +27,9 @@
                         <th>Nome</th>
                         <th>Email</th>
                         <th>Prossima Scadenza</th>
-                        <th>Azioni</th>
+                        @if(auth()->user()->ruolo !== 'utente')
+                            <th>Azioni</th>
+                        @endif
                         <th>Giacenze</th>
                     </tr>
                 </thead>
@@ -43,15 +45,16 @@
                                        value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
                                        onchange="updateScadenza({{ $magazzino->id }}, this)">
                             </td>
-                            <td>
-                                @if(auth()->user()->ruolo !== 'utente')
+                            @if(auth()->user()->ruolo !== 'utente')
+                                <td>
                                     <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">Elimina</button>
                                     </form>
-                                @endif
-                            </td>
+                                </td>
+                            @endif
+
                             <td>
                                 <a href="{{ route('giacenze.create', ['magazzino' => $magazzino->id]) }}" class="btn btn-secondary btn-sm">Vedi Giacenze</a>
                             </td>
