@@ -216,7 +216,7 @@ class OrdineController extends Controller
             ]);
     
             $registro->ordine_id = $ordine->id;
-            $registro->canale_vendita = $ordine->canale;
+            $registro->canale_vendita = ucwords($ordine->canale);
             $registro->save();
     
             foreach ($ordine->libri as $libro) {
@@ -430,7 +430,7 @@ class OrdineController extends Controller
             ]);
     
             $registro->ordine_id = $ordine->id;
-            $registro->canale_vendita = $ordine->canale;
+            $registro->canale_vendita = ucwords($ordine->canale);
             $registro->save();
     
             foreach ($request->libro_id as $index => $libro_id) {
