@@ -30,10 +30,20 @@ class GiacenzaController extends Controller
     
         // Carica i risultati filtrati
         $giacenze = $query
-            ->join('libri', 'giacenze.libro_id', '=', 'libri.id')
-            ->orderBy('libri.titolo')
-            ->select('giacenze.*')
-            ->paginate(200);
+        ->join('libri', 'giacenze.libro_id', '=', 'libri.id')
+        ->leftJoin('marchi_editoriali', 'libri.marchio_editoriale_id', '=', 'marchi_editoriali.id')
+        ->orderByRaw("
+            CASE marchi_editoriali.nome
+                WHEN 'Prospero Editore' THEN 1
+                WHEN 'Calibano Editore' THEN 2
+                WHEN 'Miranda Editrice' THEN 3
+                ELSE 4
+            END
+        ")
+        ->orderBy('libri.titolo')
+        ->select('giacenze.*')
+        ->paginate(200);
+    
 
     
         // Carica le informazioni per il magazzino
