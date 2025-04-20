@@ -20,7 +20,7 @@ class ReportController extends Controller
             $query->where('libri.titolo', 'like', '%' . $searchTerm . '%');
         }
     
-        $items = $query->latest()->paginate(100);
+        $items = $query->latest()->paginate(100)->appends($request->query());
         return view('report.index', compact('items'));
     }
     

@@ -26,7 +26,7 @@ class MagazzinoController extends Controller
             });
         }
     
-        $magazzini = $query->get();
+        $magazzini = $query->paginate(15);
     
         return view('magazzini.index', compact('magazzini'));
     }

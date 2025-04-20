@@ -5,6 +5,12 @@
   <h3>Registro Vendite</h3>
   <a class="btn btn-success mb-2" href="{{ route('registro-vendite.create') }}">Aggiungi Nuovo</a>
 
+  <form action="{{ route('registro-vendite.index') }}" method="GET" class="d-flex mb-3" style="max-width: 300px;">
+    <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per anagrafica...">
+    <button class="btn btn-outline-primary">Cerca</button>
+</form>
+
+
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -30,5 +36,10 @@
       @endforeach
     </tbody>
   </table>
+
+  <div class="d-flex justify-content-center mt-4">
+    {{ $items->onEachSide(1)->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
+
 </div>
 @endsection

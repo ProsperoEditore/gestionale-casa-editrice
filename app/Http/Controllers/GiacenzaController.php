@@ -29,7 +29,12 @@ class GiacenzaController extends Controller
         }
     
         // Carica i risultati filtrati
-        $giacenze = $query->paginate(200); 
+        $giacenze = $query
+            ->join('libri', 'giacenzas.libro_id', '=', 'libri.id')
+            ->orderBy('libri.titolo')
+            ->select('giacenzas.*')
+            ->paginate(200);
+
     
         // Carica le informazioni per il magazzino
         $magazzino = Magazzino::findOrFail($magazzino_id);

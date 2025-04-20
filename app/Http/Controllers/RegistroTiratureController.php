@@ -11,7 +11,7 @@ class RegistroTiratureController extends Controller
 {
     public function index()
     {
-        $registros = RegistroTirature::all();
+        $registros = RegistroTirature::latest()->paginate(50);
         return view('registro-tirature.index', compact('registros'));
     }
 

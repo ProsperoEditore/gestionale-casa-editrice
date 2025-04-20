@@ -35,5 +35,10 @@
             @endforeach
         </tbody>
     </table>
+<div class="d-flex justify-content-center mt-4">
+{{ $registros->onEachSide(1)->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
+
+
 </div>
 @endsection

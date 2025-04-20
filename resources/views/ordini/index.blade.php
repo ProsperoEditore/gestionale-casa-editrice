@@ -52,7 +52,7 @@
         </tbody>
     </table>
     <div class="d-flex justify-content-center mt-4">
-    {{ $ordini->onEachSide(1)->links('pagination::bootstrap-5') }}
+    {{ $ordini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
 </div>
 </div>
 @endsection

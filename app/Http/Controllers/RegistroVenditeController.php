@@ -14,11 +14,21 @@ use Illuminate\Pagination\Paginator;
 
 class RegistroVenditeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $items = RegistroVendite::with('anagrafica')->get();
+        $query = RegistroVendite::with('anagrafica');
+    
+        if ($request->filled('search')) {
+            $query->whereHas('anagrafica', function ($q) use ($request) {
+                $q->where('nome', 'like', '%' . $request->search . '%');
+            });
+        }
+    
+        $items = $query->orderBy('created_at', 'desc')->paginate(100)->appends($request->query());
+    
         return view('registro-vendite.index', compact('items'));
     }
+    
 
     public function create()
     {

@@ -62,8 +62,9 @@
     </table>
 
     <div class="d-flex justify-content-center mt-3">
-    {{ $giacenze->onEachSide(1)->links('pagination::bootstrap-5') }}
-</div>
+    {{ $giacenze->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
+    </div>
+
 
     </div>
 </div>
