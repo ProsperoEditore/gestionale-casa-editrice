@@ -31,9 +31,9 @@ class GiacenzaController extends Controller
         // Carica i risultati filtrati
         $giacenze = $query
         ->join('libri', 'giacenze.libro_id', '=', 'libri.id')
-        ->leftJoin('marchi_editoriali', 'libri.marchio_editoriale_id', '=', 'marchi_editoriali.id')
+        ->leftJoin('marchio_editoriales', 'libri.marchio_editoriale_id', '=', 'marchio_editoriales.id')
         ->orderByRaw("
-            CASE marchi_editoriali.nome
+            CASE marchio_editoriales.nome
                 WHEN 'Prospero Editore' THEN 1
                 WHEN 'Calibano Editore' THEN 2
                 WHEN 'Miranda Editrice' THEN 3
