@@ -16,6 +16,7 @@ use App\Http\Controllers\RegistroVenditeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportDettaglioController;
 use App\Http\Controllers\ScaricoController;
+use App\Http\Controllers\BackupController;
 
 Route::middleware('auth')->group(function () {
 
@@ -147,6 +148,10 @@ Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStat
 
 
 Route::resource('utenti', UserController::class)->except(['show', 'edit', 'update']);
+
+Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+Route::get('/backup/sql', [BackupController::class, 'downloadSql'])->name('backup.sql');
+Route::get('/backup/excel', [BackupController::class, 'downloadExcel'])->name('backup.excel');
 
 });
 

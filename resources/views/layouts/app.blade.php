@@ -101,6 +101,10 @@
                 @if (auth()->user()->access_report)
                     <li><a href="{{ route('report.index') }}">Report</a></li>
                 @endif
+                @if (auth()->user()->ruolo === 'admin')
+                    <li><a href="{{ route('backup.index') }}">Backup database</a></li>
+                @endif
+
 
             @endauth
         </ul>
@@ -162,6 +166,10 @@
                 @if (auth()->user()->access_report)
                     <li><a href="{{ route('report.index') }}">Report</a></li>
                 @endif
+                @if (auth()->user()->ruolo === 'admin')
+                    <li><a href="{{ route('backup.index') }}">Backup database</a></li>
+                @endif
+
 
             @endauth
             </ul>
