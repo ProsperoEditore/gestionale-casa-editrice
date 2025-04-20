@@ -75,24 +75,28 @@ class ReportController extends Controller
         $search = $request->input('query');
     
         $libri = Libro::where(function($query) use ($search) {
-            $query->where('titolo', 'like', "%{$search}%")
-                  ->orWhere('isbn', 'like', "%{$search}%");
-            })
-            ->select('id', 'titolo', 'isbn', 'prezzo')
-            ->limit(10)
-            ->get();
-        
+            $query->where('titolo', 'like', '%' . $search . '%')
+                  ->orWhere('isbn', 'like', '%' . $search . '%');
+        })
+        ->orderByRaw("CASE 
+            WHEN titolo LIKE ? THEN 0 
+            WHEN titolo LIKE ? THEN 1 
+            ELSE 2 END", ["{$search}%", "%{$search}%"])
+        ->orderBy('titolo')
+        ->select('id', 'titolo', 'isbn', 'prezzo')
+        ->take(50)
+        ->get();
     
-            return response()->json($libri->map(function ($libro) {
-                return [
-                    'id' => $libro->id,
-                    'titolo' => $libro->titolo,
-                    'isbn' => $libro->isbn,
-                    'prezzo' => $libro->prezzo,
-                ];
-            }));
-            
+        return response()->json($libri->map(function ($libro) {
+            return [
+                'id' => $libro->id,
+                'titolo' => $libro->titolo,
+                'isbn' => $libro->isbn,
+                'prezzo' => $libro->prezzo,
+            ];
+        }));
     }
+    
         
 
 }
