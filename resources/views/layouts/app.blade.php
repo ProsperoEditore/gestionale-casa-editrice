@@ -66,11 +66,7 @@
         <h2 class="fs-5 fw-bold text-center">Menu Gestionale</h2>
         <ul class="list-unstyled mt-3">
 
-            @auth
-                @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('utenti.index') }}">Gestione utenti</a></li>
-                @endif
-            
+            @auth         
                 @if (auth()->user()->access_anagrafiche)
                     <li><a href="{{ route('anagrafiche.index') }}">Anagrafiche</a></li>
                 @endif
@@ -100,6 +96,9 @@
                 @endif
                 @if (auth()->user()->access_report)
                     <li><a href="{{ route('report.index') }}">Report</a></li>
+                @endif
+                @if (auth()->user()->ruolo === 'admin')
+                    <li><a href="{{ route('utenti.index') }}">Gestione utenti</a></li>
                 @endif
                 @if (auth()->user()->ruolo === 'admin')
                     <li><a href="{{ route('backup.index') }}">Backup database</a></li>
@@ -131,11 +130,7 @@
             </a>
         </div>
             <ul class="list-unstyled">
-            @auth
-                @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('utenti.index') }}">Gestione Utenti</a></li>
-                @endif
-            
+            @auth         
                 @if (auth()->user()->access_anagrafiche)
                     <li><a href="{{ route('anagrafiche.index') }}">Anagrafiche</a></li>
                 @endif
@@ -165,6 +160,9 @@
                 @endif
                 @if (auth()->user()->access_report)
                     <li><a href="{{ route('report.index') }}">Report</a></li>
+                @endif
+                @if (auth()->user()->ruolo === 'admin')
+                    <li><a href="{{ route('utenti.index') }}">Gestione Utenti</a></li>
                 @endif
                 @if (auth()->user()->ruolo === 'admin')
                     <li><a href="{{ route('backup.index') }}">Backup database</a></li>
