@@ -75,15 +75,18 @@ class ReportController extends Controller
         $search = $request->input('query');
     
         $libri = Libro::where('titolo', 'like', "%{$search}%")
-            ->select('id', 'titolo')
+            ->select('id', 'titolo', 'isbn')
             ->limit(10)
             ->get();
     
-        return response()->json($libri);
+        return response()->json($libri->map(function ($libro) {
+            return [
+                'id' => $libro->id,
+                'titolo' => $libro->titolo,
+                'isbn' => $libro->isbn,
+            ];
+        }));
     }
-    
-    
-    
-    
+        
 
 }

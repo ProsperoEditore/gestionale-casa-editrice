@@ -44,7 +44,7 @@ $(document).ready(function () {
                 success: function (data) {
                     response($.map(data, function (item) {
                         return {
-                            label: item.titolo + " (ISBN: " + item.isbn + ")",
+                            label: `${item.titolo} [${item.isbn}]`,
                             value: item.titolo,
                             id: item.id
                         };
