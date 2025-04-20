@@ -19,7 +19,7 @@ class ScaricoController extends Controller
         }
     
         // Recupera i dati filtrati e paginati
-        $scarichi = $query->latest()->paginate(100);
+        $scarichi = $query->latest()->paginate(50);
     
         return view('scarichi.index', compact('scarichi'));
     }
