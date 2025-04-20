@@ -30,9 +30,9 @@ class GiacenzaController extends Controller
     
         // Carica i risultati filtrati
         $giacenze = $query
-            ->join('libri', 'giacenzas.libro_id', '=', 'libri.id')
+            ->join('libri', 'giacenze.libro_id', '=', 'libri.id')
             ->orderBy('libri.titolo')
-            ->select('giacenzas.*')
+            ->select('giacenze.*')
             ->paginate(200);
 
     
