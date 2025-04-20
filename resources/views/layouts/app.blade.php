@@ -68,7 +68,7 @@
 
             @auth
                 @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('utenti.index') }}">Gestione Utenti</a></li>
+                    <li><a href="{{ route('utenti.index') }}">Gestione utenti</a></li>
                 @endif
             
                 @if (auth()->user()->access_anagrafiche)
@@ -78,7 +78,7 @@
                     <li><a href="{{ route('contratti.index') }}">Contratti</a></li>
                 @endif
                 @if (auth()->user()->access_marchi)
-                    <li><a href="{{ route('marchi-editoriali.index') }}">Marchi Editoriali</a></li>
+                    <li><a href="{{ route('marchi-editoriali.index') }}">Marchi editoriali</a></li>
                 @endif
                 @if (auth()->user()->access_libri)
                     <li><a href="{{ route('libri.index') }}">Libri</a></li>
@@ -93,7 +93,7 @@
                     <li><a href="{{ route('scarichi.index') }}">Spedizioni</a></li>
                 @endif
                 @if (auth()->user()->access_registro_tirature)
-                    <li><a href="{{ route('registro-tirature.index') }}">Registro Tirature</a></li>
+                    <li><a href="{{ route('registro-tirature.index') }}">Registro tirature</a></li>
                 @endif
                 @if (auth()->user()->access_registro_vendite)
                     <li><a href="{{ route('registro-vendite.index') }}">Registro vendite</a></li>
@@ -139,7 +139,7 @@
                     <li><a href="{{ route('contratti.index') }}">Contratti</a></li>
                 @endif
                 @if (auth()->user()->access_marchi)
-                    <li><a href="{{ route('marchi-editoriali.index') }}">Marchi Editoriali</a></li>
+                    <li><a href="{{ route('marchi-editoriali.index') }}">Marchi editoriali</a></li>
                 @endif
                 @if (auth()->user()->access_libri)
                     <li><a href="{{ route('libri.index') }}">Libri</a></li>
@@ -154,7 +154,7 @@
                     <li><a href="{{ route('scarichi.index') }}">Spedizioni</a></li>
                 @endif
                 @if (auth()->user()->access_registro_tirature)
-                    <li><a href="{{ route('registro-tirature.index') }}">Registro Tirature</a></li>
+                    <li><a href="{{ route('registro-tirature.index') }}">Registro tirature</a></li>
                 @endif
                 @if (auth()->user()->access_registro_vendite)
                     <li><a href="{{ route('registro-vendite.index') }}">Registro vendite</a></li>
@@ -191,11 +191,7 @@
 
 </body>
 
-@auth
-    @if (auth()->user()->ruolo === 'admin')
-        <li><a href="{{ route('utenti.index') }}">Gestione Utenti</a></li>
-    @endif
-@endauth
+
 
 
 </html>
