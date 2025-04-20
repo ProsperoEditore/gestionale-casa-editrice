@@ -141,17 +141,16 @@
 
 
 <!-- Footer con numerazione delle pagine -->
-@if(isset($pdf))
 <script type="text/php">
-    $font = $fontMetrics->getFont('Helvetica');
-    $size = 9;
-    $pageText = 'pag. ' . $PAGE_NUM . ' di ' . $PAGE_COUNT;
-    $width = $fontMetrics->getTextWidth($pageText, $font, $size);
-    $x = ($pdf->get_width() - $width) / 2;
-    $y = $pdf->get_height() - 20;
-    $pdf->text($x, $y, $pageText, $font, $size);
+    if (isset($pdf)) {
+        $font = $fontMetrics->getFont('Helvetica', 'normal');
+        $size = 9;
+        $text = "pag. {PAGE_NUM} di {PAGE_COUNT}";
+        $width = $fontMetrics->getTextWidth($text, $font, $size);
+        $pdf->page_text(($pdf->get_width() - $width) / 2, $pdf->get_height() - 20, $text, $font, $size);
+    }
 </script>
-@endif
+
 
 
 
