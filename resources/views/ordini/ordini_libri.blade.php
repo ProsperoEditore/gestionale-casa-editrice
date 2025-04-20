@@ -138,21 +138,21 @@
 <script>
 $(function() {
     $(document).on("focus", ".titolo-autocomplete", function() {
-        $(this).autocomplete({
-            source: libri.map(libro => libro.titolo),
+                $(this).autocomplete({
+            source: libri.map(libro => ({
+                label: libro.titolo + ' — ' + libro.isbn,
+                value: libro.titolo,
+                id: libro.id,
+                isbn: libro.isbn,
+                prezzo: libro.prezzo
+            })),
             select: function(event, ui) {
-                const titolo = ui.item.value;
-                const libroTrovato = libri.find(l => l.titolo === titolo);
                 const row = $(this).closest("tr");
-
-                if (libroTrovato) {
-                    row.find(".isbn-field").val(libroTrovato.isbn);
-                    row.find(".prezzo-field").val(libroTrovato.prezzo);
-                    row.find(".libro-id").val(libroTrovato.id);
-                }
+                row.find(".isbn-field").val(ui.item.isbn);
+                row.find(".prezzo-field").val(ui.item.prezzo);
+                row.find(".libro-id").val(ui.item.id);
             }
         });
-
     });
 
     $(document).on("input", ".quantita-field, .sconto-field", function() {
