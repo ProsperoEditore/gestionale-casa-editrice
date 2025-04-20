@@ -149,21 +149,36 @@ document.addEventListener("DOMContentLoaded", function() {
         table.insertBefore(row, table.firstChild);
 
         $(row).find(".autocomplete-titolo").autocomplete({
-            source: libri.map(libro => libro.titolo),
+            minLength: 2,
+            source: function(request, response) {
+                const matches = libri.filter(libro =>
+                    libro.titolo.toLowerCase().includes(request.term.toLowerCase())
+                );
+                response(matches.map(libro => ({
+                    label: `${libro.titolo} [${libro.isbn}]`,
+                    value: libro.titolo,
+                    id: libro.id
+                })));
+            },
             select: function(event, ui) {
-                let libroTrovato = libri.find(libro => libro.titolo === ui.item.value);
-                let parentRow = $(this).closest("tr");
+                const libroSelezionato = libri.find(libro =>
+                    libro.titolo === ui.item.value && libro.id === ui.item.id
+                );
+                const parentRow = $(this).closest("tr");
 
-                if (libroTrovato) {
-                    parentRow.find(".isbn").val(libroTrovato.isbn);
-                    parentRow.find(".prezzo").val(libroTrovato.prezzo);
-                    parentRow.find(".marchio").val(libroTrovato.marchio_editoriale ? libroTrovato.marchio_editoriale.nome : "N/D");
+                if (libroSelezionato) {
+                    parentRow.find(".isbn").val(libroSelezionato.isbn);
+                    parentRow.find(".prezzo").val(libroSelezionato.prezzo);
+                    parentRow.find(".marchio").val(libroSelezionato.marchio_editoriale ? libroSelezionato.marchio_editoriale.nome : "N/D");
                     if (categoria === "magazzino editore") {
-                        parentRow.find(".costo_sconto").val(libroTrovato.costo_produzione);
+                        parentRow.find(".costo_sconto").val(libroSelezionato.costo_produzione);
+                    } else {
+                        parentRow.find(".costo_sconto").val('');
                     }
                 }
             }
         });
+
     });
 
     document.addEventListener("input", function(event) {

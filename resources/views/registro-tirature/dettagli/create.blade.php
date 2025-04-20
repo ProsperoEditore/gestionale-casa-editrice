@@ -86,9 +86,12 @@
             prezzo: libro.prezzo
         })),
         select: function (event, ui) {
-            $('#titolo_id').val(ui.item.id);
-            $('#prezzo_vendita_iva').val(formattaValore(parseFloat(ui.item.prezzo)));
-            calcola();
+            const libroSelezionato = libri.find(libro => libro.id === ui.item.id);
+            if (libroSelezionato) {
+                $('#titolo_id').val(libroSelezionato.id);
+                $('#prezzo_vendita_iva').val(formattaValore(parseFloat(libroSelezionato.prezzo)));
+                calcola();
+            }
         }
     });
 
