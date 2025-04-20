@@ -59,7 +59,7 @@
     <div class="d-none d-lg-block position-fixed h-100 sidebar">
         <div class="text-center">
             <a href="{{ route('home') }}">
-                <img src="{{ asset('images/LOGO REDESIGN_BLACK-04.png') }}" alt="Logo" class="logo img-fluid">
+            <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero Editore" class="logo img-fluid">
             </a>
         </div>
 
@@ -127,7 +127,7 @@
         <div class="offcanvas-body">
         <div class="text-center">
             <a href="{{ route('home') }}">
-                <img src="{{ asset('images/LOGO REDESIGN_BLACK-04.png') }}" alt="Logo" class="logo img-fluid">
+            <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero Editore" class="logo img-fluid">
             </a>
         </div>
             <ul class="list-unstyled">
