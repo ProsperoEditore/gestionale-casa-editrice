@@ -149,9 +149,27 @@ Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStat
 
 Route::resource('utenti', UserController::class)->except(['show', 'edit', 'update']);
 
+
+
+// Pagina principale backup
 Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+
+// Backup singoli per ogni sezione
+Route::get('/backup/libri', [BackupController::class, 'downloadSingolo'])->name('backup.libri')->defaults('sezione', 'libri');
+Route::get('/backup/magazzini', [BackupController::class, 'downloadSingolo'])->name('backup.magazzini')->defaults('sezione', 'magazzini');
+Route::get('/backup/contratti', [BackupController::class, 'downloadSingolo'])->name('backup.contratti')->defaults('sezione', 'contratti');
+Route::get('/backup/ordini', [BackupController::class, 'downloadSingolo'])->name('backup.ordini')->defaults('sezione', 'ordini');
+Route::get('/backup/registro-vendite', [BackupController::class, 'downloadSingolo'])->name('backup.registro-vendite')->defaults('sezione', 'registro-vendite');
+Route::get('/backup/registro-tirature', [BackupController::class, 'downloadSingolo'])->name('backup.registro-tirature')->defaults('sezione', 'registro-tirature');
+Route::get('/backup/report', [BackupController::class, 'downloadSingolo'])->name('backup.report')->defaults('sezione', 'report');
+Route::get('/backup/scarichi', [BackupController::class, 'downloadSingolo'])->name('backup.scarichi')->defaults('sezione', 'scarichi');
+Route::get('/backup/anagrafiche', [BackupController::class, 'downloadSingolo'])->name('backup.anagrafiche')->defaults('sezione', 'anagrafiche');
+
+// Backup completo in un unico file con più fogli
+Route::get('/backup/excel', [BackupController::class, 'downloadCompleto'])->name('backup.excel');
+
+// Backup SQL (generato tramite comando artisan)
 Route::get('/backup/sql', [BackupController::class, 'downloadSql'])->name('backup.sql');
-Route::get('/backup/excel', [BackupController::class, 'downloadExcel'])->name('backup.excel');
 
 });
 

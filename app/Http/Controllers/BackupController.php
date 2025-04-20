@@ -2,13 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MultiSheetExport;
+use App\Exports\SingoloExport;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Http\Response;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+// Importa i modelli da esportare
 use App\Models\Libro;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\LibriExport;
+use App\Models\Magazzino;
+use App\Models\Contratto;
+use App\Models\Ordine;
+use App\Models\RegistroVendite;
+use App\Models\RegistroTirature;
+use App\Models\Report;
+use App\Models\Scarico;
+use App\Models\Anagrafica;
 
 class BackupController extends Controller
 {
@@ -17,45 +30,66 @@ class BackupController extends Controller
         return view('backup.index');
     }
 
-    public function download()
+    public function downloadSingolo($sezione)
     {
-        $database = config('database.connections.pgsql.database');
-        $username = config('database.connections.pgsql.username');
-        $password = config('database.connections.pgsql.password');
-        $host = config('database.connections.pgsql.host');
-        $backupFile = 'backup_' . now()->format('Y-m-d_H-i-s') . '.sql';
+        $modelMap = [
+            'libri' => Libro::class,
+            'magazzini' => Magazzino::class,
+            'contratti' => Contratto::class,
+            'ordini' => Ordine::class,
+            'registro-vendite' => RegistroVendite::class,
+            'registro-tirature' => RegistroTirature::class,
+            'report' => Report::class,
+            'scarichi' => Scarico::class,
+            'anagrafiche' => Anagrafica::class,
+        ];
 
-        // Comando per dump
-        $command = "PGPASSWORD={$password} pg_dump -h {$host} -U {$username} -d {$database} > storage/app/{$backupFile}";
-        exec($command);
+        if (!array_key_exists($sezione, $modelMap)) {
+            abort(404);
+        }
 
-        return response()->download(storage_path("app/{$backupFile}"))->deleteFileAfterSend(true);
+        $model = $modelMap[$sezione];
+        $nomeFile = 'backup_' . $sezione . '_' . now()->format('Ymd_His') . '.xlsx';
+
+        return Excel::download(new SingoloExport($model), $nomeFile);
     }
 
-    
+    public function downloadCompleto()
+    {
+        return Excel::download(new MultiSheetExport, 'backup_completo_' . now()->format('Ymd_His') . '.xlsx');
+    }
+
     public function downloadSql()
     {
-        $filename = 'backup_' . date('Ymd_His') . '.sql';
-        $path = storage_path('app/' . $filename);
-
-        // esegue il dump del database
-        $command = sprintf(
-            'PGPASSWORD=%s pg_dump -h %s -U %s -d %s -F p -f %s',
-            env('DB_PASSWORD'),
-            env('DB_HOST'),
-            env('DB_USERNAME'),
-            env('DB_DATABASE'),
-            $path
-        );
-
-        putenv("PGPASSWORD=" . env('DB_PASSWORD'));
-        exec($command);
-
+        $db = config('database.connections.pgsql'); // Modifica se usi MySQL: 'mysql'
+        $filename = 'backup_database_' . now()->format('Ymd_His') . '.sql';
+        $path = storage_path("app/{$filename}");
+    
+        // Se usi Postgres su Heroku
+        $url = parse_url(env('DATABASE_URL'));
+        $host = $url['host'];
+        $port = $url['port'];
+        $database = ltrim($url['path'], '/');
+        $username = $url['user'];
+        $password = $url['pass'];
+    
+        $process = new Process([
+            'pg_dump',
+            '-h', $host,
+            '-p', $port,
+            '-U', $username,
+            '-d', $database,
+            '-f', $path
+        ]);
+    
+        $process->setEnv(['PGPASSWORD' => $password]);
+        $process->run();
+    
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+    
         return response()->download($path)->deleteFileAfterSend(true);
     }
 
-    public function downloadExcel()
-    {
-        return Excel::download(new LibriExport, 'libri_backup_' . date('Ymd_His') . '.xlsx');
-    }
 }
