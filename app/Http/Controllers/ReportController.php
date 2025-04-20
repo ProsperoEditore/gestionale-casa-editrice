@@ -74,18 +74,18 @@ class ReportController extends Controller
     {
         $search = $request->input('query');
     
-        $libri = Libro::where(function($query) use ($search) {
-            $query->where('titolo', 'like', '%' . $search . '%')
-                  ->orWhere('isbn', 'like', '%' . $search . '%');
-        })
-        ->orderByRaw("CASE 
-            WHEN titolo LIKE ? THEN 0 
-            WHEN titolo LIKE ? THEN 1 
-            ELSE 2 END", ["{$search}%", "%{$search}%"])
-        ->orderBy('titolo')
-        ->select('id', 'titolo', 'isbn', 'prezzo')
-        ->take(50)
-        ->get();
+        $libri = Libro::where(function ($query) use ($search) {
+                $query->whereRaw("LOWER(titolo) LIKE ?", ['%' . strtolower($search) . '%'])
+                      ->orWhereRaw("LOWER(isbn) LIKE ?", ['%' . strtolower($search) . '%']);
+            })
+            ->orderByRaw("CASE 
+                WHEN LOWER(titolo) LIKE ? THEN 0 
+                WHEN LOWER(titolo) LIKE ? THEN 1 
+                ELSE 2 END", [strtolower($search) . '%', '%' . strtolower($search) . '%'])
+            ->orderBy('titolo')
+            ->select('id', 'titolo', 'isbn', 'prezzo')
+            ->take(50)
+            ->get();
     
         return response()->json($libri->map(function ($libro) {
             return [
@@ -96,6 +96,7 @@ class ReportController extends Controller
             ];
         }));
     }
+    
     
         
 

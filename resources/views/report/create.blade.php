@@ -50,6 +50,8 @@
 <script>
 $(function () {
     $("#libro_autocomplete").autocomplete({
+        minLength: 2,
+        delay: 100,
         source: function (request, response) {
             $.ajax({
                 url: "{{ route('report.autocomplete-libro') }}",
