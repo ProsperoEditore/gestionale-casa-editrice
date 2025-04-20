@@ -15,15 +15,15 @@
 
     <h5 class="mt-4">Esporta singole sezioni (.xlsx)</h5>
     <div class="d-flex flex-wrap gap-2 mb-3">
-        <a href="{{ route('backup.singolo', ['sezione' => 'libri']) }}" class="btn btn-outline-success btn-sm">Libri</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'anagrafiche']) }}" class="btn btn-outline-success btn-sm">Anagrafiche</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'contratti']) }}" class="btn btn-outline-success btn-sm">Contratti</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'magazzini']) }}" class="btn btn-outline-success btn-sm">Magazzini</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'ordini']) }}" class="btn btn-outline-success btn-sm">Ordini</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'scarichi']) }}" class="btn btn-outline-success btn-sm">Spedizioni</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'registro-tirature']) }}" class="btn btn-outline-success btn-sm">Registro Tirature</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'registro-vendite']) }}" class="btn btn-outline-success btn-sm">Registro Vendite</a>
-        <a href="{{ route('backup.singolo', ['sezione' => 'report']) }}" class="btn btn-outline-success btn-sm">Report</a>
+        <a href="{{ route('backup.libri') }}" class="btn btn-outline-success btn-sm">Libri</a>
+        <a href="{{ route('backup.anagrafiche') }}" class="btn btn-outline-success btn-sm">Anagrafiche</a>
+        <a href="{{ route('backup.contratti') }}" class="btn btn-outline-success btn-sm">Contratti</a>
+        <a href="{{ route('backup.magazzini') }}" class="btn btn-outline-success btn-sm">Magazzini</a>
+        <a href="{{ route('backup.ordini') }}" class="btn btn-outline-success btn-sm">Ordini</a>
+        <a href="{{ route('backup.scarichi') }}" class="btn btn-outline-success btn-sm">Spedizioni</a>
+        <a href="{{ route('backup.registro-tirature') }}" class="btn btn-outline-success btn-sm">Registro Tirature</a>
+        <a href="{{ route('backup.registro-vendite') }}" class="btn btn-outline-success btn-sm">Registro Vendite</a>
+        <a href="{{ route('backup.report') }}" class="btn btn-outline-success btn-sm">Report</a>
     </div>
 
     <hr>
@@ -40,4 +40,3 @@ heroku pg:backups:restore 'URL_DEL_BACKUP' DATABASE_URL --app gestionale-prosper
     </pre>
 </div>
 @endsection
-
