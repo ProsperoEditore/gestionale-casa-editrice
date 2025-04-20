@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 class SingoloExport implements FromCollection, WithHeadings
 {
     protected $modelClass;
-    protected $collection;
+    protected $data;
 
     public function __construct(string $modelClass)
     {
@@ -22,28 +22,28 @@ class SingoloExport implements FromCollection, WithHeadings
         // Carica relazioni in base al tipo di modello
         switch (class_basename($model)) {
             case 'Ordine':
-                $this->collection = $model::with('righe', 'anagrafica')->get();
+                $query = $model::with('righe', 'anagrafica')->get();
                 break;
 
             case 'RegistroVendite':
-                $this->collection = $model::with('dettagli')->get();
+                $query = $model::with('dettagli', 'anagrafica')->get();
                 break;
 
             case 'RegistroTirature':
-                $this->collection = $model::with('dettagli')->get();
+                $query = $model::with('dettagli')->get();
                 break;
 
             case 'Magazzino':
-                $this->collection = $model::with('giacenze')->get();
+                $query = $model::with('giacenze')->get();
                 break;
 
             default:
-                $this->collection = $model::all();
+                $query = $model::all();
                 break;
         }
 
-        // Trasformazione per esportazione
-        return $this->collection->map(function ($item) use ($model) {
+        // Salva per headings()
+        $this->data = $query->map(function ($item) use ($model) {
             switch (class_basename($model)) {
                 case 'Ordine':
                     return [
@@ -82,12 +82,14 @@ class SingoloExport implements FromCollection, WithHeadings
                     return $item->toArray();
             }
         });
+
+        return $this->data;
     }
 
     public function headings(): array
     {
-        return $this->collection->isNotEmpty()
-            ? array_keys($this->collection->first()->toArray())
-            : [];
+        return $this->data && $this->data->isNotEmpty()
+            ? array_keys($this->data->first()->toArray())
+            : ['Nessun dato'];
     }
 }
