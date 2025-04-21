@@ -43,33 +43,37 @@
                 </div>
 
                 <h4 class="mt-4 mb-2">Accesso al Menu</h4>
-                <div class="row">
-                    @php
-                        $voci = [
-                            'access_anagrafiche' => 'Anagrafiche',
-                            'access_contratti' => 'Contratti',
-                            'access_marchi' => 'Marchi Editoriali',
-                            'access_libri' => 'Libri',
-                            'access_magazzini' => 'Magazzini e Conti Deposito',
-                            'access_ordini' => 'Ordini',
-                            'access_scarichi' => 'Scarichi',
-                            'access_registro_tirature' => 'Registro Tirature',
-                            'access_registro_vendite' => 'Registro vendite',
-                            'access_report' => 'Report',
-                        ];
-                    @endphp
+                    <div class="row">
+                        @php
+                            $voci = [
+                                'access_anagrafiche' => 'Anagrafiche',
+                                'access_contratti' => 'Contratti',
+                                'access_marchi' => 'Marchi Editoriali',
+                                'access_libri' => 'Libri',
+                                'access_schede_libro' => 'Schede libro',
+                                'access_magazzini' => 'Magazzini e Conti Deposito',
+                                'access_ordini' => 'Ordini',
+                                'access_scarichi' => 'Scarichi',
+                                'access_registro_tirature' => 'Registro Tirature',
+                                'access_registro_vendite' => 'Registro vendite',
+                                'access_report' => 'Report',
+                                'access_backup' => 'Backup',
+                            ];
+                        @endphp
 
-                    @foreach($voci as $campo => $etichetta)
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="{{ $campo }}" id="{{ $campo }}" value="1">
-                                <label class="form-check-label" for="{{ $campo }}">
-                                    {{ $etichetta }}
-                                </label>
+                        @foreach($voci as $campo => $etichetta)
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="{{ $campo }}" id="{{ $campo }}" value="1"
+                                        {{ old($campo) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="{{ $campo }}">
+                                        {{ $etichetta }}
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
+                        @endforeach
+                    </div>
+
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-success">Salva</button>

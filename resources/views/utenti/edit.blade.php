@@ -32,27 +32,30 @@
         </div>
 
         <h4>Accesso al Menu</h4>
-        @php
-            $voci = [
-                'access_anagrafiche' => 'Anagrafiche',
-                'access_contratti' => 'Contratti',
-                'access_marchi' => 'Marchi Editoriali',
-                'access_libri' => 'Libri',
-                'access_magazzini' => 'Magazzini e Conti Deposito',
-                'access_ordini' => 'Ordini',
-                'access_scarichi' => 'Spedizioni',
-                'access_registro_vendite' => 'Registro vendite',
-                'access_registro_tirature' => 'Registro tirature',
-                'access_report' => 'Report',
-            ];
-        @endphp
+@php
+    $voci = [
+        'access_anagrafiche' => 'Anagrafiche',
+        'access_contratti' => 'Contratti',
+        'access_marchi' => 'Marchi Editoriali',
+        'access_libri' => 'Libri',
+        'access_schede_libro' => 'Schede libro',
+        'access_magazzini' => 'Magazzini e Conti Deposito',
+        'access_ordini' => 'Ordini',
+        'access_scarichi' => 'Spedizioni',
+        'access_registro_vendite' => 'Registro vendite',
+        'access_registro_tirature' => 'Registro tirature',
+        'access_report' => 'Report',
+        'access_backup' => 'Backup',
+    ];
+@endphp
 
-        @foreach($voci as $campo => $etichetta)
-            <label>
-                <input type="checkbox" name="{{ $campo }}" value="1" {{ $utente->$campo ? 'checked' : '' }}>
-                {{ $etichetta }}
-            </label><br>
-        @endforeach
+@foreach($voci as $campo => $etichetta)
+    <label class="d-block">
+        <input type="checkbox" name="{{ $campo }}" value="1" {{ $utente->$campo ? 'checked' : '' }}>
+        {{ $etichetta }}
+    </label>
+@endforeach
+
 
         <button type="submit" class="btn btn-primary mt-3">Aggiorna</button>
         <a href="{{ route('utenti.index') }}" class="btn btn-secondary mt-3">Annulla</a>
