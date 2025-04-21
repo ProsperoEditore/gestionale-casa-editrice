@@ -72,7 +72,7 @@
     const libri = @json($libri->map(function($l) {
         return [
             'id'    => $l->id,
-            'label' => $l->titolo + ' [' + $l->isbn + ']',
+            'label' => $l->titolo . ' [' . $l->isbn . ']',
             'value' => $l->titolo
         ];
     }));
