@@ -16,6 +16,7 @@ use App\Http\Controllers\RegistroVenditeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportDettaglioController;
 use App\Http\Controllers\ScaricoController;
+use App\Http\Controllers\SchedaLibroController;
 use App\Http\Controllers\BackupController;
 
 Route::middleware('auth')->group(function () {
