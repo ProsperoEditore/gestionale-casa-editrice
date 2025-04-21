@@ -146,8 +146,16 @@ Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStat
 
 
 
-
+// Utenti
 Route::resource('utenti', UserController::class)->except(['show', 'edit', 'update']);
+
+
+// Schede libro
+Route::resource('schede-libro', SchedaLibroController::class);
+Route::get('/schede-libro/{id}/pdf', [SchedaLibroController::class, 'pdf'])->name('schede-libro.pdf');
+
+
+
 
 
 
