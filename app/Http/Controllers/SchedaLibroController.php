@@ -127,4 +127,17 @@ class SchedaLibroController extends Controller
     }
 
 
+    
+public function autocompleteLibro(Request $request)
+{
+    $term = $request->get('query');
+
+    $libri = Libro::where('titolo', 'ilike', "%{$term}%")
+                ->orWhere('isbn', 'ilike', "%{$term}%")
+                ->get();
+
+    return response()->json($libri);
+}
+
+
 }

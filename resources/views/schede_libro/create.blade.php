@@ -10,8 +10,8 @@
         {{-- Autocomplete per selezionare un libro esistente --}}
         <div class="mb-3">
             <label for="libro_id" class="form-label">Libro</label>
-            <input type="text" id="titolo_libro" class="form-control" placeholder="Cerca libro per titolo o ISBN">
-            <input type="hidden" name="libro_id" id="libro_id">
+            <input type="text" id="libro_autocomplete" class="form-control titolo-autocomplete" placeholder="Cerca titolo o ISBN..." required>
+            <input type="hidden" name="libro_id" class="libro-id" id="libro_id">
         </div>
 
         {{-- Campi descrittivi facoltativi --}}
@@ -67,25 +67,37 @@
 </div>
 @endsection
 
-@section('scripts')
-<script>
-    const libri = @json($libri->map(function($l) {
-        return [
-            'id'    => $l->id,
-            'label' => $l->titolo . ' [' . $l->isbn . ']',
-            'value' => $l->titolo
-        ];
-    }));
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
-    $(function () {
-        $('#titolo_libro').autocomplete({
-            source: libri,
-            select: function (event, ui) {
-                $('#titolo_libro').val(ui.item.label); // mostra Titolo [ISBN]
-                $('#libro_id').val(ui.item.id);        // salva solo l'ID nascosto
-                return false;
-            }
-        });
+<script>
+$(function () {
+    $("#libro_autocomplete").autocomplete({
+        minLength: 2,
+        delay: 100,
+        source: function (request, response) {
+            $.ajax({
+                url: "{{ route('scheda-libro.autocomplete-libro') }}",
+                data: { query: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return {
+                            label: item.titolo + ' [' + item.isbn + ']',
+                            value: item.titolo + ' [' + item.isbn + ']',
+                            id: item.id
+                        };
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            $("#libro_autocomplete").val(ui.item.label);
+            $("#libro_id").val(ui.item.id);
+            return false;
+        }
     });
+});
 </script>
-@endsection
+@endpush
