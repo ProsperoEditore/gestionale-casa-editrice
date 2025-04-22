@@ -80,7 +80,7 @@
 
     $('#titolo_autocomplete').autocomplete({
         source: libri.map(libro => ({
-            label: libro.titolo,
+            label: libro.titolo + " (" + libro.isbn + ")",
             value: libro.titolo,
             id: libro.id,
             prezzo: libro.prezzo
@@ -94,6 +94,7 @@
             }
         }
     });
+
 
     [copieStampateInput, prezzoVenditaInput].forEach(el => {
         el.addEventListener('input', calcola);

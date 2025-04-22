@@ -93,21 +93,17 @@ $(document).ready(function() {
 
     function initAutocomplete(input) {
         $(input).autocomplete({
-            source: libri.map(libro => libro.titolo),
+            source: libri.map(libro => ({
+                label: libro.titolo + " (" + libro.isbn + ")",
+                value: libro.titolo,
+                isbn: libro.isbn,
+                prezzo: libro.prezzo
+            })),
             select: function(event, ui) {
                 let parentRow = $(this).closest("tr");
-                let libroSelezionato = libri.find(libro => libro.titolo === ui.item.value && libro.isbn === parentRow.find(".isbn").val());
-
-                if (!libroSelezionato) {
-                    // Fallback: seleziona il primo libro con quel titolo
-                    libroSelezionato = libri.find(libro => libro.titolo === ui.item.value);
-                }
-
-                if (libroSelezionato) {
-                    parentRow.find(".isbn").val(libroSelezionato.isbn);
-                    parentRow.find(".prezzo").val(libroSelezionato.prezzo);
-                    aggiornaValoreLordo(parentRow);
-                }
+                parentRow.find(".isbn").val(ui.item.isbn);
+                parentRow.find(".prezzo").val(ui.item.prezzo);
+                aggiornaValoreLordo(parentRow);
             }
         });
     }

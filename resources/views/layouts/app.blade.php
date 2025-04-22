@@ -84,8 +84,9 @@
                     @if (auth()->user()->access_schede_libro)
                         <li><a href="{{ route('schede-libro.index') }}">Schede libro</a></li>
                     @endif
-                    {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi questo commento e assicurati che l'utente abbia access_schede_libro abilitato. --}}
                 --}}
+                {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
+
 
                 @if (auth()->user()->access_magazzini)
                     <li><a href="{{ route('magazzini.index') }}">Magazzini e Conti deposito</a></li>
@@ -156,8 +157,9 @@
                     @if (auth()->user()->access_schede_libro)
                         <li><a href="{{ route('schede-libro.index') }}">Schede libro</a></li>
                     @endif
-                    {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi questo commento e assicurati che l'utente abbia access_schede_libro abilitato. --}}
                 --}}
+                {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
+
 
                 @if (auth()->user()->access_magazzini)
                     <li><a href="{{ route('magazzini.index') }}">Magazzini e Conti deposito</a></li>
