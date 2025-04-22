@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Milon\Barcode\Facades\DNS1DFacade;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SchedaLibroController extends Controller
 {
@@ -68,7 +68,7 @@ class SchedaLibroController extends Controller
     {
     $scheda = SchedaLibro::with('libro')->findOrFail($id);
 
-    $pdf = PDF::loadView('schede_libro.pdf', compact('scheda'))->setPaper('a4', 'portrait');
+    $pdf = Pdf::loadView('schede_libro.pdf', compact('scheda'))->setPaper('a4', 'portrait');
 
     return $pdf->download('Scheda_' . Str::slug($scheda->libro->titolo) . '.pdf');
     }
