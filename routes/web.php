@@ -152,10 +152,9 @@ Route::resource('utenti', UserController::class)->except(['show', 'edit', 'updat
 
 
 // Schede libro
-Route::resource('schede-libro', SchedaLibroController::class);
-Route::get('/schede-libro/{id}/pdf', [SchedaLibroController::class, 'pdf'])->name('schede-libro.pdf');
 Route::get('/schede-libro/autocomplete-libro', [SchedaLibroController::class, 'autocompleteLibro'])->name('scheda-libro.autocomplete-libro');
-
+Route::get('/schede-libro/{id}/pdf', [SchedaLibroController::class, 'pdf'])->name('schede-libro.pdf');
+Route::resource('schede-libro', SchedaLibroController::class);
 
 
 
