@@ -6,19 +6,14 @@
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            padding: 40px;
-            color: #111;
-            line-height: 1.5;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #444;
-            padding-bottom: 10px;
+            padding: 50px;
+            font-size: 13px;
+            color: #222;
+            line-height: 1.6;
         }
         .logo {
-            width: 120px;
+            height: 60px;
+            margin-bottom: 20px;
         }
         .row {
             display: flex;
@@ -28,36 +23,35 @@
         .col {
             flex: 1;
         }
-        .titolo {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .dati p {
-            margin: 4px 0;
-            font-size: 14px;
-        }
         .copertina {
             max-width: 100%;
-            max-height: 300px;
+            max-height: 340px;
             border: 1px solid #ccc;
+        }
+        .titolo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .meta p {
+            margin: 2px 0;
         }
         .sezione {
             margin-top: 25px;
         }
         .sezione h2 {
-            font-size: 15px;
-            color: #222;
-            border-bottom: 1px solid #aaa;
+            font-size: 14px;
             margin-bottom: 5px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 2px;
         }
         .barcode {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
         }
         .copertina-stesa {
-            margin-top: 40px;
             text-align: center;
+            margin-top: 40px;
         }
         .copertina-stesa img {
             max-width: 100%;
@@ -67,38 +61,30 @@
 </head>
 <body>
 
-    {{-- LOGO MARCHIO + NOME --}}
-    <div class="header">
-        @php
-            $marchio = strtolower($scheda->libro->marchio_editoriale ?? 'prospero');
-            $logoPath = public_path("images/marchi/logo-$marchio.png");
-        @endphp
-
-        @if (file_exists($logoPath))
-            <img src="{{ $logoPath }}" class="logo" alt="Logo marchio editoriale">
-        @endif
-
-        <div style="margin-left: 20px; font-size: 16px; font-weight: bold;">
-            {{ $scheda->libro->marchio_editoriale ?? 'Prospero Editore' }}
-        </div>
-    </div>
-
+    {{-- LOGO MARCHIO EDITORIALE --}}
+    @php
+        $marchio = strtolower($scheda->libro->marchio_editoriale ?? 'prospero');
+        $logoPath = public_path("images/marchi/logo-$marchio.png");
+    @endphp
+    @if (file_exists($logoPath))
+        <img src="{{ $logoPath }}" class="logo" alt="Logo marchio">
+    @endif
 
     {{-- COPERTINA + DATI --}}
     <div class="row">
         <div class="col">
             @if ($scheda->copertina_path)
-                <img src="{{ public_path('storage/' . $scheda->copertina_path) }}" class="copertina" alt="Copertina">
+                <img src="{{ public_path('storage/' . $scheda->copertina_path) }}" alt="Copertina" class="copertina">
             @endif
         </div>
         <div class="col">
             <div class="titolo">{{ $scheda->libro->titolo }}</div>
-            <div class="dati">
+            <div class="meta">
                 <p><strong>ISBN:</strong> {{ $scheda->libro->isbn }}</p>
                 <p><strong>Prezzo:</strong> €{{ number_format($scheda->libro->prezzo, 2, ',', '.') }}</p>
                 <p><strong>Data pubblicazione:</strong> {{ optional($scheda->libro->data_pubblicazione)->format('d/m/Y') }}</p>
-                <p><strong>Marchio:</strong> {{ $scheda->libro->marchio_editoriale ?? '-' }}</p>
-                <p><strong>Collana:</strong> {{ $scheda->libro->collana ?? '-' }}</p>
+                <p><strong>Marchio:</strong> {{ $scheda->libro->marchio_editoriale }}</p>
+                <p><strong>Collana:</strong> {{ $scheda->libro->collana }}</p>
             </div>
         </div>
     </div>
