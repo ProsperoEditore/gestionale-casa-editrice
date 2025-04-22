@@ -6,6 +6,7 @@ use App\Models\SchedaLibro;
 use App\Models\Libro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Milon\Barcode\Facades\DNS1DFacade;
 use PDF;
 
@@ -28,7 +29,7 @@ class SchedaLibroController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'libro_id' => 'required|exists:libros,id',
+            'libro_id' => 'required|exists:libri,id',
             'descrizione_breve' => 'nullable|string',
             'sinossi' => 'nullable|string',
             'strillo' => 'nullable|string',
@@ -81,7 +82,7 @@ class SchedaLibroController extends Controller
     $scheda = SchedaLibro::findOrFail($id);
 
     $validated = $request->validate([
-        'libro_id' => 'required|exists:libros,id',
+        'libro_id' => 'required|exists:libri,id',
         'descrizione_breve' => 'nullable|string',
         'sinossi' => 'nullable|string',
         'strillo' => 'nullable|string',
