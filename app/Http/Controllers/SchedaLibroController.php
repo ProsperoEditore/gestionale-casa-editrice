@@ -6,6 +6,7 @@ use App\Models\SchedaLibro;
 use App\Models\Libro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Milon\Barcode\Facades\DNS1DFacade;
 use PDF;
