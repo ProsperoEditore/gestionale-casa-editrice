@@ -17,44 +17,43 @@
             border-bottom: 2px solid #444;
             padding-bottom: 10px;
         }
-        .header .logo {
+        .logo {
             width: 120px;
         }
         .row {
             display: flex;
-            gap: 40px;
-            margin-top: 20px;
+            gap: 30px;
+            margin-bottom: 30px;
         }
         .col {
             flex: 1;
         }
         .titolo {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
-        .dati {
-            font-size: 13px;
-            color: #555;
+        .dati p {
+            margin: 4px 0;
+            font-size: 14px;
         }
         .copertina {
             max-width: 100%;
-            max-height: 320px;
+            max-height: 300px;
             border: 1px solid #ccc;
         }
         .sezione {
             margin-top: 25px;
         }
         .sezione h2 {
-            font-size: 16px;
-            color: #333;
+            font-size: 15px;
+            color: #222;
             border-bottom: 1px solid #aaa;
-            padding-bottom: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         .barcode {
-            margin-top: 30px;
             text-align: center;
+            margin-top: 30px;
         }
         .copertina-stesa {
             margin-top: 40px;
@@ -68,33 +67,36 @@
 </head>
 <body>
 
-    {{-- HEADER CON LOGO --}}
+    {{-- LOGO MARCHIO + NOME --}}
     <div class="header">
         @php
             $marchio = strtolower($scheda->libro->marchio_editoriale ?? 'prospero');
             $logoPath = public_path("images/marchi/logo-$marchio.png");
         @endphp
+
         @if (file_exists($logoPath))
-            <img src="{{ $logoPath }}" class="logo" alt="Logo marchio">
+            <img src="{{ $logoPath }}" class="logo" alt="Logo marchio editoriale">
         @endif
+
+        <div style="margin-left: 20px; font-size: 16px; font-weight: bold;">
+            {{ $scheda->libro->marchio_editoriale ?? 'Prospero Editore' }}
+        </div>
     </div>
 
-    {{-- RIGA: COPERTINA + DATI --}}
+
+    {{-- COPERTINA + DATI --}}
     <div class="row">
-        {{-- COLONNA COPERTINA --}}
         <div class="col">
             @if ($scheda->copertina_path)
-                <img src="{{ public_path('storage/' . $scheda->copertina_path) }}" alt="Copertina" class="copertina">
+                <img src="{{ public_path('storage/' . $scheda->copertina_path) }}" class="copertina" alt="Copertina">
             @endif
         </div>
-
-        {{-- COLONNA DATI --}}
         <div class="col">
             <div class="titolo">{{ $scheda->libro->titolo }}</div>
             <div class="dati">
                 <p><strong>ISBN:</strong> {{ $scheda->libro->isbn }}</p>
                 <p><strong>Prezzo:</strong> €{{ number_format($scheda->libro->prezzo, 2, ',', '.') }}</p>
-                <p><strong>Data pubblicazione:</strong> {{ \Carbon\Carbon::parse($scheda->libro->data_pubblicazione)->format('d/m/Y') }}</p>
+                <p><strong>Data pubblicazione:</strong> {{ optional($scheda->libro->data_pubblicazione)->format('d/m/Y') }}</p>
                 <p><strong>Marchio:</strong> {{ $scheda->libro->marchio_editoriale ?? '-' }}</p>
                 <p><strong>Collana:</strong> {{ $scheda->libro->collana ?? '-' }}</p>
             </div>
@@ -102,40 +104,20 @@
     </div>
 
     {{-- SEZIONI TESTUALI --}}
-    @if ($scheda->strillo)
-        <div class="sezione">
-            <h2>Strillo</h2>
-            <p>{{ $scheda->strillo }}</p>
-        </div>
-    @endif
-
-    @if ($scheda->descrizione_breve)
-        <div class="sezione">
-            <h2>Descrizione breve</h2>
-            <p>{{ $scheda->descrizione_breve }}</p>
-        </div>
-    @endif
-
-    @if ($scheda->sinossi)
-        <div class="sezione">
-            <h2>Sinossi</h2>
-            <p>{{ $scheda->sinossi }}</p>
-        </div>
-    @endif
-
-    @if ($scheda->biografia_autore)
-        <div class="sezione">
-            <h2>Biografia autore</h2>
-            <p>{{ $scheda->biografia_autore }}</p>
-        </div>
-    @endif
-
-    @if ($scheda->extra)
-        <div class="sezione">
-            <h2>Extra</h2>
-            <p>{{ $scheda->extra }}</p>
-        </div>
-    @endif
+    @foreach ([
+        'Strillo' => $scheda->strillo,
+        'Descrizione breve' => $scheda->descrizione_breve,
+        'Sinossi' => $scheda->sinossi,
+        'Biografia autore' => $scheda->biografia_autore,
+        'Extra' => $scheda->extra,
+    ] as $titolo => $testo)
+        @if ($testo)
+            <div class="sezione">
+                <h2>{{ $titolo }}</h2>
+                <p>{{ $testo }}</p>
+            </div>
+        @endif
+    @endforeach
 
     {{-- DETTAGLI TECNICI --}}
     <div class="sezione">
@@ -151,7 +133,7 @@
         </div>
     @endif
 
-    {{-- COPERTINA STESA (SE PRESENTE) --}}
+    {{-- COPERTINA STESA --}}
     @if ($scheda->copertina_stesa_path)
         <div class="copertina-stesa">
             <h2>Copertina completa</h2>
