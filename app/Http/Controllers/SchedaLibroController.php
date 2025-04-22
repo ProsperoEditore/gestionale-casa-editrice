@@ -24,6 +24,13 @@ class SchedaLibroController extends Controller
         $libri = \App\Models\Libro::select('id', 'titolo', 'isbn')->get();
         return view('schede_libro.create', compact('libri'));
     }
+
+    public function show($id)
+    {
+    // Se non ti serve, puoi semplicemente fare un redirect o un messaggio
+    return redirect()->route('schede-libro.index');
+    }
+
     
 
     public function store(Request $request)
