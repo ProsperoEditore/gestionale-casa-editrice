@@ -111,16 +111,15 @@ class Libro extends Model
 
     public function getBarcodeAttribute()
     {
-        // Crea un'istanza del generatore di barcode
-        $barcode = new DNS1D();
-        
-        // Genera il codice a barre per l'ISBN
-        $barcodeImage = $barcode->getBarcodePNG($this->isbn, 'C128', 2, 60); // Modifica il tipo di codice a barre (C128 è per il formato Code 128)
-        
-        // Restituisce il codice a barre come base64
-        return 'data:image/png;base64,' . base64_encode($barcodeImage);
-    }
+    $barcode = new DNS1D();
     
+    // Genera il codice a barre come stringa base64
+    $barcodeImage = $barcode->getBarcodePNG($this->isbn, 'C128', 2, 60);
+    
+    // Restituisce l'immagine del codice a barre come base64
+    return 'data:image/png;base64,' . base64_encode($barcodeImage);
+    }
+
     
     
     
