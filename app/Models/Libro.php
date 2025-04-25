@@ -111,15 +111,27 @@ class Libro extends Model
 
     public function getBarcodeAttribute()
     {
-    $barcode = new DNS1D();
+        // Crea un'istanza del generatore di barcode
+        $barcode = new DNS1D();
+        
+        // Genera il codice a barre per l'ISBN
+        $barcodeImage = $barcode->getBarcodePNG($this->isbn, 'C128', 2, 60); // Modifica il tipo di codice a barre (C128 è per il formato Code 128)
     
-    // Genera il codice a barre come stringa base64
-    $barcodeImage = $barcode->getBarcodePNG($this->isbn, 'C128', 2, 60);
+        // Verifica che la cartella esista
+        $barcodePath = public_path('barcodes/' . $this->isbn . '.png');
+        
+        if (!file_exists($barcodePath)) {
+            // Crea la cartella se non esiste
+            if (!is_dir(public_path('barcodes'))) {
+                mkdir(public_path('barcodes'), 0777, true); // Crea la cartella 'barcodes'
+            }
+            // Salva l'immagine del codice a barre
+            file_put_contents($barcodePath, base64_decode($barcodeImage));
+        }
     
-    // Restituisce l'immagine del codice a barre come base64
-    return 'data:image/png;base64,' . base64_encode($barcodeImage);
+        // Restituisce il percorso relativo dell'immagine del codice a barre
+        return 'barcodes/' . $this->isbn . '.png';
     }
-
     
     
     

@@ -280,25 +280,23 @@ class OrdineController extends Controller
         } else {
             $marchio = MarchioEditoriale::where('nome', 'Prospero Editore')->first();
         }
-
-
-    // Genera il codice a barre per ogni libro in memoria
-    foreach ($ordine->libri as $libro) {
-        $barcode = new DNS1D();
-        foreach ($ordine->libri as $libro) {
-            $libro->barcode = $libro->barcode; // Restituisce il codice a barre in base64
-        }
-
-
     
+        // Genera il codice a barre per ogni libro e assicura che il percorso venga passato alla vista
+        foreach ($ordine->libri as $libro) {
+            // Aggiungi la proprietà 'barcode' per ogni libro
+            $libro->barcode = asset('barcodes/' . $libro->isbn . '.png');
+        }
+    
+        // Genera il PDF con i dati, incluso il barcode
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
     
+        // Nome del file PDF
         $filename = 'ordine_' . preg_replace('/[\/\\\\]/', '-', $ordine->codice) . '.pdf';
-
-        return PDF::loadView('ordini.pdf', compact('ordine', 'marchio'))
-          ->download($filename);
+    
+        // Restituisci il PDF in download
+        return $pdf->download($filename);
     }
-}
+    
 
     public function gestioneLibri($id)
     {
