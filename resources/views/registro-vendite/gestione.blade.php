@@ -124,9 +124,9 @@ $(document).ready(function() {
             <td><input type="number" name="valore_lordo[]" value="0.00" class="form-control valore-lordo" readonly></td>
             <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
         </tr>`;
-        $("#registroVenditeBody").append(newRow);
+        $("#registroVenditeBody")prepend(newRow);
 
-        let addedRow = $("#registroVenditeBody tr").last();
+        let addedRow = $("#registroVenditeBody tr").first();
         initAutocomplete(addedRow.find(".titolo"));
     });
 

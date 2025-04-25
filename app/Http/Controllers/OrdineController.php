@@ -9,7 +9,6 @@ use App\Models\Anagrafica;
 use App\Models\MarchioEditoriale;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Milon\Barcode\DNS1D;
-use Illuminate\Support\Facades\Log;
 
 
 class OrdineController extends Controller
@@ -299,13 +298,6 @@ class OrdineController extends Controller
         // Salva il codice a barre come file immagine
         $barcodeFilePath = public_path('barcodes/' . $libro->isbn . '.png');
         file_put_contents($barcodeFilePath, $barcodeImage);
-
-        // Verifica se l'immagine è stata creata correttamente
-        if (file_exists($barcodeFilePath)) {
-            \Log::info("Barcode creato per ISBN: " . $libro->isbn);
-        } else {
-            \Log::error("Errore nella creazione del barcode per ISBN: " . $libro->isbn);
-        }
 
         // Aggiungi il percorso dell'immagine del codice a barre nel libro
         $libro->barcode = asset('barcodes/' . $libro->isbn . '.png');
