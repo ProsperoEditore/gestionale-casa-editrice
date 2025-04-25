@@ -281,18 +281,28 @@ class OrdineController extends Controller
         }
 
 
+    // Genera il codice a barre per ogni libro
         foreach ($ordine->libri as $libro) {
-            $barcode = new DNS1D();
-            $barcode->setStorPath(public_path('barcode_images/')); // Salva l'immagine del codice a barre
-    
-            // Genera il codice a barre con formato C128
-            $barcodeImage = $barcode->getBarcodePNG($libro->isbn, 'C128', 2, 50);  // 2 è la larghezza della barra e 50 è l'altezza
-    
-            // Salva l'immagine in base64 per visualizzarla nel PDF
-            $libro->barcode = 'data:image/png;base64,' . base64_encode($barcodeImage); // Aggiungi il codice a barre come immagine base64
+        $barcode = new DNS1D();
+        $barcode->setStorPath(public_path('barcodes/')); // Impostiamo la cartella per salvare i codici a barre
+
+        // Verifica che la cartella esista
+        if (!is_dir(public_path('barcodes'))) {
+            mkdir(public_path('barcodes'), 0777, true); // Crea la cartella se non esiste
         }
 
-        
+        // Genera il codice a barre in formato PNG e salva il file
+        $barcodeImage = $barcode->getBarcodePNG($libro->isbn, 'C128', 2, 50);
+
+        // Salva il codice a barre come file immagine
+        $barcodeFilePath = public_path('barcodes/' . $libro->isbn . '.png');
+        file_put_contents($barcodeFilePath, $barcodeImage);
+
+        // Aggiungi il percorso dell'immagine del codice a barre nel libro
+        $libro->barcode = asset('barcodes/' . $libro->isbn . '.png');
+    }
+
+
     
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
     
