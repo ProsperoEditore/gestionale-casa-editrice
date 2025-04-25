@@ -8,6 +8,7 @@ use App\Models\Libro;
 use App\Models\Anagrafica;
 use App\Models\MarchioEditoriale;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Milon\Barcode\DNS1D; 
 
 class OrdineController extends Controller
 {
@@ -278,6 +279,20 @@ class OrdineController extends Controller
         } else {
             $marchio = MarchioEditoriale::where('nome', 'Prospero Editore')->first();
         }
+
+
+        foreach ($ordine->libri as $libro) {
+            $barcode = new DNS1D();
+            $barcode->setStorPath(public_path('barcode_images/')); // Salva l'immagine del codice a barre
+    
+            // Genera il codice a barre con formato C128
+            $barcodeImage = $barcode->getBarcodePNG($libro->isbn, 'C128', 2, 50);  // 2 è la larghezza della barra e 50 è l'altezza
+    
+            // Salva l'immagine in base64 per visualizzarla nel PDF
+            $libro->barcode = 'data:image/png;base64,' . base64_encode($barcodeImage); // Aggiungi il codice a barre come immagine base64
+        }
+
+        
     
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
     

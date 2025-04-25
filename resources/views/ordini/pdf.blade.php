@@ -167,6 +167,7 @@
         <tbody>
             @foreach($ordine->libri as $libro)
                 <tr>
+                <td><img src="{{ $libro->barcode }}" alt="Barcode"></td>
                 <td>{{ $libro->isbn }}</td>
                 <td>{{ $libro->titolo }}</td>
                 <td>{{ $libro->pivot->quantita }}</td>
