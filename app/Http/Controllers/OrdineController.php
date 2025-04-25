@@ -298,7 +298,7 @@ class OrdineController extends Controller
         return PDF::loadView('ordini.pdf', compact('ordine', 'marchio'))
           ->download($filename);
     }
-    
+}
 
     public function gestioneLibri($id)
     {
