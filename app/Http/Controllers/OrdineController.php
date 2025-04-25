@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Models\Ordine;
 use App\Models\Libro;
 use App\Models\Anagrafica;
 use App\Models\MarchioEditoriale;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Milon\Barcode\DNS1D; 
+use Milon\Barcode\DNS1D;
+
 
 class OrdineController extends Controller
 {
