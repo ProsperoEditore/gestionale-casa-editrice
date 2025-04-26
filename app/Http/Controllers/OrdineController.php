@@ -124,11 +124,12 @@ class OrdineController extends Controller
     
         $ordine = \App\Models\Ordine::findOrFail($id);
     
+
         // Salviamo i dati originali dei libri con quantità
         $libriPrecedenti = $ordine->libri()->withPivot('quantita')->get()->keyBy('id');
     
         $ordine->pagato = $request->input('pagato'); 
-        
+
         // Aggiorna i dati dell'ordine
         $ordine->update([
             'data' => $request->input('data'),
