@@ -75,7 +75,19 @@
     .totale-row {
     font-weight: bold;
     background-color: #f2f2f2;
-}
+    }
+
+    @font-face {
+        font-family: 'Code128';
+        src: url('{{ asset('fonts/code128.ttf') }}');
+    }
+
+    .barcode {
+        font-family: 'Code128';
+        font-size: 30px; /* Modifica la dimensione in base alle tue necessità */
+        margin-right: 10px;
+    }
+
 </style>
 
 
@@ -167,7 +179,7 @@
         <tbody>
             @foreach($ordine->libri as $libro)
                 <tr>
-                <td><img src="{{ $libro->barcode }}" alt="Barcode" style="height: 60px;">{{ $libro->isbn }}</td>
+                <td><span class="barcode">{{ $libro->isbn }}</span></td>
                 <td>{{ $libro->titolo }}</td>
                 <td>{{ $libro->pivot->quantita }}</td>
                 <td>{{ number_format($libro->pivot->prezzo_copertina, 2) }} €</td>

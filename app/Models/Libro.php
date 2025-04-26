@@ -14,6 +14,7 @@ use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class Libro extends Model
 {
     use HasFactory, SoftDeletes;
@@ -109,6 +110,9 @@ class Libro extends Model
         }
     }
 
+// Commenta l'intero metodo getBarcodeAttribute
+/*
+
 
     public function getBarcodeAttribute()
     {
@@ -125,7 +129,7 @@ class Libro extends Model
         // Restituisce l'URL del file su S3
         return Storage::disk('s3')->url($barcodePath);
     }
-   
+ */  
     
     
     

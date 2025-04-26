@@ -282,14 +282,15 @@ class OrdineController extends Controller
         } else {
             $marchio = MarchioEditoriale::where('nome', 'Prospero Editore')->first();
         }
-    
+// Commenta la parte in cui usi S3 per il barcode
+/*
         // Genera il codice a barre per ogni libro e assicura che il percorso venga passato alla vista
         foreach ($ordine->libri as $libro) {
             // Aggiungi la proprietà 'barcode' per ogni libro
             $libro->barcode = Storage::disk('s3')->url('barcodes/' . $libro->isbn . '.png');
         }
-
-        // Genera il PDF con i dati, incluso il barcode
+*/
+        // Genera il PDF con i dati
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
 
         // Nome del file PDF
