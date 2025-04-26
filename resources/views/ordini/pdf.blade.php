@@ -179,7 +179,10 @@
         <tbody>
             @foreach($ordine->libri as $libro)
                 <tr>
-                <td><span class="barcode">{{ $libro->isbn }}</span></td>
+                <td><span class="barcode">{{ $libro->isbn }}</span>
+                <br>
+                {{ $libro->isbn }}
+                </td>
                 <td>{{ $libro->titolo }}</td>
                 <td>{{ $libro->pivot->quantita }}</td>
                 <td>{{ number_format($libro->pivot->prezzo_copertina, 2) }} €</td>
