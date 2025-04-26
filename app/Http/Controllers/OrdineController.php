@@ -374,6 +374,7 @@ class OrdineController extends Controller
         $ordine = Ordine::select('id', 'anagrafica_id', 'data', 'canale', 'codice', 'tipo_ordine')->findOrFail($id);
     
         $ordine->update([
+            'pagato' => $request->input('pagato'),
             'causale' => $request->input('causale'),
             'condizioni_conto_deposito' => $request->input('condizioni_conto_deposito'),
             'totale_netto_compilato' => $request->input('totale_netto_compilato'),
