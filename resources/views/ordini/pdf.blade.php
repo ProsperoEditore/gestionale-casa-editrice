@@ -149,6 +149,13 @@
     <p><strong>Tipo ordine:</strong> {{ ucfirst($ordine->tipo_ordine) }}</p>
     <p><strong>Data:</strong> {{ $ordine->data }}</p>
 
+    @if($ordine->pagato)
+    <div style="text-align: center; color: red; font-weight: bold; margin-top: 20px;">
+        <p>PAGATO: {{ $ordine->pagato }}</p>
+    </div>
+@endif
+
+
     {{-- Se tipo = Conto Deposito, mostra causale e condizioni se compilati --}}
     @if($ordine->tipo_ordine === 'conto deposito')
         @if(!empty($ordine->causale))
