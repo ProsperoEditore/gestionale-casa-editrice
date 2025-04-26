@@ -28,7 +28,8 @@ class Ordine extends Model
         'totale_netto_compilato',
         'specifiche_iva',
         'costo_spedizione',
-        'altre_specifiche_iva'
+        'altre_specifiche_iva',
+        'pagato'
 
     ];
 
