@@ -149,11 +149,6 @@
     <p><strong>Tipo ordine:</strong> {{ ucfirst($ordine->tipo_ordine) }}</p>
     <p><strong>Data:</strong> {{ $ordine->data }}</p>
 
-    @if($ordine->pagato)
-    <div style="text-align: center; color: red; font-weight: bold; margin-top: 20px;">
-        <p>PAGATO: {{ $ordine->pagato }}</p>
-    </div>
-@endif
 
 
     {{-- Se tipo = Conto Deposito, mostra causale e condizioni se compilati --}}
@@ -213,6 +208,12 @@
             Totale a pagare: {{ number_format($ordine->totale_netto_compilato, 2) }} €
         </p>
     </div>
+
+    @if($ordine->pagato)
+    <div style="text-align: center; color: red; font-weight: bold; margin-top: 20px;">
+        <p>PAGATO: {{ $ordine->pagato }}</p>
+    </div>
+@endif
 
     @if(!empty($ordine->specifiche_iva))
         <p><strong>Specifiche IVA:</strong> {{ $ordine->specifiche_iva }}</p>
