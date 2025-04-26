@@ -283,8 +283,6 @@ class OrdineController extends Controller
             $marchio = MarchioEditoriale::where('nome', 'Prospero Editore')->first();
         }
     
-        dd(config('filesystems.disks.s3'));
-        
         // Genera il codice a barre per ogni libro e assicura che il percorso venga passato alla vista
         foreach ($ordine->libri as $libro) {
             // Aggiungi la proprietà 'barcode' per ogni libro
