@@ -128,7 +128,6 @@ class OrdineController extends Controller
         // Salviamo i dati originali dei libri con quantità
         $libriPrecedenti = $ordine->libri()->withPivot('quantita')->get()->keyBy('id');
     
-        $ordine->pagato = $request->input('pagato'); 
 
         // Aggiorna i dati dell'ordine
         $ordine->update([
@@ -140,6 +139,7 @@ class OrdineController extends Controller
             'totale_netto_compilato' => $request->input('totale_netto_compilato'),
             'tempi_pagamento' => $request->input('tempi_pagamento'),
             'modalita_pagamento' => $request->input('modalita_pagamento'),
+            'pagato' => $request->input('pagato'),
         ]);
     
         // Aggiorna i libri dell'ordine

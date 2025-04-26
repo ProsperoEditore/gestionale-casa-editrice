@@ -47,10 +47,10 @@
         @endif
 
         @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-            <div class="mb-3 mt-4">
-                <label for="pagato" class="form-label"><strong>PAGATO</strong></label>
-                <input type="text" name="pagato" maxlength="250" class="form-control" value="{{ old('pagato', $ordine->pagato) }}">
-            </div>
+        <div class="mb-3">
+            <label for="pagato" class="form-label"><strong>Pagato</strong></label>
+            <input type="text" name="pagato" class="form-control" maxlength="250" value="{{ old('pagato', $ordine->pagato) }}">
+        </div>
         <div class="mb-3 mt-4">
             <label for="specifiche_iva" class="form-label"><strong>Specifiche IVA</strong></label>
             <input type="text" name="specifiche_iva" maxlength="255" class="form-control" value="{{ old('specifiche_iva', $ordine->specifiche_iva ?? "IVA assolta all'origine dall'editore, ai sensi dell'art.74 co. 1 lett. c del DPR 633/72") }}">
