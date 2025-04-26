@@ -284,15 +284,15 @@ class OrdineController extends Controller
         // Genera il codice a barre per ogni libro e assicura che il percorso venga passato alla vista
         foreach ($ordine->libri as $libro) {
             // Aggiungi la proprietà 'barcode' per ogni libro
-            $libro->barcode = asset('barcodes/' . $libro->isbn . '.png');
+            $libro->barcode = Storage::disk('s3')->url('barcodes/' . $libro->isbn . '.png');
         }
-    
+
         // Genera il PDF con i dati, incluso il barcode
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
-    
+
         // Nome del file PDF
         $filename = 'ordine_' . preg_replace('/[\/\\\\]/', '-', $ordine->codice) . '.pdf';
-    
+
         // Restituisci il PDF in download
         return $pdf->download($filename);
     }

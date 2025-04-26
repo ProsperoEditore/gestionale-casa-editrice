@@ -11,6 +11,7 @@ use App\Models\MarchioEditoriale;
 use App\Models\Magazzino;
 use App\Models\Giacenza;
 use Milon\Barcode\DNS1D;
+use Illuminate\Support\Facades\Storage;
 
 
 class Libro extends Model
@@ -116,23 +117,15 @@ class Libro extends Model
         
         // Genera il codice a barre per l'ISBN
         $barcodeImage = $barcode->getBarcodePNG($this->isbn, 'C128', 2, 60); // Modifica il tipo di codice a barre (C128 è per il formato Code 128)
-    
-        // Verifica che la cartella esista
-        $barcodePath = public_path('barcodes/' . $this->isbn . '.png');
         
-        if (!file_exists($barcodePath)) {
-            // Crea la cartella se non esiste
-            if (!is_dir(public_path('barcodes'))) {
-                mkdir(public_path('barcodes'), 0777, true); // Crea la cartella 'barcodes'
-            }
-            // Salva l'immagine del codice a barre
-            file_put_contents($barcodePath, base64_decode($barcodeImage));
-        }
-    
-        // Restituisce il percorso relativo dell'immagine del codice a barre
-        return 'barcodes/' . $this->isbn . '.png';
+        // Salva l'immagine su S3 (al posto di salvarla localmente)
+        $barcodePath = 'barcodes/' . $this->isbn . '.png';
+        Storage::disk('s3')->put($barcodePath, base64_decode($barcodeImage));
+        
+        // Restituisce l'URL del file su S3
+        return Storage::disk('s3')->url($barcodePath);
     }
-    
+   
     
     
     

@@ -73,5 +73,18 @@
             </tr>
         </tfoot>
     </table>
+
+    <!-- Footer con numerazione delle pagine -->
+<script type="text/php">
+    if (isset($pdf)) {
+        $font = $fontMetrics->getFont('Helvetica', 'normal');
+        $size = 9;
+        $text = "pag. {PAGE_NUM} di {PAGE_COUNT}";
+        $width = $fontMetrics->getTextWidth($text, $font, $size);
+        $pdf->page_text(($pdf->get_width() - $width) / 2, $pdf->get_height() - 20, $text, $font, $size);
+    }
+</script>
+
+
 </body>
 </html>
