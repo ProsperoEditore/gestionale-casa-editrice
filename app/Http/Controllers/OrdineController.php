@@ -9,6 +9,8 @@ use App\Models\Anagrafica;
 use App\Models\MarchioEditoriale;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Milon\Barcode\DNS1D;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class OrdineController extends Controller
