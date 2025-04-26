@@ -69,6 +69,8 @@ class OrdineController extends Controller
         }
     
         $validatedData = $request->validate($rules);
+
+        $validatedData['pagato'] = $request->input('pagato'); 
     
         // ✅ Se non è acquisto, metti un valore valido placeholder per evitare errori di constraint
         if ($tipo !== 'acquisto') {
@@ -125,6 +127,8 @@ class OrdineController extends Controller
         // Salviamo i dati originali dei libri con quantità
         $libriPrecedenti = $ordine->libri()->withPivot('quantita')->get()->keyBy('id');
     
+        $ordine->pagato = $request->input('pagato'); 
+        
         // Aggiorna i dati dell'ordine
         $ordine->update([
             'data' => $request->input('data'),
