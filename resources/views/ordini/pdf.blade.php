@@ -210,11 +210,12 @@
     </div>
 
     @if($ordine->pagato)
-    <div style="margin: 10px 10; text-align: center;">
-        <p style="font-size: 14 px; color: red; font-weight: bold; margin-top: 10px;">
-        <p>PAGATO: {{ $ordine->pagato }}</p>
+    <div style="margin: 10px 0; text-align: center;">
+        <p style="font-size: 14px; color: red; font-weight: bold; margin-top: 5px;">
+            PAGATO: {{ $ordine->pagato }}
+        </p>
     </div>
-@endif
+    @endif
 
     @if(!empty($ordine->specifiche_iva))
         <p><strong>Specifiche IVA:</strong> {{ $ordine->specifiche_iva }}</p>
