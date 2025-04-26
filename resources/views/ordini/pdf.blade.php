@@ -203,14 +203,15 @@
 
     {{-- Totale e metodi di pagamento solo per Acquisto --}}
     @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-    <div style="margin: 30px 0; text-align: center;">
+    <div style="margin: 20px 0; text-align: center;">
         <p style="font-size: 16px; font-weight: bold; margin: 10px 0;">
             Totale a pagare: {{ number_format($ordine->totale_netto_compilato, 2) }} €
         </p>
     </div>
 
     @if($ordine->pagato)
-    <div style="text-align: center; color: red; font-weight: bold; margin-top: 20px;">
+    <div style="margin: 10px 10; text-align: center;">
+        <p style="font-size: 14 px; color: red; font-weight: bold; margin-top: 10px;">
         <p>PAGATO: {{ $ordine->pagato }}</p>
     </div>
 @endif
