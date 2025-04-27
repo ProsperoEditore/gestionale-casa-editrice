@@ -20,12 +20,13 @@
 
     .logo-container {
     position: absolute;
-    top: 40px;
-    right: 40px;
+    top: 0px;
+    right: 0px;
+    padding: 10px;
 }
 
 .logo {
-    height: 170px;
+    height: 150px;
     width: auto;
 }
 
