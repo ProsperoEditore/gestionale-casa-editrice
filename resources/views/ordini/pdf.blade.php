@@ -93,7 +93,23 @@
 
 </head>
 <body>
-    {{-- Header: Logo e dati marchio + anagrafica cliente a destra --}}
+
+@php
+    $marchiPresenti = $ordine->libri->pluck('marchio_id')->unique();
+    $logo = 'logo-prospero.png'; // default
+    if ($marchiPresenti->count() === 1) {
+        $marchioId = $marchiPresenti->first();
+        if ($marchioId == 1) {
+            $logo = 'logo-prospero.png';
+        } elseif ($marchioId == 2) {
+            $logo = 'logo-calibano.png';
+        } elseif ($marchioId == 3) {
+            $logo = 'logo-miranda.png';
+        }
+    }
+@endphp
+
+    {{-- Header: Colonna sinistra dati marchio --}}
     <div class="header">
         <div>
             <div class="marchio-info">
@@ -107,6 +123,13 @@
                 Email: {{ $marchio->email }}<br>
                 Sito: {{ $marchio->sito_web }}
             </div>
+        </div>
+
+        {{-- Header: Colonna destra logo marchio e sotto anagrafica cliente--}}
+
+        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+        <div style="margin-bottom: 100px;">
+            <img src="{{ public_path('images/' . $logo) }}" class="logo" alt="Logo Marchio">
         </div>
 
         <div class="cliente-info">
@@ -142,8 +165,8 @@
                 <strong>Telefono:</strong> {{ $ordine->anagrafica->telefono }}<br>
             @endif
         </div>
-
     </div>
+</div>
 
     <h2 style="margin-top: 40px;">Dettagli Ordine #{{ $ordine->codice }}</h2>
     <p><strong>Tipo ordine:</strong> {{ ucfirst($ordine->tipo_ordine) }}</p>
