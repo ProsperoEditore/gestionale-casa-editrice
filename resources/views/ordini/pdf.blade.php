@@ -127,13 +127,11 @@
         </div>
     </div>
 
-    <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-start;">
-    <div style="margin-bottom: 10px;">
-        <img src="{{ public_path('images/' . $logo) }}" class="logo" alt="Logo Marchio">
-    </div>
-
-    <div class="cliente-info">
-        <h4>Dati Cliente</h4>
+    <div style="flex: 1; text-align: right;">
+        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio" style="height: 80px; margin-bottom: 20px;">
+        
+        <div class="cliente-info">
+            <h4>Dati Cliente</h4>
             @if(!empty($ordine->anagrafica->nome))
                 <strong>Nome:</strong> {{ $ordine->anagrafica->nome }}<br>
             @endif
