@@ -128,7 +128,7 @@
     </div>
 
     <div style="flex: 1; text-align: right;">
-        <img src="{{ public_path('images/' . \$logo) }}" class="logo" alt="Logo Marchio">
+        <img src="{{ public_path('images/' . $logo) }}" class="logo" alt="Logo Marchio">
         <div class="cliente-info">
             <h4>Dati Cliente</h4>
             <h4>Dati Cliente</h4>
