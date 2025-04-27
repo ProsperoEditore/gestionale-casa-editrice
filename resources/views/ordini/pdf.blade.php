@@ -128,8 +128,8 @@
     </div>
 
     <div style="flex: 1; text-align: right;">
-        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio" style="height: 80px; margin-bottom: 20px;">
-        
+        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio" style="height: 200px; width: auto; margin-top: 0; margin-bottom: 20px;">
+    
         <div class="cliente-info">
             <h4>Dati Cliente</h4>
             @if(!empty($ordine->anagrafica->nome))
