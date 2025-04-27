@@ -17,12 +17,15 @@
         align-items: flex-start;
     }
 
-    .logo {
-    height: 300px;
-    width: auto;
+    .logo-container {
     position: absolute;
-    top: 40px;
-    right: 40px;
+    top: 0px;
+    right: 0px;
+}
+
+.logo {
+    height: 160px;
+    width: auto;
 }
 
 
