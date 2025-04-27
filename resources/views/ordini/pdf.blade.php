@@ -128,8 +128,8 @@
         {{-- Header: Colonna destra logo marchio e sotto anagrafica cliente--}}
 
         <div style="display: flex; flex-direction: column; align-items: flex-end;">
-        <div style="margin-bottom: 100px;">
-            <img src="{{ public_path('images/' . $logo) }}" class="logo" alt="Logo Marchio">
+        <div style="margin-bottom: 50px;">
+        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio">
         </div>
 
         <div class="cliente-info">
