@@ -18,7 +18,9 @@
     }
 
     .logo {
-        height: 60px;
+    height: 150px;
+    width: auto; 
+    margin-bottom: 10px;
     }
 
     .marchio-info {
@@ -111,28 +113,24 @@
 
     {{-- Header: Colonna sinistra dati marchio --}}
     <div class="header">
-        <div>
-            <div class="marchio-info">
-                <strong>{{ $marchio->nome }}</strong><br>
-                Indirizzo legale: {{ $marchio->indirizzo_sede_legale }}<br>
-                Indirizzo logistica: {{ $marchio->indirizzo_sede_logistica }}<br>
-                P.IVA: {{ $marchio->partita_iva }}<br>
-                Codice Univoco: {{ $marchio->codice_univoco }}<br>
-                IBAN: {{ $marchio->iban }}<br>
-                Tel: {{ $marchio->telefono }}<br>
-                Email: {{ $marchio->email }}<br>
-                Sito: {{ $marchio->sito_web }}
-            </div>
+    <div style="flex: 1;">
+        <div class="marchio-info">
+            <strong>{{ \$marchio->nome }}</strong><br>
+            Indirizzo legale: {{ \$marchio->indirizzo_sede_legale }}<br>
+            Indirizzo logistica: {{ \$marchio->indirizzo_sede_logistica }}<br>
+            P.IVA: {{ \$marchio->partita_iva }}<br>
+            Codice Univoco: {{ \$marchio->codice_univoco }}<br>
+            IBAN: {{ \$marchio->iban }}<br>
+            Tel: {{ \$marchio->telefono }}<br>
+            Email: {{ \$marchio->email }}<br>
+            Sito: {{ \$marchio->sito_web }}
         </div>
+    </div>
 
-        {{-- Header: Colonna destra logo marchio e sotto anagrafica cliente--}}
-
-        <div style="display: flex; flex-direction: column; align-items: flex-end;">
-        <div style="margin-bottom: 50px;">
-        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio">
-        </div>
-
+    <div style="flex: 1; text-align: right;">
+        <img src="{{ public_path('images/' . \$logo) }}" class="logo" alt="Logo Marchio">
         <div class="cliente-info">
+            <h4>Dati Cliente</h4>
             <h4>Dati Cliente</h4>
             @if(!empty($ordine->anagrafica->nome))
                 <strong>Nome:</strong> {{ $ordine->anagrafica->nome }}<br>
