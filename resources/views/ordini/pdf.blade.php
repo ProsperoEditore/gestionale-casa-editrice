@@ -9,6 +9,7 @@
         font-size: 12px;
         color: #222;
         margin: 40px;
+        position: relative; 
     }
 
     .header {
@@ -19,12 +20,12 @@
 
     .logo-container {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 40px;
+    right: 40px;
 }
 
 .logo {
-    height: 160px;
+    height: 170px;
     width: auto;
 }
 
@@ -133,8 +134,10 @@
         </div>
     </div>
 
+    <div class="logo-container">
         <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio">
-    
+    </div>
+
         <div class="cliente-info">
             <h4>Dati Cliente</h4>
             @if(!empty($ordine->anagrafica->nome))
