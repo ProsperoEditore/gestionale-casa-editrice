@@ -115,15 +115,15 @@
     <div class="header">
     <div style="flex: 1;">
         <div class="marchio-info">
-            <strong>{{ \$marchio->nome }}</strong><br>
-            Indirizzo legale: {{ \$marchio->indirizzo_sede_legale }}<br>
-            Indirizzo logistica: {{ \$marchio->indirizzo_sede_logistica }}<br>
-            P.IVA: {{ \$marchio->partita_iva }}<br>
-            Codice Univoco: {{ \$marchio->codice_univoco }}<br>
-            IBAN: {{ \$marchio->iban }}<br>
-            Tel: {{ \$marchio->telefono }}<br>
-            Email: {{ \$marchio->email }}<br>
-            Sito: {{ \$marchio->sito_web }}
+            <strong>{{ $marchio->nome }}</strong><br>
+            Indirizzo legale: {{ $marchio->indirizzo_sede_legale }}<br>
+            Indirizzo logistica: {{ $marchio->indirizzo_sede_logistica }}<br>
+            P.IVA: {{ $marchio->partita_iva }}<br>
+            Codice Univoco: {{ $marchio->codice_univoco }}<br>
+            IBAN: {{ $marchio->iban }}<br>
+            Tel: {{ $marchio->telefono }}<br>
+            Email: {{ $marchio->email }}<br>
+            Sito: {{ $marchio->sito_web }}
         </div>
     </div>
 
