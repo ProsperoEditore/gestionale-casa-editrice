@@ -18,10 +18,13 @@
     }
 
     .logo {
-    height: 150px;
-    width: auto; 
-    margin-bottom: 10px;
-    }
+    height: 300px;
+    width: auto;
+    position: absolute;
+    top: 40px;
+    right: 40px;
+}
+
 
     .marchio-info {
         font-size: 12px;
@@ -127,8 +130,7 @@
         </div>
     </div>
 
-    <div style="flex: 1; text-align: right;">
-        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio" style="height: 200px; width: auto; margin-top: 0; margin-bottom: 20px;">
+        <img src="{{ asset('images/' . $logo) }}" class="logo" alt="Logo Marchio">
     
         <div class="cliente-info">
             <h4>Dati Cliente</h4>
