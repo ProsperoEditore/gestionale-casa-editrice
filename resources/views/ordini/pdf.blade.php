@@ -22,11 +22,10 @@
     position: absolute;
     top: 0px;
     right: 0px;
-    padding: 10px;
 }
 
 .logo {
-    height: 60px;
+    height: 65px;
     width: auto;
 }
 
