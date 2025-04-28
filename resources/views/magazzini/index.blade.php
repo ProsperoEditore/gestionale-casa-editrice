@@ -40,14 +40,16 @@
                             <td>{{ $magazzino->anagrafica->nome ?? 'N/A' }}</td>
                             <td>{{ $magazzino->anagrafica->email ?? 'N/A' }}</td>
                             <td class="d-flex align-items-center justify-content-center gap-2">
-                                <input type="date" class="form-control scadenza-input"
-                                    data-id="{{ $magazzino->id }}"
-                                    value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
-                                    onchange="updateScadenza({{ $magazzino->id }}, this)">
                                 @if(optional($magazzino->anagrafica)->categoria === 'magazzino editore')
                                     <span class="badge bg-secondary">N.D.</span>
+                                @else
+                                    <input type="date" class="form-control scadenza-input"
+                                        data-id="{{ $magazzino->id }}"
+                                        value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
+                                        onchange="updateScadenza({{ $magazzino->id }}, this)">
                                 @endif
                             </td>
+
                             @if(auth()->user()->ruolo !== 'utente')
                                 <td>
                                     <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
@@ -91,19 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
     input.style.backgroundColor = '';
     input.style.color = '';
 
-    // Recupera la categoria del magazzino
-    const categoriaCell = input.closest('tr').querySelector('td:nth-child(1)');
-    const categoria = categoriaCell ? categoriaCell.textContent.trim().toLowerCase() : '';
-
-    // Se il magazzino è "magazzino editore", sfondo fisso grigio chiaro
-    if (categoria === 'magazzino editore') {
-        input.style.backgroundColor = '#f8f9fa'; // Grigio chiarissimo
-        input.style.color = '#000';
-        return;
-    }
-
     if (!dateValue) {
-        // Se non è "magazzino editore" ma la data è vuota
         input.style.backgroundColor = '#f8f9fa';
         input.style.color = '#000';
         return;
@@ -114,8 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const diffDays = Math.round((scadenzaDate - today) / (1000 * 60 * 60 * 24));
 
-    if (diffDays >= -7 && diffDays <= 14) {
+    if (diffDays >= 0 && diffDays <= 7) {
         input.style.backgroundColor = '#ffeb3b'; // Giallo
+        input.style.color = '#000';
+    } else if (diffDays < 0 && Math.abs(diffDays) <= 14) {
+        input.style.backgroundColor = '#ffeb3b'; // Giallo anche se è passata da meno di 14gg
         input.style.color = '#000';
     } else if (diffDays < -14) {
         input.style.backgroundColor = '#dc3545'; // Rosso
@@ -125,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
         input.style.color = '#fff';
     }
 }
-
 
 
     let timeout;
