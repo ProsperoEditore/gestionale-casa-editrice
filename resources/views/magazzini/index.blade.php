@@ -39,11 +39,14 @@
                             <td>{{ $magazzino->anagrafica->categoria ?? 'N/A' }}</td>
                             <td>{{ $magazzino->anagrafica->nome ?? 'N/A' }}</td>
                             <td>{{ $magazzino->anagrafica->email ?? 'N/A' }}</td>
-                            <td>
+                            <td class="d-flex align-items-center justify-content-center gap-2">
                                 <input type="date" class="form-control scadenza-input"
-                                       data-id="{{ $magazzino->id }}"
-                                       value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
-                                       onchange="updateScadenza({{ $magazzino->id }}, this)">
+                                    data-id="{{ $magazzino->id }}"
+                                    value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
+                                    onchange="updateScadenza({{ $magazzino->id }}, this)">
+                                @if(optional($magazzino->anagrafica)->categoria === 'magazzino editore')
+                                    <span class="badge bg-secondary">N.D.</span>
+                                @endif
                             </td>
                             @if(auth()->user()->ruolo !== 'utente')
                                 <td>
@@ -83,13 +86,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    input.style.transition = 'background-color 0.5s ease, color 0.5s ease'; // Transizione morbida
+    input.style.transition = 'background-color 0.5s ease, color 0.5s ease';
 
     input.style.backgroundColor = '';
     input.style.color = '';
 
+    // Recupera la categoria del magazzino
+    const categoriaCell = input.closest('tr').querySelector('td:nth-child(1)');
+    const categoria = categoriaCell ? categoriaCell.textContent.trim().toLowerCase() : '';
+
+    // Se il magazzino è "magazzino editore", sfondo fisso grigio chiaro
+    if (categoria === 'magazzino editore') {
+        input.style.backgroundColor = '#f8f9fa'; // Grigio chiarissimo
+        input.style.color = '#000';
+        return;
+    }
+
     if (!dateValue) {
-        // Se la data è vuota: sfondo grigio chiaro
+        // Se non è "magazzino editore" ma la data è vuota
         input.style.backgroundColor = '#f8f9fa';
         input.style.color = '#000';
         return;
