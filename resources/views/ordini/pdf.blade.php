@@ -216,7 +216,7 @@
                 </td>
                 <td>{{ $libro->titolo }}</td>
                 <td>{{ $libro->pivot->quantita }}</td>
-                <td>{{ number_format($libro->pivot->prezzo_copertina, 2) }} €</td>
+                <td>{{ number_format($libro->pivot->prezzo, 2) }} €</td>
                 <td>
                     <del>{{ number_format($libro->pivot->valore_vendita_lordo, 2) }} €</del>
                 </td>
