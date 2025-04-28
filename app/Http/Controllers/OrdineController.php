@@ -397,7 +397,8 @@ class OrdineController extends Controller
             foreach ($request->libro_id as $index => $libro_id) {
                 if (!empty($libro_id)) {
                     $quantita = $request->quantita[$index] ?? 0;
-                    $prezzo = $request->prezzo[$index] ?? 0.00;
+                    $libro = \App\Models\Libro::find($libro_id);
+                    $prezzo_copertina = $libro ? $libro->prezzo : 0.00;
                     $valore_lordo = $request->valore_vendita_lordo[$index] ?? 0.00;
                     $sconto = $request->sconto[$index] ?? 0.00;
                     $netto = $request->netto_a_pagare[$index] ?? 0.00;
