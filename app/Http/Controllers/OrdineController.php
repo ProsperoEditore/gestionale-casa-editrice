@@ -406,7 +406,7 @@ class OrdineController extends Controller
     
                     $libriSync[$libro_id] = [
                         'quantita' => $quantita,
-                        'prezzo_copertina' => $prezzo,
+                        'prezzo_copertina' => $prezzo_copertina,
                         'valore_vendita_lordo' => $valore_lordo,
                         'sconto' => $sconto,
                         'netto_a_pagare' => $netto,
