@@ -79,27 +79,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function colorizeDate(input) {
-        const dateValue = input.value;
-        if (!dateValue) return;
+    const dateValue = input.value;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-        const today = new Date();
-        const scadenzaDate = new Date(dateValue);
-        scadenzaDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
+    input.style.transition = 'background-color 0.5s ease, color 0.5s ease'; // Transizione morbida
 
-        const diffDays = Math.round((scadenzaDate - today) / (1000 * 60 * 60 * 24));
+    input.style.backgroundColor = '';
+    input.style.color = '';
 
-        input.style.backgroundColor = '';
-        input.style.color = '';
-
-        if (diffDays >= -7 && diffDays <= 14) {
-            input.style.backgroundColor = '#ffeb3b';
-            input.style.color = '#000';
-        } else if (diffDays < -14) {
-            input.style.backgroundColor = '#dc3545';
-            input.style.color = '#fff';
-        }
+    if (!dateValue) {
+        // Se la data è vuota: sfondo grigio chiaro
+        input.style.backgroundColor = '#f8f9fa';
+        input.style.color = '#000';
+        return;
     }
+
+    const scadenzaDate = new Date(dateValue);
+    scadenzaDate.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.round((scadenzaDate - today) / (1000 * 60 * 60 * 24));
+
+    if (diffDays >= -7 && diffDays <= 14) {
+        input.style.backgroundColor = '#ffeb3b'; // Giallo
+        input.style.color = '#000';
+    } else if (diffDays < -14) {
+        input.style.backgroundColor = '#dc3545'; // Rosso
+        input.style.color = '#fff';
+    } else {
+        input.style.backgroundColor = '#28a745'; // Verde
+        input.style.color = '#fff';
+    }
+}
+
+
 
     let timeout;
 
@@ -118,12 +131,12 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    colorizeDate(input);
-                } else {
+                colorizeDate(input); // forza il ricolore sempre
+                if (!data.success) {
                     alert("Errore nell'aggiornamento della data.");
                 }
             })
+
             .catch(error => {
                 console.error('Errore:', error);
                 alert("Errore nella richiesta.");
