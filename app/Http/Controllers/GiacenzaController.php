@@ -120,12 +120,10 @@ class GiacenzaController extends Controller
                 }
             }
     
-            // Se è nuova o modificata → aggiorna data e salva
-            if ($isNuova || $modificata) {
                 $giacenza->data_ultimo_aggiornamento = now();
                 $giacenza->save();
                 $savedIds[] = ['id' => $giacenza->id, 'isbn' => $giacenza->isbn];
-            }
+            
         }
     
         return response()->json(['success' => true, 'saved_ids' => $savedIds]);
