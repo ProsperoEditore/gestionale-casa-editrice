@@ -111,20 +111,33 @@ class RegistroVenditeController extends Controller
             foreach ($request->data as $index => $data) {
                 $periodo = !empty($request->periodo[$index]) ? $request->periodo[$index] : 'N/D';
     
-                RegistroVenditeDettaglio::updateOrCreate(
-                    [
+                // Se il dettaglio ha ID, aggiorna, altrimenti crea
+                if (!empty($request->id[$index])) {
+                    $dettaglio = RegistroVenditeDettaglio::find($request->id[$index]);
+                    if ($dettaglio) {
+                        $dettaglio->update([
+                            'data' => $data,
+                            'periodo' => $periodo,
+                            'isbn' => $request->isbn[$index] ?? null,
+                            'titolo' => $request->titolo[$index] ?? null,
+                            'quantita' => $request->quantita[$index] ?? 0,
+                            'prezzo' => $request->prezzo[$index] ?? 0.00,
+                            'valore_lordo' => ($request->quantita[$index] ?? 0) * ($request->prezzo[$index] ?? 0.00),
+                        ]);
+                    }
+                } else {
+                    RegistroVenditeDettaglio::create([
                         'registro_vendita_id' => $registroVendita->id,
-                        'isbn' => $request->isbn[$index],
-                        'data' => $data
-                    ],
-                    [
+                        'data' => $data,
                         'periodo' => $periodo,
+                        'isbn' => $request->isbn[$index] ?? null,
                         'titolo' => $request->titolo[$index] ?? null,
                         'quantita' => $request->quantita[$index] ?? 0,
                         'prezzo' => $request->prezzo[$index] ?? 0.00,
                         'valore_lordo' => ($request->quantita[$index] ?? 0) * ($request->prezzo[$index] ?? 0.00),
-                    ]
-                );
+                    ]);
+                }
+
     
                 // ✅ AGGIORNA GIACENZA se esiste il magazzino per l'anagrafica
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $registroVendita->anagrafica_id)->first();
