@@ -25,7 +25,7 @@
 }
 
 .logo {
-    height: 65px;
+    height: 60px;
     width: auto;
 }
 
@@ -106,7 +106,7 @@
 @php
     $logo = 'logo-prospero.png'; // Default di sicurezza
 
-    $marchiPresenti = $ordine->libri->pluck('marchio_id')->unique();
+    $marchiPresenti = $ordine->libri->pluck('marchio_editoriale_id')->unique();
 
     if ($marchiPresenti->contains(1)) {
         // Se tra i libri c'è almeno un libro di Prospero, usa sempre il logo di Prospero
