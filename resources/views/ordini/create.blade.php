@@ -18,8 +18,12 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Anagrafica</label>
-                        <input type="text" id="anagrafica_autocomplete" class="form-control" placeholder="Digita un nome..." required>
-                        <input type="hidden" name="anagrafica_id" id="anagrafica_id">
+                        <select class="form-control select2" name="anagrafica_id" required>
+                        <option></option>
+                        @foreach ($anagrafiche as $anagrafica)
+                            <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome }}</option>
+                        @endforeach
+                    </select>
                     </div>
 
                 </div>
@@ -67,38 +71,9 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
-
-<script>
-$(document).ready(function () {
-    $("#anagrafica_autocomplete").autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: "{{ route('ordini.autocomplete-anagrafica') }}",
-                data: {
-                    query: request.term
-                },
-                success: function (data) {
-                    response($.map(data, function (item) {
-                        return {
-                            label: item.nome,
-                            value: item.nome,
-                            id: item.id
-                        };
-                    }));
-                }
-            });
-        },
-        select: function (event, ui) {
-            $('#anagrafica_autocomplete').val(ui.item.label);
-            $('#anagrafica_id').val(ui.item.id);
-            return false;
-        }
-    });
-});
-</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -117,6 +92,16 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleCanale(); // eseguito all'avvio
 });
 </script>
+
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        placeholder: "Cerca un'anagrafica",
+        allowClear: true
+    });
+});
+</script>
+
 
 
 @endpush
