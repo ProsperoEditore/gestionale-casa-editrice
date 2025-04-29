@@ -30,7 +30,7 @@ class OrdineController extends Controller
         
             return view('ordini.index', compact('ordini', 'tutteAnagrafiche'));
         }
-    
+    }  
     
 
     public function create()
