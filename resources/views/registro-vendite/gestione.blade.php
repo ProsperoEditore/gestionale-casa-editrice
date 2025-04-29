@@ -46,27 +46,29 @@
                     </tr>
                 </thead>
                 <tbody id="registroVenditeBody">
-                    @if($dettagli->count() > 0)
-                        @foreach($dettagli as $dettaglio)
-                            <tr data-id="{{ $dettaglio->id }}">
-                                <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
-                                <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
-                                <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
-                                <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
-                                <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
-                                <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
-                                <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="8" class="text-center">Nessuna vendita presente.</td>
-                        </tr>
-                    @endif
-                </tbody>
+    @if($dettagli->count() > 0)
+        @foreach($dettagli as $dettaglio)
+            <tr data-id="{{ $dettaglio->id }}">
+                <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
+                <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
+                <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
+                <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
+                <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
+                <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
+                <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
+                <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+                </td>
+            </tr>
+        @endforeach
+    @else
+        <tr>
+            <td colspan="8" class="text-center">Nessuna vendita presente.</td>
+        </tr>
+    @endif
+</tbody>
+
             </table>
 
             <!-- 🔽 Paginazione -->
