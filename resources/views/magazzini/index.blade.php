@@ -8,7 +8,14 @@
         <a href="{{ route('magazzini.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
         <form action="{{ route('magazzini.index') }}" method="GET" class="d-flex flex-wrap gap-2">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per nome...">
+            <select name="search" class="form-control select2" onchange="this.form.submit()">
+                <option value="">Cerca per nome...</option>
+                @foreach(\App\Models\Anagrafica::orderBy('nome')->get() as $anagrafica)
+                    <option value="{{ $anagrafica->nome }}" {{ request('search') == $anagrafica->nome ? 'selected' : '' }}>
+                        {{ $anagrafica->nome }}
+                    </option>
+                @endforeach
+            </select>
             <select name="categoria" class="form-select">
                 <option value="">Cerca per categoria...</option>
                 <option value="magazzino editore" {{ request('categoria') == 'magazzino editore' ? 'selected' : '' }}>Magazzino Editore</option>
@@ -151,4 +158,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('.select2').select2({
+        placeholder: "Cerca per nome...",
+        allowClear: true
+    });
+});
+</script>
+
 @endsection

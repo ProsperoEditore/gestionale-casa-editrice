@@ -14,8 +14,9 @@ class MagazzinoController extends Controller
     
         // Filtro per nome dell'anagrafica
         if ($request->filled('search')) {
-            $query->whereHas('anagrafica', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->search . '%');
+            $searchTerm = strtolower(trim($request->search));
+            $query->whereHas('anagrafica', function ($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(REPLACE(nome, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $searchTerm) . '%']);
             });
         }
     
