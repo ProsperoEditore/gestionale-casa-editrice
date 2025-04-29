@@ -104,15 +104,14 @@
 <body>
 
 @php
-    $marchiPresenti = $ordine->libri->pluck('marchio_id')->unique();
     $logo = 'logo-prospero.png'; // default
-    if ($marchiPresenti->count() === 1) {
-        $marchioId = $marchiPresenti->first();
-        if ($marchioId == 1) {
+
+    if (!empty($marchio)) {
+        if ($marchio->id == 1) {
             $logo = 'logo-prospero.png';
-        } elseif ($marchioId == 2) {
+        } elseif ($marchio->id == 2) {
             $logo = 'logo-calibano.png';
-        } elseif ($marchioId == 3) {
+        } elseif ($marchio->id == 3) {
             $logo = 'logo-miranda.png';
         }
     }
