@@ -11,7 +11,7 @@
 
                 <div class="mb-3">
                     <label for="anagrafica_id" class="form-label">Anagrafica Associata</label>
-                    <select name="anagrafica_id" id="anagrafica_id" class="form-control" required>
+                    <select name="anagrafica_id" id="anagrafica_id" class="form-control select2" required>
                         <option value="">Seleziona un'anagrafica</option>
                         @foreach($anagrafiche as $anagrafica)
                             <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome }} ({{ $anagrafica->categoria }})</option>
