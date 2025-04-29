@@ -155,25 +155,28 @@ class RegistroVenditeController extends Controller
 
      
 
-public function gestione($id, Request $request)
+    public function gestione($id, Request $request)
     {
-    $registroVendita = RegistroVendite::with('dettagli')->findOrFail($id);
-    $query = RegistroVenditeDettaglio::where('registro_vendita_id', $id);
-
-    if ($request->has('search') && $request->input('search') != '') {
-        $searchTerm = $request->input('search');
-        $query->whereHas('libro', function($q) use ($searchTerm) {
-            $q->where('titolo', 'like', '%' . $searchTerm . '%');
-        });
+        $registroVendita = RegistroVendite::with('dettagli')->findOrFail($id);
+        $query = RegistroVenditeDettaglio::where('registro_vendita_id', $id);
+    
+        if ($request->has('search') && $request->input('search') != '') {
+            $searchTerm = $request->input('search');
+            $query->whereHas('libro', function($q) use ($searchTerm) {
+                $q->where('titolo', 'like', '%' . $searchTerm . '%');
+            });
+        }
+    
+        // 👇 Qui aggiungi orderBy PRIMA di paginate
+        $dettagli = $query->orderBy('data', 'desc')->paginate(100)->appends($request->query());
+        
+        $libri = Libro::with('marchio_editoriale')->get();
+    
+        return view('registro-vendite.gestione', compact('registroVendita', 'dettagli', 'libri'));
     }
 
-    $dettagli = $query->paginate(100)->appends($request->query());
-    $libri = Libro::with('marchio_editoriale')->get();
+    
 
-    return view('registro-vendite.gestione', compact('registroVendita', 'dettagli', 'libri'));
-    }
-
-   
 
     public function importExcel(Request $request, $id)
     {
