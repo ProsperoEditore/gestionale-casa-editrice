@@ -117,6 +117,7 @@
                         <select name="info_spedizione[]" class="form-control">
                             <option value="">Seleziona...</option>
                             <option value="spedito da magazzino editore" {{ $libro->pivot->info_spedizione == 'spedito da magazzino editore' ? 'selected' : '' }}>Spedito da magazzino editore</option>
+                            <option value="consegna a mano" {{ $libro->pivot->info_spedizione == 'consegna a mano' ? 'selected' : '' }}>Consegna a mano</option>
                             <option value="spedito da tipografia" {{ $libro->pivot->info_spedizione == 'spedito da tipografia' ? 'selected' : '' }}>Spedito da tipografia</option>
                             <option value="spedito da magazzino terzo" {{ $libro->pivot->info_spedizione == 'spedito da magazzino terzo' ? 'selected' : '' }}>Spedito da magazzino terzo</option>
                             <option value="fuori catalogo" {{ $libro->pivot->info_spedizione == 'fuori catalogo' ? 'selected' : '' }}>Fuori catalogo</option>
@@ -192,6 +193,7 @@ $(function() {
                 <select name="info_spedizione[]" class="form-control">
                     <option value="">Seleziona...</option>
                     <option value="spedito da magazzino editore">Spedito da magazzino editore</option>
+                    <option value="consegna a mano">Consegna a mano</option>
                     <option value="spedito da tipografia">Spedito da tipografia</option>
                     <option value="spedito da magazzino terzo">Spedito da magazzino terzo</option>
                     <option value="fuori catalogo">Fuori catalogo</option>
