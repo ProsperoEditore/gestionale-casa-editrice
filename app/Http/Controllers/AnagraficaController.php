@@ -12,16 +12,19 @@ class AnagraficaController extends Controller
         $query = Anagrafica::query();
     
         if ($request->filled('search')) {
-            $query->where('nome', 'like', '%' . $request->search . '%');
+            $search = strtolower(str_replace(' ', '', $request->search));
+            $query->whereRaw("LOWER(REPLACE(nome, ' ', '')) LIKE ?", ["%{$search}%"]);
         }
-
+    
         if ($request->filled('categoria')) {
             $query->where('categoria', $request->categoria);
         }
-
-        $items = $query->latest()->paginate(100);
+    
+        $items = $query->paginate(50);
+    
         return view('anagrafiche.index', compact('items'));
     }
+    
 
     public function create()
     {
