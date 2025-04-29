@@ -12,15 +12,18 @@ class LibroController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Libro::query();
-
-        // Aggiungi il filtro per la ricerca
+        $query = Libro::with('marchio_editoriale');
+    
         if ($request->filled('search')) {
             $query->where('titolo', 'like', '%' . $request->search . '%');
         }
-        
-        $items = $query->latest()->paginate(100);
-        return view('libri.index', compact('items'));
+    
+        $items = $query->orderBy('titolo')->paginate(50)->appends($request->query());
+    
+        // Per popolare il menu Select2
+        $tuttiTitoli = Libro::orderBy('titolo')->get();
+    
+        return view('libri.index', compact('items', 'tuttiTitoli'));
     }
 
     public function create()
