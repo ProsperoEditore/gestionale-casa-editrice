@@ -104,14 +104,19 @@
 <body>
 
 @php
-    $logo = 'logo-prospero.png'; // default
+    $logo = 'logo-prospero.png'; // Default di sicurezza
 
-    if (!empty($marchio)) {
-        if ($marchio->id == 1) {
-            $logo = 'logo-prospero.png';
-        } elseif ($marchio->id == 2) {
+    $marchiPresenti = $ordine->libri->pluck('marchio_id')->unique();
+
+    if ($marchiPresenti->contains(1)) {
+        // Se tra i libri c'è almeno un libro di Prospero, usa sempre il logo di Prospero
+        $logo = 'logo-prospero.png';
+    } elseif ($marchiPresenti->count() === 1) {
+        // Se c'è solo un marchio presente e non è Prospero
+        $marchioId = $marchiPresenti->first();
+        if ($marchioId == 2) {
             $logo = 'logo-calibano.png';
-        } elseif ($marchio->id == 3) {
+        } elseif ($marchioId == 3) {
             $logo = 'logo-miranda.png';
         }
     }
