@@ -7,10 +7,17 @@
     <div class="mb-3">
         <a href="{{ route('ordini.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
-    <form action="{{ route('ordini.index') }}" method="GET" class="d-flex" style="max-width: 300px;">
-        <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per anagrafica...">
-        <button class="btn btn-outline-primary">Cerca</button>
-    </form>
+        <form action="{{ route('ordini.index') }}" method="GET" style="min-width: 300px;" class="d-flex align-items-center mt-2">
+            <select name="search" id="anagrafica_search" class="form-control select2" onchange="this.form.submit()">
+                <option value="">Cerca per anagrafica...</option>
+                @foreach($tutteAnagrafiche as $anagrafica)
+                    <option value="{{ $anagrafica->id }}" {{ request('search') == $anagrafica->id ? 'selected' : '' }}>
+                        {{ $anagrafica->nome }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+
     </div>
 
     <table class="table table-bordered">
@@ -55,4 +62,20 @@
     {{ $ordini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
 </div>
 </div>
+
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#anagrafica_search').select2({
+        placeholder: "Cerca per anagrafica...",
+        allowClear: true
+    });
+});
+</script>
+
 @endsection

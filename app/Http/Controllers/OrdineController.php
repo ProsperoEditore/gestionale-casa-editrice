@@ -18,19 +18,18 @@ class OrdineController extends Controller
 
     public function index(Request $request)
     {
-        $query = Ordine::with('anagrafica');
-    
-        // Filtro di ricerca per anagrafica
-        if ($request->filled('search')) {
-            $query->whereHas('anagrafica', function ($query) use ($request) {
-                $query->where('nome', 'like', '%' . $request->search . '%');
-            });
+        {
+            $query = Ordine::with('anagrafica');
+        
+            if ($request->filled('search')) {
+                $query->where('anagrafica_id', $request->search);
+            }
+        
+            $ordini = $query->orderBy('data', 'desc')->paginate(50);
+            $tutteAnagrafiche = Anagrafica::orderBy('nome')->get();
+        
+            return view('ordini.index', compact('ordini', 'tutteAnagrafiche'));
         }
-    
-        $ordini = $query->latest()->paginate(100);
-    
-        return view('ordini.index', compact('ordini'));
-    }
     
     
 
