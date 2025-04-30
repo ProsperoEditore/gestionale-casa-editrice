@@ -46,7 +46,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Codice Fiscale</label>
-                        <input type="text" name="codice_fiscale" class="form-control">
+                        <input type="text" name="codice_fiscale" id="codice_fiscale" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Codice Univoco</label>
-                        <input type="text" name="codice_univoco" class="form-control">
+                        <input type="text" name="codice_univoco" id="codice_univoco" class="form-control">
                     </div>
 
                     <div class="text-center mt-3">
@@ -73,4 +73,20 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        ['codice_fiscale', 'codice_univoco'].forEach(function (id) {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function () {
+                    this.value = this.value.toUpperCase();
+                });
+            }
+        });
+    });
+    </script>
+
+
 @endsection
