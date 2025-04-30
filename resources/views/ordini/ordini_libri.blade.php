@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Gestione Libri - Ordine {{ $ordine->codice }}</h3>
 
-    @if($ordine->exists)
+    @if($ordine->exists && $ordine->tipo_ordine === 'conto deposito')
     <div class="alert alert-warning mt-3 text-center">
         ⚠️ Stai modificando un ordine esistente.<br>
         Ricorda di aggiornare manualmente le quantità in <strong>Magazzino</strong> se cambi le quantità dei libri.
