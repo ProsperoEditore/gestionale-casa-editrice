@@ -204,7 +204,7 @@
                 <th>Quantità</th>
                 <th>Prezzo Copertina</th>
                 <th>Prezzo Lordo</th>
-            @if($ordine->tipo_ordine !== 'acquisto')
+            @if(!in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
                 <th>Sconto (%)</th>
                 <th>Valore Scontato</th>
             @endif
@@ -224,7 +224,7 @@
                 <td>
                     <del>{{ number_format($libro->pivot->valore_vendita_lordo, 2) }} €</del>
                 </td>
-                @if($ordine->tipo_ordine !== 'acquisto')
+                @if(!in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
                     <td>{{ number_format($libro->pivot->sconto, 2) }}%</td>
                     <td>{{ number_format($libro->pivot->netto_a_pagare, 2) }} €</td>
                 @endif
