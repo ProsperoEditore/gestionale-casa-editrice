@@ -298,7 +298,9 @@ class OrdineController extends Controller
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
 
         // Nome del file PDF
-        $filename = 'ordine_' . preg_replace('/[\/\\\\]/', '-', $ordine->codice) . '.pdf';
+        $nomeCliente = preg_replace('/[\/:*?"<>|]/', '', $ordine->anagrafica->nome ?? '');
+        $filename = preg_replace('/[\/\\\\]/', '-', $ordine->codice . ' ' . $nomeCliente) . '.pdf';
+
 
         // Restituisci il PDF in download
         return $pdf->download($filename);

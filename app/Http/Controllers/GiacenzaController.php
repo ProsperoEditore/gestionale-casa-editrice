@@ -21,12 +21,13 @@ class GiacenzaController extends Controller
         $query = Giacenza::query()->where('magazzino_id', $magazzino_id);
 
         // Filtro di ricerca per titolo
-        if ($request->has('search') && $request->input('search') != '') {
-            $searchTerm = $request->input('search');
+        if ($request->filled('search')) {
+            $searchTerm = strtolower($request->input('search'));
             $query->whereHas('libro', function ($q) use ($searchTerm) {
-                $q->where('titolo', 'like', '%' . $searchTerm . '%');
+                $q->whereRaw("LOWER(titolo) LIKE ?", ["%{$searchTerm}%"]);
             });
         }
+        
     
         // Carica i risultati filtrati
         $giacenze = $query
@@ -42,7 +43,7 @@ class GiacenzaController extends Controller
         ")
         ->orderBy('libri.titolo')
         ->select('giacenze.*')
-        ->paginate(200);
+        ->paginate(50);
     
 
     
