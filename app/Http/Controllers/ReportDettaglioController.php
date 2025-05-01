@@ -103,12 +103,13 @@ $dettagli = $dettagli->sort(function ($a, $b) {
     $luogoCmp = strcmp($a->luogo ?? '', $b->luogo ?? '');
     if ($luogoCmp !== 0) return $luogoCmp;
 
-    $aPeriodo = $a->periodo ? \Carbon\Carbon::parse($a->periodo) : null;
-    $bPeriodo = $b->periodo ? \Carbon\Carbon::parse($b->periodo) : null;
-
-    if ($aPeriodo && $bPeriodo) {
-        return $bPeriodo->timestamp <=> $aPeriodo->timestamp; // più recente prima
+    $aPeriodo = $a->periodo ?? '';
+    $bPeriodo = $b->periodo ?? '';
+    
+    if ($aPeriodo !== '' && $bPeriodo !== '') {
+        return strcmp($bPeriodo, $aPeriodo); // ordine alfabetico inverso
     }
+    
 
     return 0;
 });
