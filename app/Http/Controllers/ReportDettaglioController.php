@@ -26,13 +26,15 @@ class ReportDettaglioController extends Controller
             'evento' => $contratto->royalties_eventi ?? 0,
         ];
     
-        // Recupera i dettagli del report filtrati per ISBN e anno
         $dettagli_raw = RegistroVenditeDettaglio::with(['registroVendite'])
-            ->where('isbn', $report->libro->isbn)
-            ->when($anno, function ($query) use ($anno) {
-                return $query->whereYear('periodo', $anno);
-            })
-            ->get();
+        ->where('isbn', $report->libro->isbn)
+        ->when($anno, function ($query) use ($anno) {
+            return $query->whereYear('periodo', $anno);
+        })
+        ->get()
+        ->sortBy(fn($item) => $item->periodo ?? '') // ordinamento cronologico per il calcolo
+        ->values();
+    
     
         // Variabile per tenere traccia della quantità cumulativa
         $quantita_cumulata = 0;
@@ -87,7 +89,7 @@ class ReportDettaglioController extends Controller
             return $item;
         });
 
-        // Ordinamento per: canale → luogo → periodo (recente prima)
+// Ordinamento visivo finale: canale → luogo → periodo
 $dettagli = $dettagli->sort(function ($a, $b) {
     $prioritaCanale = [
         'Vendite indirette' => 1,
@@ -103,38 +105,9 @@ $dettagli = $dettagli->sort(function ($a, $b) {
     $luogoCmp = strcmp($a->luogo ?? '', $b->luogo ?? '');
     if ($luogoCmp !== 0) return $luogoCmp;
 
-    $aPeriodo = $a->periodo ?? '';
-    $bPeriodo = $b->periodo ?? '';
-    
-    // Funzione per tentare di convertire la stringa in Carbon, se è una data valida
-    $parsePeriodo = function ($value) {
-        try {
-            // Prima prova con formato d/m/Y
-            if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $value)) {
-                return \Carbon\Carbon::createFromFormat('d/m/Y', $value);
-            }
-            // Poi prova con formato Y-m-d
-            if (preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $value)) {
-                return \Carbon\Carbon::parse($value);
-            }
-        } catch (\Exception $e) {
-            return null;
-        }
-        return null;
-    };
-    
-    $aCarbon = $parsePeriodo($aPeriodo);
-    $bCarbon = $parsePeriodo($bPeriodo);
-    
-    // Se entrambi sono date valide, ordina per data (più recente prima)
-    if ($aCarbon && $bCarbon) {
-        return $bCarbon->timestamp <=> $aCarbon->timestamp;
-    }
-    
-    // Altrimenti ordina come testo (alfabetico inverso)
-    return strcmp($bPeriodo, $aPeriodo);
-
+    return strcmp($b->periodo ?? '', $a->periodo ?? ''); // più recente prima
 });
+
 
     
         // Calcola i totali per la tabella
