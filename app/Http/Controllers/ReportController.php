@@ -15,12 +15,13 @@ class ReportController extends Controller
             ->join('libri', 'libri.id', '=', 'reports.libro_id')  
             ->select('reports.*', 'libri.titolo'); 
     
-        if ($request->has('search') && $request->input('search') != '') {
-            $searchTerm = $request->input('search');
-            $query->where('libri.titolo', 'like', '%' . $searchTerm . '%');
-        }
+            if ($request->filled('search')) {
+                $searchTerm = strtolower(str_replace(' ', '', $request->input('search')));
+                $query->whereRaw("LOWER(REPLACE(libri.titolo, ' ', '')) LIKE ?", ["%{$searchTerm}%"]);
+            }
+            
     
-        $items = $query->latest()->paginate(100)->appends($request->query());
+        $items = $query->latest()->paginate(30)->appends($request->query());
         return view('report.index', compact('items'));
     }
     

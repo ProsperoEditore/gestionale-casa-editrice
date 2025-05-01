@@ -9,6 +9,7 @@ use App\Models\RegistroVendite;
 use App\Models\RegistroVenditeDettaglio;
 use App\Models\Contratto;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class ReportDettaglioController extends Controller
 {
@@ -85,6 +86,33 @@ class ReportDettaglioController extends Controller
     
             return $item;
         });
+
+        // Ordinamento per: canale → luogo → periodo (recente prima)
+$dettagli = $dettagli->sort(function ($a, $b) {
+    $prioritaCanale = [
+        'Vendite indirette' => 1,
+        'Vendite dirette' => 2,
+        'Evento' => 3,
+    ];
+
+    $aCanale = $prioritaCanale[$a->canale] ?? 99;
+    $bCanale = $prioritaCanale[$b->canale] ?? 99;
+
+    if ($aCanale !== $bCanale) return $aCanale <=> $bCanale;
+
+    $luogoCmp = strcmp($a->luogo ?? '', $b->luogo ?? '');
+    if ($luogoCmp !== 0) return $luogoCmp;
+
+    $aPeriodo = $a->periodo ? \Carbon\Carbon::parse($a->periodo) : null;
+    $bPeriodo = $b->periodo ? \Carbon\Carbon::parse($b->periodo) : null;
+
+    if ($aPeriodo && $bPeriodo) {
+        return $bPeriodo->timestamp <=> $aPeriodo->timestamp; // più recente prima
+    }
+
+    return 0;
+});
+
     
         // Calcola i totali per la tabella
         $totali = [
