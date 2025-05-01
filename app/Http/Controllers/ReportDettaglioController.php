@@ -106,12 +106,34 @@ $dettagli = $dettagli->sort(function ($a, $b) {
     $aPeriodo = $a->periodo ?? '';
     $bPeriodo = $b->periodo ?? '';
     
-    if ($aPeriodo !== '' && $bPeriodo !== '') {
-        return strcmp($bPeriodo, $aPeriodo); // ordine alfabetico inverso
+    // Funzione per tentare di convertire la stringa in Carbon, se è una data valida
+    $parsePeriodo = function ($value) {
+        try {
+            // Prima prova con formato d/m/Y
+            if (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $value)) {
+                return \Carbon\Carbon::createFromFormat('d/m/Y', $value);
+            }
+            // Poi prova con formato Y-m-d
+            if (preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $value)) {
+                return \Carbon\Carbon::parse($value);
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+        return null;
+    };
+    
+    $aCarbon = $parsePeriodo($aPeriodo);
+    $bCarbon = $parsePeriodo($bPeriodo);
+    
+    // Se entrambi sono date valide, ordina per data (più recente prima)
+    if ($aCarbon && $bCarbon) {
+        return $bCarbon->timestamp <=> $aCarbon->timestamp;
     }
     
+    // Altrimenti ordina come testo (alfabetico inverso)
+    return strcmp($bPeriodo, $aPeriodo);
 
-    return 0;
 });
 
     
