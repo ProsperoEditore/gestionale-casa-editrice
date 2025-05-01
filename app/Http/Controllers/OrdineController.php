@@ -10,6 +10,7 @@ use App\Models\MarchioEditoriale;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 
 
@@ -18,19 +19,48 @@ class OrdineController extends Controller
 
     public function index(Request $request)
     {
-        {
             $query = Ordine::with('anagrafica');
         
             if ($request->filled('search')) {
                 $query->where('anagrafica_id', $request->search);
             }
         
-            $ordini = $query->orderBy('data', 'desc')->paginate(50);
-            $tutteAnagrafiche = Anagrafica::orderBy('nome')->get();
-        
-            return view('ordini.index', compact('ordini', 'tutteAnagrafiche'));
+    // Recupera tutti gli ordini (senza paginate qui)
+    $ordini = $query->get();
+
+    // Ordinamento personalizzato
+    $ordiniOrdinati = $ordini->sort(function ($a, $b) {
+        $aDate = $a->data ? \Carbon\Carbon::parse($a->data) : null;
+        $bDate = $b->data ? \Carbon\Carbon::parse($b->data) : null;
+
+        // Ordina per data decrescente (più recente prima)
+        if ($aDate && $bDate && $aDate->ne($bDate)) {
+            return $aDate->lt($bDate) ? 1 : -1;
         }
-    }  
+
+        // Se stessa data, ordina per tipo ordine
+        $tipoCmp = strcmp($a->tipo_ordine ?? '', $b->tipo_ordine ?? '');
+        if ($tipoCmp !== 0) return $tipoCmp;
+
+        // Se stesso tipo ordine, ordina per nome anagrafica
+        return strcmp($a->anagrafica->nome ?? '', $b->anagrafica->nome ?? '');
+    });
+
+    // Paginazione manuale
+    $perPage = 30;
+    $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+    $currentItems = $ordiniOrdinati->slice(($currentPage - 1) * $perPage, $perPage)->all();
+    $paginatedOrdini = new \Illuminate\Pagination\LengthAwarePaginator($currentItems, $ordiniOrdinati->count(), $perPage, $currentPage);
+    $paginatedOrdini->setPath($request->url());
+    $paginatedOrdini->appends($request->query());
+
+    $tutteAnagrafiche = Anagrafica::orderBy('nome')->get();
+
+    return view('ordini.index', [
+        'ordini' => $paginatedOrdini,
+        'tutteAnagrafiche' => $tutteAnagrafiche
+    ]);
+}
     
 
     public function create()
