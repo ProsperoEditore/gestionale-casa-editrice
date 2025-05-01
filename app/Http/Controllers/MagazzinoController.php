@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Magazzino;
 use App\Models\Anagrafica;
+use Carbon\Carbon;
 
 class MagazzinoController extends Controller
 {
@@ -26,10 +29,40 @@ class MagazzinoController extends Controller
                 $q->where('categoria', $request->categoria);
             });
         }
+
+    $magazzini = $query->get();
     
-        $magazzini = $query->paginate(30);
-    
-        return view('magazzini.index', compact('magazzini'));
+    // Separazione
+    $editori = $magazzini->filter(fn($m) => optional($m->anagrafica)->categoria === 'magazzino editore');
+    $altri = $magazzini->reject(fn($m) => optional($m->anagrafica)->categoria === 'magazzino editore');
+
+    // Ordinamento personalizzato
+    $altriOrdinati = $altri->sort(function ($a, $b) {
+        $aDate = $a->prossima_scadenza ? Carbon::parse($a->prossima_scadenza) : null;
+        $bDate = $b->prossima_scadenza ? Carbon::parse($b->prossima_scadenza) : null;
+
+        if (!$aDate && $bDate) return -1;
+        if ($aDate && !$bDate) return 1;
+        if (!$aDate && !$bDate) {
+            $catCmp = strcmp($a->anagrafica->categoria ?? '', $b->anagrafica->categoria ?? '');
+            return $catCmp !== 0 ? $catCmp : strcmp($a->anagrafica->nome ?? '', $b->anagrafica->nome ?? '');
+        }
+        if ($aDate->ne($bDate)) return $aDate->gt($bDate) ? 1 : -1;
+        $catCmp = strcmp($a->anagrafica->categoria ?? '', $b->anagrafica->categoria ?? '');
+        return $catCmp !== 0 ? $catCmp : strcmp($a->anagrafica->nome ?? '', $b->anagrafica->nome ?? '');
+        });
+
+        // Merge e paginazione
+        $magazziniFinale = $editori->merge($altriOrdinati)->values();
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $magazziniFinale->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $paginatedMagazzini = new LengthAwarePaginator($currentItems, $magazziniFinale->count(), $perPage, $currentPage);
+        $paginatedMagazzini->setPath($request->url());
+        $paginatedMagazzini->appends($request->query());
+
+    // Passaggio alla view
+    return view('magazzini.index', ['magazzini' => $paginatedMagazzini]);
     }
     
     
