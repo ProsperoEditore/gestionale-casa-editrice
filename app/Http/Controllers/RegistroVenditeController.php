@@ -19,12 +19,14 @@ class RegistroVenditeController extends Controller
         $query = RegistroVendite::with('anagrafica');
     
         if ($request->filled('search')) {
-            $query->whereHas('anagrafica', function ($q) use ($request) {
-                $q->where('nome', 'like', '%' . $request->search . '%');
+            $search = strtolower(str_replace(' ', '', $request->search));
+            $query->whereHas('anagrafica', function ($q) use ($search) {
+                $q->whereRaw("LOWER(REPLACE(nome, ' ', '')) LIKE ?", ["%{$search}%"]);
             });
         }
+        
     
-        $items = $query->orderBy('created_at', 'desc')->paginate(100)->appends($request->query());
+        $items = $query->orderBy('created_at', 'desc')->paginate(30)->appends($request->query());
     
         return view('registro-vendite.index', compact('items'));
     }
