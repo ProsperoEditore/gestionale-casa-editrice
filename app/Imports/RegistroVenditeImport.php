@@ -43,7 +43,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
     
         return new RegistroVenditeDettaglio([
             'registro_vendita_id' => $this->registroVendita->id,
-            'data' => $data ? date('Y-m-d', strtotime($data)) : now()->toDateString(),
+            'data' => $this->parseData($data),
             'periodo' => (string) $periodo,
             'isbn' => $isbn,
             'titolo' => $libroTitolo,
@@ -52,6 +52,24 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             'valore_lordo' => $quantita * $libroPrezzo,
         ]);
     }
+
+    private function parseData($data)
+{
+    // Se è un numero (Excel serial date), convertilo
+    if (is_numeric($data)) {
+        try {
+            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            Log::error('Errore conversione data Excel: ' . $e->getMessage());
+            return now()->toDateString();
+        }
+    }
+
+    // Altrimenti prova con strtotime
+    $timestamp = strtotime($data);
+    return $timestamp ? date('Y-m-d', $timestamp) : now()->toDateString();
+}
+
     
 
 }
