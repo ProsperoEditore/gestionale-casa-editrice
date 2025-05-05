@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use App\Models\RegistroVenditeDettaglio;
 use App\Models\Libro;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -10,10 +10,11 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
-
 class RegistroVenditeImport implements ToModel, WithHeadingRow
 {
     protected $registroVendita;
+    protected static $errori = [];
+    protected static $riga = 1;
 
     public function __construct($registroVendita)
     {
@@ -22,26 +23,35 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        // ✅ 1. Recupera i dati con fallback sicuro
+        self::$riga++;
+
         $dataRaw = trim($row['data'] ?? $row['Data'] ?? '');
         $isbn = trim($row['isbn'] ?? $row['ISBN'] ?? '');
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? 0;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? 'N/D';
-    
-        // ✅ 2. Salta righe completamente vuote
+
+        // ✅ Salta righe completamente vuote
         if (empty($isbn) && empty($quantita)) {
             return null;
         }
-    
-        // ✅ 3. Recupera dati libro
-        $libro = Libro::where('isbn', $isbn)->first();
-        $titolo = $libro->titolo ?? 'Titolo non trovato';
-        $prezzo = $libro->prezzo ?? 0;
-    
-        // ✅ 4. Parsing sicuro della data
+
+        // ✅ Parsing sicuro della data
         $data = $this->parseData($dataRaw);
-    
-        // ✅ 5. Ritorna la riga del modello
+        if (is_null($data)) {
+            self::$errori[] = "Errore alla riga " . self::$riga . ": formato data non valido.";
+            return null;
+        }
+
+        // ✅ Verifica ISBN
+        $libro = Libro::where('isbn', $isbn)->first();
+        if (!$libro) {
+            self::$errori[] = "Errore alla riga " . self::$riga . ": ISBN '{$isbn}' non trovato nel catalogo.";
+            return null;
+        }
+
+        $titolo = $libro->titolo;
+        $prezzo = $libro->prezzo ?? 0;
+
         return new RegistroVenditeDettaglio([
             'registro_vendita_id' => $this->registroVendita->id,
             'data' => $data,
@@ -53,16 +63,13 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             'valore_lordo' => $quantita * $prezzo,
         ]);
     }
-    
-    
-
 
     private function parseData($data)
     {
         if (is_null($data) || trim($data) === '') {
-            return null; // lasciare null è meglio che usare now()
+            return null;
         }
-    
+
         try {
             if (is_numeric($data)) {
                 return Carbon::instance(ExcelDate::excelToDateTimeObject($data))->toDateString();
@@ -73,6 +80,13 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             return null;
         }
     }
-    
-    
+
+    public function __destruct()
+    {
+        if (!empty(self::$errori)) {
+            Session::flash('import_errori', self::$errori);
+        } else {
+            Session::flash('success', 'Vendite importate con successo!');
+        }
+    }
 }

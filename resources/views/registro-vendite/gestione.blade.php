@@ -19,6 +19,24 @@
         </div>
     </div>
 
+    @if(session('import_errori'))
+    <div class="alert alert-danger mt-3">
+        <strong>Alcune righe non sono state importate:</strong>
+        <ul class="mb-0">
+            @foreach(session('import_errori') as $errore)
+                <li>{{ $errore }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success mt-3">
+        {{ session('success') }}
+    </div>
+@endif
+
+
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
         <form action="{{ route('registro-vendite.gestione', ['id' => $registroVendita->id]) }}" method="GET" class="d-flex" style="max-width: 300px;">
