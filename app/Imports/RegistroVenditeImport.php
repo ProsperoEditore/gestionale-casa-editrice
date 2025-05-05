@@ -22,16 +22,15 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-
-        Log::info('📅 Valore originale di data ricevuto da Excel:', [
-            'data' => $row['data'] ?? $row['Data'] ?? null
-        ]);
-
-        
+        Log::info('🧾 Riga completa Excel ricevuta:', $row); // ✅ Dump completo per debugging
+    
+        $dataRaw = $row['data'] ?? $row['Data'] ?? null;
+    
+        Log::info('📅 Valore campo data grezzo:', ['data' => $dataRaw]);
+    
         $isbn = $row['isbn'] ?? $row['ISBN'] ?? null;
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? null;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? null;
-        $data = $row['data'] ?? $row['Data'] ?? null;
     
         if (empty($isbn)) {
             Log::warning('Riga saltata: ISBN mancante o non leggibile.');
@@ -40,18 +39,12 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
     
         $libro = Libro::where('isbn', trim($isbn))->first();
     
-        if (!$libro) {
-            Log::warning('ISBN non trovato: ' . $isbn);
-            $libroTitolo = 'Titolo non trovato';
-            $libroPrezzo = 0;
-        } else {
-            $libroTitolo = $libro->titolo;
-            $libroPrezzo = $libro->prezzo;
-        }
+        $libroTitolo = $libro->titolo ?? 'Titolo non trovato';
+        $libroPrezzo = $libro->prezzo ?? 0;
     
         return new RegistroVenditeDettaglio([
             'registro_vendita_id' => $this->registroVendita->id,
-            'data' => $this->parseData($data),
+            'data' => $this->parseData($dataRaw),
             'periodo' => (string) $periodo,
             'isbn' => $isbn,
             'titolo' => $libroTitolo,
@@ -60,6 +53,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             'valore_lordo' => $quantita * $libroPrezzo,
         ]);
     }
+    
 
 
     private function parseData($data)
