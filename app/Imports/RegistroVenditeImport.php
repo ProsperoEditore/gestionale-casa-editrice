@@ -54,6 +54,8 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
         ]);
     }
 
+    use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
+
     private function parseData($data)
     {
         if (is_null($data)) {
@@ -61,27 +63,25 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             return now()->toDateString();
         }
     
-        // Pulisce eventuali spazi o caratteri invisibili
-        $data = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $data));
-    
-        // Se è un numero (formato seriale Excel)
+        // Se è un numero intero, consideralo come seriale Excel
         if (is_numeric($data)) {
             try {
-                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data)->format('Y-m-d');
+                return ExcelDate::excelToDateTimeObject($data)->format('Y-m-d');
             } catch (\Throwable $e) {
-                Log::error('Errore conversione data Excel (seriale): "' . $data . '" → ' . $e->getMessage());
+                Log::error('Errore conversione data seriale: ' . $e->getMessage());
                 return now()->toDateString();
             }
         }
     
-        // Se è una data testuale → usa Carbon
+        // Se è stringa già formattata tipo '2019-09-15'
         try {
-            return \Carbon\Carbon::parse($data)->format('Y-m-d');
+            return Carbon::parse($data)->format('Y-m-d');
         } catch (\Throwable $e) {
-            Log::warning('Formato data non riconosciuto: "' . $data . '", uso data odierna.');
+            Log::error('Errore parsing stringa data: "' . $data . '" - ' . $e->getMessage());
             return now()->toDateString();
         }
     }
+    
     
     
 
