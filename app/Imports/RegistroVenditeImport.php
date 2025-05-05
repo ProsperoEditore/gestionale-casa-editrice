@@ -7,6 +7,7 @@ use App\Models\RegistroVenditeDettaglio;
 use App\Models\Libro;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Carbon\Carbon;
 
 
 class RegistroVenditeImport implements ToModel, WithHeadingRow
@@ -74,10 +75,13 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
         }
     
         // Se è già una data testuale tipo 2019-09-15
-        $timestamp = strtotime($data);
-        if ($timestamp !== false) {
-            return date('Y-m-d', $timestamp);
+        try {
+            return Carbon::parse($data)->format('Y-m-d');
+        } catch (\Exception $e) {
+            Log::error('Errore parsing data: "' . $data . '" → ' . $e->getMessage());
+            return now()->toDateString();
         }
+        
     
         // Se tutto fallisce, logga e usa la data odierna
         Log::warning('Formato data non riconosciuto: "' . $data . '", uso data odierna.');
