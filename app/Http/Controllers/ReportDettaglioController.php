@@ -124,7 +124,7 @@ class ReportDettaglioController extends Controller
         $dettagli_raw = RegistroVenditeDettaglio::with(['registroVendite.anagrafica'])
         ->where('isbn', $report->libro->isbn)
         ->get()
-        ->sortByDesc(fn($item) => $item->data)
+        ->sortBy(fn($item) => $item->data)
         ->values();
     
     
