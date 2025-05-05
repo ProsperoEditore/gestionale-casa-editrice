@@ -22,60 +22,57 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
+        // ✅ 1. Recupera i dati con fallback sicuro
+        $dataRaw = trim($row['data'] ?? $row['Data'] ?? '');
+        $isbn = trim($row['isbn'] ?? $row['ISBN'] ?? '');
+        $quantita = $row['quantita'] ?? $row['Quantità'] ?? 0;
+        $periodo = $row['periodo'] ?? $row['Periodo'] ?? 'N/D';
     
-        $dataRaw = $row['data'] ?? $row['Data'] ?? null;
-        $isbn = $row['isbn'] ?? $row['ISBN'] ?? null;
-        $quantita = $row['quantita'] ?? $row['Quantità'] ?? null;
-        $periodo = $row['periodo'] ?? $row['Periodo'] ?? null;
-    
-        if (empty($isbn)) {
-            Log::warning('Riga saltata: ISBN mancante o non leggibile.');
+        // ✅ 2. Salta righe completamente vuote
+        if (empty($isbn) && empty($quantita)) {
             return null;
         }
     
-        $libro = Libro::where('isbn', trim($isbn))->first();
+        // ✅ 3. Recupera dati libro
+        $libro = Libro::where('isbn', $isbn)->first();
+        $titolo = $libro->titolo ?? 'Titolo non trovato';
+        $prezzo = $libro->prezzo ?? 0;
     
-        $libroTitolo = $libro->titolo ?? 'Titolo non trovato';
-        $libroPrezzo = $libro->prezzo ?? 0;
+        // ✅ 4. Parsing sicuro della data
+        $data = $this->parseData($dataRaw);
     
+        // ✅ 5. Ritorna la riga del modello
         return new RegistroVenditeDettaglio([
             'registro_vendita_id' => $this->registroVendita->id,
-            'data' => $this->parseData($dataRaw),
+            'data' => $data,
             'periodo' => (string) $periodo,
             'isbn' => $isbn,
-            'titolo' => $libroTitolo,
+            'titolo' => $titolo,
             'quantita' => $quantita,
-            'prezzo' => $libroPrezzo,
-            'valore_lordo' => $quantita * $libroPrezzo,
+            'prezzo' => $prezzo,
+            'valore_lordo' => $quantita * $prezzo,
         ]);
     }
+    
     
 
 
     private function parseData($data)
     {
-        if (is_null($data) || $data === '') {
-            Log::warning('🟡 Data mancante o vuota, uso data odierna.');
-            return now()->toDateString();
+        if (is_null($data) || trim($data) === '') {
+            return null; // lasciare null è meglio che usare now()
         }
     
         try {
             if (is_numeric($data)) {
-                // 📅 Caso: Excel ha salvato la data come numero seriale
-                $carbonDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data);
-                $parsed = \Carbon\Carbon::instance($carbonDate)->toDateString();
-                Log::info("✅ Data convertita da seriale Excel: {$data} ➜ {$parsed}");
-                return $parsed;
+                return Carbon::instance(ExcelDate::excelToDateTimeObject($data))->toDateString();
             } else {
-                // 📅 Caso: la data è una stringa (es. "2024-02-01")
-                $parsed = \Carbon\Carbon::parse($data)->toDateString();
-                Log::info("✅ Data convertita da stringa: {$data} ➜ {$parsed}");
-                return $parsed;
+                return Carbon::parse($data)->toDateString();
             }
         } catch (\Throwable $e) {
-            Log::error("❌ Errore nel parsing della data '{$data}': " . $e->getMessage());
-            return now()->toDateString();
+            return null;
         }
     }
+    
     
 }
