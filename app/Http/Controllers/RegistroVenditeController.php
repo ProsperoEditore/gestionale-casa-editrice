@@ -204,11 +204,22 @@ class RegistroVenditeController extends Controller
             // Importa i dati
             Excel::import(new RegistroVenditeImport($registro), $file);
     
+            // Leggi eventuali errori salvati nella sessione dal destruct dell'import
+            $erroriTrovati = session('import_errori', []);
+    
+            if (!empty($erroriTrovati)) {
+                return redirect()->back()->with([
+                    'success' => 'Vendite importate, alcune righe sono state scartate.',
+                    'import_errori' => $erroriTrovati
+                ]);
+            }
+    
             return redirect()->back()->with('success', 'Vendite importate con successo!');
         }
     
         return redirect()->back()->with('error', 'Errore nell\'importazione del file.');
     }
+    
     
 
     public function edit($id)
