@@ -23,7 +23,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
     
-        $dataRaw = $row['data'] ?? $row['Data'] ?? null; 
+        $dataRaw = $row['data'] ?? $row['Data'] ?? null;
         $isbn = $row['isbn'] ?? $row['ISBN'] ?? null;
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? null;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? null;
@@ -54,33 +54,28 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     private function parseData($data)
     {
-        Log::info('🔍 Valore ricevuto per la data:', ['raw_data' => $data]);
-    
         if (is_null($data) || $data === '') {
-            Log::warning('⚠️ Data mancante o vuota. Uso data odierna.');
+            Log::warning('🟡 Data mancante o vuota, uso data odierna.');
             return now()->toDateString();
         }
     
         try {
             if (is_numeric($data)) {
-                // Valore numerico: potrebbe essere un seriale Excel
-                $converted = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data);
-                Log::info('📅 Data convertita da seriale Excel:', ['excel_seriale' => $data, 'convertita' => $converted]);
-                return \Carbon\Carbon::instance($converted)->toDateString();
+                // 📅 Caso: Excel ha salvato la data come numero seriale
+                $carbonDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data);
+                $parsed = \Carbon\Carbon::instance($carbonDate)->toDateString();
+                Log::info("✅ Data convertita da seriale Excel: {$data} ➜ {$parsed}");
+                return $parsed;
             } else {
-                // Prova a fare il parse di una data stringa
-                $parsed = \Carbon\Carbon::parse($data);
-                Log::info('📅 Data convertita da stringa:', ['originale' => $data, 'convertita' => $parsed]);
-                return $parsed->toDateString();
+                // 📅 Caso: la data è una stringa (es. "2024-02-01")
+                $parsed = \Carbon\Carbon::parse($data)->toDateString();
+                Log::info("✅ Data convertita da stringa: {$data} ➜ {$parsed}");
+                return $parsed;
             }
         } catch (\Throwable $e) {
-            Log::error('❌ Errore durante il parsing della data', [
-                'valore' => $data,
-                'errore' => $e->getMessage()
-            ]);
+            Log::error("❌ Errore nel parsing della data '{$data}': " . $e->getMessage());
             return now()->toDateString();
         }
     }
     
-
 }
