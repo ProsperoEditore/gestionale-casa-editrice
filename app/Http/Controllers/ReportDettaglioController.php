@@ -32,7 +32,7 @@ class ReportDettaglioController extends Controller
             return $query->whereYear('periodo', $anno);
         })
         ->get()
-        ->sortBy(fn($item) => $item->periodo ?? '') // ordinamento cronologico per il calcolo
+        ->sortBy(fn($item) => $item->data ?? '') // ordinamento cronologico per il calcolo
         ->values();
     
     
@@ -89,24 +89,7 @@ class ReportDettaglioController extends Controller
             return $item;
         });
 
-// Ordinamento visivo finale: canale → luogo → periodo
-$dettagli = $dettagli->sort(function ($a, $b) {
-    $prioritaCanale = [
-        'Vendite indirette' => 1,
-        'Vendite dirette' => 2,
-        'Evento' => 3,
-    ];
-
-    $aCanale = $prioritaCanale[$a->canale] ?? 99;
-    $bCanale = $prioritaCanale[$b->canale] ?? 99;
-
-    if ($aCanale !== $bCanale) return $aCanale <=> $bCanale;
-
-    $luogoCmp = strcmp($a->luogo ?? '', $b->luogo ?? '');
-    if ($luogoCmp !== 0) return $luogoCmp;
-
-    return strcmp($b->periodo ?? '', $a->periodo ?? ''); // più recente prima
-});
+        $dettagli = $dettagli->sortBy(fn($item) => $item->data)->values();
 
 
     
@@ -139,9 +122,11 @@ $dettagli = $dettagli->sort(function ($a, $b) {
         ];
     
         $dettagli_raw = RegistroVenditeDettaglio::with(['registroVendite.anagrafica'])
-            ->where('isbn', $report->libro->isbn)
-            ->orderBy('periodo')
-            ->get();
+        ->where('isbn', $report->libro->isbn)
+        ->get()
+        ->sortBy(fn($item) => $item->data)
+        ->values();
+    
     
         $quantita_cumulata = 0;
     

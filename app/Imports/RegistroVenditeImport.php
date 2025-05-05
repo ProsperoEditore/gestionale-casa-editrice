@@ -23,6 +23,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
         $isbn = $row['isbn'] ?? $row['ISBN'] ?? null;
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? null;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? null;
+        $data = $row['data'] ?? $row['Data'] ?? null;
     
         if (empty($isbn)) {
             Log::warning('Riga saltata: ISBN mancante o non leggibile.');
@@ -42,7 +43,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
     
         return new RegistroVenditeDettaglio([
             'registro_vendita_id' => $this->registroVendita->id,
-            'data' => now()->toDateString(),
+            'data' => $data ? date('Y-m-d', strtotime($data)) : now()->toDateString(),
             'periodo' => (string) $periodo,
             'isbn' => $isbn,
             'titolo' => $libroTitolo,
@@ -50,6 +51,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             'prezzo' => $libroPrezzo,
             'valore_lordo' => $quantita * $libroPrezzo,
         ]);
-}
+    }
+    
 
 }
