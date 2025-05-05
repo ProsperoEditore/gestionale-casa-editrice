@@ -36,6 +36,7 @@
     <table>
         <thead>
             <tr>
+                <th>Data</th>
                 <th>Periodo</th>
                 <th>Luogo</th>
                 <th>Q.tà</th>
@@ -48,6 +49,7 @@
         <tbody>
         @foreach($dettagli as $riga)
             <tr>
+                <td>{{ \Carbon\Carbon::parse($riga->data)->format('d/m/Y') }}</td>
                 <td>{{ $riga->periodo_testo }}</td>
                 <td>{{ $riga->luogo }}</td>
                 <td>{{ $riga->quantita }}</td>
@@ -68,7 +70,7 @@
             <tr class="totali-row">
                 <td colspan="2">TOTALE</td>
                 <td>{{ $totali['quantita'] }}</td>
-                <td colspan="3"></td>
+                <td colspan="4"></td>
                 <td class="royalties">€ {{ number_format($totali['royalties'], 2, ',', '.') }}</td>
             </tr>
         </tfoot>
