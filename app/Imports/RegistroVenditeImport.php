@@ -63,26 +63,19 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             return now()->toDateString();
         }
     
-        $data = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $data));
-    
-        // Caso 1: Formato seriale Excel (numero)
-        if (is_numeric($data)) {
-            try {
-                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data)->format('Y-m-d');
-            } catch (\Throwable $e) {
-                Log::error('Errore conversione data seriale: ' . $data);
-                return now()->toDateString();
-            }
-        }
-    
-        // Caso 2: Formato stringa riconoscibile
         try {
-            return Carbon::createFromFormat('Y-m-d', $data)->format('Y-m-d');
+            if (is_numeric($data)) {
+                // Converte seriale Excel in oggetto Carbon
+                return Carbon::instance(ExcelDate::excelToDateTimeObject($data))->toDateString();
+            } else {
+                return Carbon::parse($data)->toDateString(); // qualsiasi stringa interpretabile
+            }
         } catch (\Throwable $e) {
-            Log::warning('Data in formato non riconosciuto: "' . $data . '" - uso data odierna.');
+            Log::warning('Errore parsing data "' . $data . '": ' . $e->getMessage());
             return now()->toDateString();
         }
     }
+    
      
 
 }
