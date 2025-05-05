@@ -22,12 +22,8 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        Log::info('🧾 Riga completa Excel ricevuta:', $row); // ✅ Dump completo per debugging
     
-        $dataRaw = $row['data'] ?? $row['Data'] ?? null;
-    
-        Log::info('📅 Valore campo data grezzo:', ['data' => $dataRaw]);
-    
+        $dataRaw = $row['data'] ?? $row['Data'] ?? null; 
         $isbn = $row['isbn'] ?? $row['ISBN'] ?? null;
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? null;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? null;
@@ -58,24 +54,33 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     private function parseData($data)
     {
-        if (is_null($data)) {
-            Log::warning('Data mancante, uso data odierna.');
+        Log::info('🔍 Valore ricevuto per la data:', ['raw_data' => $data]);
+    
+        if (is_null($data) || $data === '') {
+            Log::warning('⚠️ Data mancante o vuota. Uso data odierna.');
             return now()->toDateString();
         }
     
         try {
             if (is_numeric($data)) {
-                // Converte seriale Excel in oggetto Carbon
-                return Carbon::instance(ExcelDate::excelToDateTimeObject($data))->toDateString();
+                // Valore numerico: potrebbe essere un seriale Excel
+                $converted = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data);
+                Log::info('📅 Data convertita da seriale Excel:', ['excel_seriale' => $data, 'convertita' => $converted]);
+                return \Carbon\Carbon::instance($converted)->toDateString();
             } else {
-                return Carbon::parse($data)->toDateString(); // qualsiasi stringa interpretabile
+                // Prova a fare il parse di una data stringa
+                $parsed = \Carbon\Carbon::parse($data);
+                Log::info('📅 Data convertita da stringa:', ['originale' => $data, 'convertita' => $parsed]);
+                return $parsed->toDateString();
             }
         } catch (\Throwable $e) {
-            Log::warning('Errore parsing data "' . $data . '": ' . $e->getMessage());
+            Log::error('❌ Errore durante il parsing della data', [
+                'valore' => $data,
+                'errore' => $e->getMessage()
+            ]);
             return now()->toDateString();
         }
     }
     
-     
 
 }

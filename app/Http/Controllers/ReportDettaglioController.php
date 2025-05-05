@@ -89,7 +89,7 @@ class ReportDettaglioController extends Controller
             return $item;
         });
 
-        $dettagli = $dettagli->sortBy(fn($item) => $item->data)->values();
+        $dettagli = $dettagli->sortByDesc(fn($item) => $item->data)->values();
 
 
     
@@ -124,8 +124,9 @@ class ReportDettaglioController extends Controller
         $dettagli_raw = RegistroVenditeDettaglio::with(['registroVendite.anagrafica'])
         ->where('isbn', $report->libro->isbn)
         ->get()
-        ->sortBy(fn($item) => $item->data)
+        ->sortByDesc(fn($item) => $item->data)
         ->values();
+    
     
     
         $quantita_cumulata = 0;
