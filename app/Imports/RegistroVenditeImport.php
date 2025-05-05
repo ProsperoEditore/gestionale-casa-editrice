@@ -54,21 +54,36 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
     }
 
     private function parseData($data)
-{
-    // Se è un numero (Excel serial date), convertilo
-    if (is_numeric($data)) {
-        try {
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data)->format('Y-m-d');
-        } catch (\Throwable $e) {
-            Log::error('Errore conversione data Excel: ' . $e->getMessage());
+    {
+        if (is_null($data)) {
+            Log::warning('Data mancante, uso data odierna.');
             return now()->toDateString();
         }
+    
+        // Pulisce eventuali spazi o caratteri invisibili
+        $data = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $data));
+    
+        // Se è un numero (formato seriale Excel)
+        if (is_numeric($data)) {
+            try {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($data)->format('Y-m-d');
+            } catch (\Throwable $e) {
+                Log::error('Errore conversione data Excel (seriale): "' . $data . '" → ' . $e->getMessage());
+                return now()->toDateString();
+            }
+        }
+    
+        // Se è già una data testuale tipo 2019-09-15
+        $timestamp = strtotime($data);
+        if ($timestamp !== false) {
+            return date('Y-m-d', $timestamp);
+        }
+    
+        // Se tutto fallisce, logga e usa la data odierna
+        Log::warning('Formato data non riconosciuto: "' . $data . '", uso data odierna.');
+        return now()->toDateString();
     }
-
-    // Altrimenti prova con strtotime
-    $timestamp = strtotime($data);
-    return $timestamp ? date('Y-m-d', $timestamp) : now()->toDateString();
-}
+    
 
     
 
