@@ -22,6 +22,12 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
+
+        Log::info('📅 Valore originale di data ricevuto da Excel:', [
+            'data' => $row['data'] ?? $row['Data'] ?? null
+        ]);
+
+        
         $isbn = $row['isbn'] ?? $row['ISBN'] ?? null;
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? null;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? null;
