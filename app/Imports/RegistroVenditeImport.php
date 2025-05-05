@@ -74,19 +74,15 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             }
         }
     
-        // Se è già una data testuale tipo 2019-09-15
+        // Se è una data testuale → usa Carbon
         try {
-            return Carbon::parse($data)->format('Y-m-d');
-        } catch (\Exception $e) {
-            Log::error('Errore parsing data: "' . $data . '" → ' . $e->getMessage());
+            return \Carbon\Carbon::parse($data)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            Log::warning('Formato data non riconosciuto: "' . $data . '", uso data odierna.');
             return now()->toDateString();
         }
-        
-    
-        // Se tutto fallisce, logga e usa la data odierna
-        Log::warning('Formato data non riconosciuto: "' . $data . '", uso data odierna.');
-        return now()->toDateString();
     }
+    
     
 
     
