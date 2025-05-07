@@ -186,7 +186,7 @@ $(function() {
 
     if (libroId) {
         const quantitaDisponibile = disponibilitaEditore[libroId] || 0;
-        stockDiv.text(`Disp.: ${quantitaDisponibile}`);
+        stockDiv.text(`Disponibili: ${quantitaDisponibile}`);
         stockDiv.show();
     } else {
         stockDiv.hide();
