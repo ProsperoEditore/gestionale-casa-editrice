@@ -23,9 +23,9 @@
         <thead class="table-dark">
             <tr>
                 <th>Codice Ordine</th>
-                <th>Data</th>
+                <th style="width: 10%;">Data</th>
                 <th>Tipo ordine</th>
-                <th>Anagrafica</th>
+                <th style="width: 18%;">Anagrafica</th>
                 <th>Pagato</th>
                 <th>Azioni</th>
                 <th>Visualizza</th>
@@ -54,17 +54,20 @@
                         @endif
                     </td>
 
-                    <td>
-                        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-                            <button class="btn btn-sm btn-primary salva-pagato" data-id="{{ $ordine->id }}">Salva</button><br><br>
-                        @endif
-                        <a href="{{ route('ordini.edit', $ordine->id) }}" class="btn btn-warning btn-sm">Modifica</a>
-                        <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
-                        </form>
+                    <td class="align-middle">
+                        <div class="d-flex flex-wrap gap-1">
+                            @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                                <button class="btn btn-sm btn-primary salva-pagato" data-id="{{ $ordine->id }}">Salva</button>
+                            @endif
+                            <a href="{{ route('ordini.edit', $ordine->id) }}" class="btn btn-warning btn-sm">Modifica</a>
+                            <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
+                            </form>
+                        </div>
                     </td>
+
 
                     <td>
                         <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="btn btn-info">Visualizza</a>
