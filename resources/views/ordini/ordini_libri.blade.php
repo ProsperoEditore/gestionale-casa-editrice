@@ -180,18 +180,19 @@ $(function() {
 
 
     $(document).on("focus", ".quantita-field", function () {
-        const row = $(this).closest("tr");
-        const libroId = row.find(".libro-id").val();
-        const stockDiv = row.find(".stock-info");
+    const row = $(this).closest("tr");
+    const libroId = row.find(".libro-id").val();
+    const stockDiv = row.find(".stock-info");
 
-        if (disponibilitaEditore[libroId]) {
-            const quantitaDisponibile = disponibilitaEditore[libroId];
-            stockDiv.text(`Disp.: ${quantitaDisponibile}`);
-            stockDiv.show();
-        } else {
-            stockDiv.hide();
-        }
+    if (libroId) {
+        const quantitaDisponibile = disponibilitaEditore[libroId] || 0;
+        stockDiv.text(`Disp.: ${quantitaDisponibile}`);
+        stockDiv.show();
+    } else {
+        stockDiv.hide();
+    }
     });
+
 
     $(document).on("blur", ".quantita-field", function () {
         const row = $(this).closest("tr");
@@ -213,7 +214,10 @@ $(function() {
                 <input type="hidden" name="libro_id[]" class="libro-id">
                 <input type="hidden" class="prezzo-field">
             </td>
-            <td><input type="number" name="quantita[]" class="form-control quantita-field"></td>
+            <td>
+                <input type="number" name="quantita[]" class="form-control quantita-field">
+                <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
+            </td>
             <td><input type="text" name="prezzo[]" class="form-control prezzo-field" readonly></td>
             <td><input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" readonly></td>
             <td><input type="text" name="sconto[]" class="form-control sconto-field"></td>
