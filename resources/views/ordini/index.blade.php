@@ -48,7 +48,7 @@
                                 class="form-control pagato-input" 
                                 data-id="{{ $ordine->id }}" 
                                 value="{{ $ordine->pagato }}"
-                                style="background-color: {{ $ordine->pagato ? '#d4edda' : '#fff3cd' }};">
+                                style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white;"
                         @else
                             <span class="text-muted">ND</span>
                         @endif
@@ -109,8 +109,9 @@ $(document).ready(function () {
                 pagato: data
             },
             success: function () {
-                input.css('background-color', data ? '#d4edda' : '#fff3cd');
-            },
+                input.css('background-color', data ? '#28a745' : '#ffc107');
+                input.css('color', 'white');
+            }
             error: function () {
                 alert('Errore nel salvataggio del campo Pagato');
             }
