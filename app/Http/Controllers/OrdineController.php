@@ -7,6 +7,8 @@ use App\Models\Ordine;
 use App\Models\Libro;
 use App\Models\Anagrafica;
 use App\Models\MarchioEditoriale;
+use App\Models\Giacenza;
+use App\Models\Magazzino;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Storage;
@@ -342,8 +344,16 @@ class OrdineController extends Controller
         $ordine = Ordine::with('libri')->findOrFail($id);
         $libri = Libro::with('marchio_editoriale')->select('id', 'titolo', 'isbn', 'prezzo')->get();
     
-        return view('ordini.ordini_libri', compact('ordine', 'libri'));
+        // ✅ Recupero quantità disponibili nei magazzini di tipo "magazzino editore"
+        $quantitaMagazzinoEditore = \App\Models\Giacenza::whereHas('magazzino', function ($query) {
+            $query->where('categoria', 'magazzino editore');
+        })->get()->groupBy('libro_id')->map(function ($giacenze) {
+            return $giacenze->sum('quantita');
+        });
+    
+        return view('ordini.ordini_libri', compact('ordine', 'libri', 'quantitaMagazzinoEditore'));
     }
+    
     
 
     public function importLibri(Request $request, $id)

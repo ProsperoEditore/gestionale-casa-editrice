@@ -28,7 +28,6 @@
 
     <form action="{{ route('ordini.libri.store', $ordine->id) }}" method="POST">
         @csrf
-        <button type="submit" class="btn btn-primary mt-3">Salva</button>
 
         @if($ordine->tipo_ordine === 'conto deposito')
         <div class="mb-3 mt-4">
@@ -108,7 +107,10 @@
                         <input type="hidden" name="prezzo[]" class="prezzo-field" value="{{ $libro->prezzo }}">
                     </td>
 
-                    <td><input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}"></td>
+                    <td>
+                        <input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}">
+                        <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
+                    </td>
                     <td><input type="text" name="prezzo[]" class="form-control prezzo-field" value="{{ $libro->prezzo }}" readonly></td>
                     <td><input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" value="{{ $libro->pivot->valore_vendita_lordo }}" readonly></td>
                     <td><input type="text" name="sconto[]" class="form-control sconto-field" value="{{ $libro->pivot->sconto }}"></td>
@@ -138,6 +140,10 @@
 
 <script>
     const libri = @json($libri);
+</script>
+
+<script>
+    const disponibilitaEditore = @json($quantitaMagazzinoEditore);
 </script>
 
 <script>
@@ -171,6 +177,29 @@ $(function() {
         const netto = valoreLordo - (valoreLordo * sconto / 100);
         row.find(".netto_a_pagare").val(netto.toFixed(2));
     });
+
+
+    $(document).on("focus", ".quantita-field", function () {
+        const row = $(this).closest("tr");
+        const libroId = row.find(".libro-id").val();
+        const stockDiv = row.find(".stock-info");
+
+        if (disponibilitaEditore[libroId]) {
+            const quantitaDisponibile = disponibilitaEditore[libroId];
+            stockDiv.text(`Disp.: ${quantitaDisponibile}`);
+            stockDiv.show();
+        } else {
+            stockDiv.hide();
+        }
+    });
+
+    $(document).on("blur", ".quantita-field", function () {
+        const row = $(this).closest("tr");
+        row.find(".stock-info").fadeOut();
+    });
+
+
+
 
     $(document).on("click", ".removeRow", function() {
         $(this).closest("tr").remove();
