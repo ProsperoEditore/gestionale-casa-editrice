@@ -27,7 +27,7 @@
                 <th>Tipo ordine</th>
                 <th style="width: 18%;">Anagrafica</th>
                 <th style="width: 9%;">Pagato</th>
-                <th style="width: 16%;">Azioni</th>
+                <th style="width: 170px;">Azioni</th>
                 <th>Visualizza</th>
                 <th>Stampa</th>
             </tr>
@@ -42,15 +42,17 @@
 
                     <td>
                         @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-                            <input 
-                                type="date" 
-                                name="pagato" 
-                                class="form-control pagato-input" 
-                                data-id="{{ $ordine->id }}" 
-                                value="{{ $ordine->pagato }}"
-                                style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; padding: 0 4px; min-width: 110px;"
-                                onmousedown="this.showPicker(); return false;"
-                            >
+                        <input 
+                            type="date" 
+                            name="pagato" 
+                            class="form-control pagato-input" 
+                            data-id="{{ $ordine->id }}" 
+                            value="{{ $ordine->pagato }}"
+                            style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; border: none; width: 110px;"
+                            onfocus="this.showPicker()" 
+                            onmousedown="return false;"
+                        >
+
                         @else
                             <span class="text-muted">ND</span>
                         @endif
