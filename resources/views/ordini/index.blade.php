@@ -19,18 +19,18 @@
         </form>
     </div>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered text-center align-middle" style="table-layout: fixed; width: 100%;">
         <thead class="table-dark">
-            <tr>
-                <th style="width: 8%;">Codice Ordine</th>
-                <th style="width: 10%;">Data</th>
-                <th>Tipo ordine</th>
-                <th style="width: 22%;">Anagrafica</th>
-                <th style="width: 12%;">Pagato</th>
-                <th style="width: 14%;">Azioni</th>
-                <th>Visualizza</th>
-                <th>Stampa</th>
-            </tr>
+        <tr>
+            <th style="width: 8%;">Codice Ordine</th>
+            <th style="width: 10%;">Data</th>
+            <th style="width: 12%;">Tipo ordine</th>
+            <th style="width: 24%;">Anagrafica</th>
+            <th style="width: 14%;">Pagato</th>
+            <th style="width: 14%;">Azioni</th>
+            <th style="width: 9%;">Visualizza</th>
+            <th style="width: 9%;">Stampa</th>
+        </tr>
         </thead>
         <tbody>
             @foreach($ordini as $ordine)
