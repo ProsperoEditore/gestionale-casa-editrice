@@ -58,7 +58,6 @@
                         @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
                             <button class="btn btn-sm btn-primary salva-pagato" data-id="{{ $ordine->id }}">Salva</button><br><br>
                         @endif
-
                         <a href="{{ route('ordini.edit', $ordine->id) }}" class="btn btn-warning btn-sm">Modifica</a>
                         <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
                             @csrf
