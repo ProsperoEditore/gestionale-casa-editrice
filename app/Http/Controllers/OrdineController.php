@@ -345,7 +345,7 @@ class OrdineController extends Controller
         $libri = Libro::with('marchio_editoriale')->select('id', 'titolo', 'isbn', 'prezzo')->get();
     
         // ✅ Recupero quantità disponibili nei magazzini di tipo "magazzino editore"
-        $quantitaMagazzinoEditore = \App\Models\Giacenza::whereHas('magazzino', function ($query) {
+        $quantitaMagazzinoEditore = \App\Models\Giacenza::whereHas('magazzino.anagrafica', function ($query) {
             $query->where('categoria', 'magazzino editore');
         })->get()->groupBy('libro_id')->map(function ($giacenze) {
             return $giacenze->sum('quantita');
