@@ -26,8 +26,8 @@
                 <th style="width: 10%;">Data</th>
                 <th>Tipo ordine</th>
                 <th style="width: 18%;">Anagrafica</th>
-                <th>Pagato</th>
-                <th>Azioni</th>
+                <th style="width: 9%;">Pagato</th>
+                <th style="width: 16%;">Azioni</th>
                 <th>Visualizza</th>
                 <th>Stampa</th>
             </tr>
@@ -48,11 +48,14 @@
                                 class="form-control pagato-input" 
                                 data-id="{{ $ordine->id }}" 
                                 value="{{ $ordine->pagato }}"
-                                style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white;"
+                                style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; padding: 0 4px; min-width: 110px;"
+                                onmousedown="this.showPicker(); return false;"
+                            >
                         @else
                             <span class="text-muted">ND</span>
                         @endif
                     </td>
+
 
                     <td class="align-middle">
                         <div class="d-flex flex-wrap gap-1">
