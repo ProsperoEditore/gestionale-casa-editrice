@@ -43,16 +43,13 @@
                     <td>
                         @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
                         <input 
-                        type="date" 
-                        name="pagato" 
-                        class="form-control pagato-input" 
-                        data-id="{{ $ordine->id }}" 
-                        value="{{ $ordine->pagato }}"
-                        style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; border: none; width: 110px;"
-                        onfocus="this.showPicker()" 
-                        onmousedown="return false;"
-                    >
-
+                            type="date" 
+                            name="pagato" 
+                            class="form-control pagato-input" 
+                            data-id="{{ $ordine->id }}" 
+                            value="{{ $ordine->pagato }}"
+                            style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; border: none;"
+                        >
                         @else
                             <span class="text-muted">ND</span>
                         @endif
