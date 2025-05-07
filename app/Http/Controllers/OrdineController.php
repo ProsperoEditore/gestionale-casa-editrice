@@ -84,6 +84,21 @@ class OrdineController extends Controller
     }
 
 
+    public function aggiornaPagato(Request $request, $id)
+    {
+    $ordine = Ordine::findOrFail($id);
+
+    if (!in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore'])) {
+        return response()->json(['error' => 'Tipo ordine non modificabile'], 403);
+    }
+
+    $ordine->pagato = $request->input('pagato');
+    $ordine->save();
+
+    return response()->json(['success' => true]);
+    }
+
+
     public function store(Request $request)
     {
         $tipo = $request->input('tipo_ordine');

@@ -101,6 +101,7 @@ Route::get('/ordini/{id}/stampa', [OrdineController::class, 'stampa'])->name('or
 Route::get('/ordini/{id}/libri', [OrdineController::class, 'gestioneLibri'])->name('ordini.gestione_libri');
 Route::post('/ordini/{id}/libri', [OrdineController::class, 'storeLibri'])->name('ordini.libri.store');
 Route::get('/ordini/search', [OrdineController::class, 'search'])->name('ordini.search');
+Route::put('/ordini/{id}/aggiorna-pagato', [OrdineController::class, 'aggiornaPagato'])->name('ordini.aggiornaPagato');
 
 
 

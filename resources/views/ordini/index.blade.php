@@ -17,7 +17,6 @@
                 @endforeach
             </select>
         </form>
-
     </div>
 
     <table class="table table-bordered">
@@ -27,6 +26,7 @@
                 <th>Data</th>
                 <th>Tipo ordine</th>
                 <th>Anagrafica</th>
+                <th>Pagato</th>
                 <th>Azioni</th>
                 <th>Visualizza</th>
                 <th>Stampa</th>
@@ -37,9 +37,28 @@
                 <tr>
                     <td>{{ $ordine->codice }}</td>
                     <td>{{ $ordine->data }}</td>
-                    <td>{{ ucfirst($ordine->tipo_ordine) }}</td> 
+                    <td>{{ ucfirst($ordine->tipo_ordine) }}</td>
                     <td>{{ $ordine->anagrafica->nome }}</td>
+
                     <td>
+                        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                            <input 
+                                type="date" 
+                                name="pagato" 
+                                class="form-control pagato-input" 
+                                data-id="{{ $ordine->id }}" 
+                                value="{{ $ordine->pagato }}"
+                                style="background-color: {{ $ordine->pagato ? '#d4edda' : '#fff3cd' }};">
+                        @else
+                            <span class="text-muted">ND</span>
+                        @endif
+                    </td>
+
+                    <td>
+                        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                            <button class="btn btn-sm btn-primary salva-pagato" data-id="{{ $ordine->id }}">Salva</button><br><br>
+                        @endif
+
                         <a href="{{ route('ordini.edit', $ordine->id) }}" class="btn btn-warning btn-sm">Modifica</a>
                         <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
                             @csrf
@@ -47,6 +66,7 @@
                             <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
                         </form>
                     </td>
+
                     <td>
                         <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="btn btn-info">Visualizza</a>
                     </td>
@@ -58,11 +78,11 @@
             @endforeach
         </tbody>
     </table>
-    <div class="d-flex justify-content-center mt-4">
-    {{ $ordini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
-</div>
-</div>
 
+    <div class="d-flex justify-content-center mt-4">
+        {{ $ordini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
+    </div>
+</div>
 
 <!-- Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
@@ -75,7 +95,27 @@ $(document).ready(function () {
         placeholder: "Cerca per anagrafica...",
         allowClear: true
     });
+
+    $('.salva-pagato').on('click', function () {
+        const id = $(this).data('id');
+        const input = $('input.pagato-input[data-id="' + id + '"]');
+        const data = input.val();
+
+        $.ajax({
+            url: '/ordini/' + id + '/aggiorna-pagato',
+            method: 'PUT',
+            data: {
+                _token: '{{ csrf_token() }}',
+                pagato: data
+            },
+            success: function () {
+                input.css('background-color', data ? '#d4edda' : '#fff3cd');
+            },
+            error: function () {
+                alert('Errore nel salvataggio del campo Pagato');
+            }
+        });
+    });
 });
 </script>
-
 @endsection
