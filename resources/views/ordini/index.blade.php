@@ -22,12 +22,12 @@
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
-                <th>Codice Ordine</th>
+                <th style="width: 8%;">Codice Ordine</th>
                 <th style="width: 10%;">Data</th>
                 <th>Tipo ordine</th>
-                <th style="width: 18%;">Anagrafica</th>
-                <th style="width: 9%;">Pagato</th>
-                <th style="width: 16%;">Azioni</th>
+                <th style="width: 22%;">Anagrafica</th>
+                <th style="width: 12%;">Pagato</th>
+                <th style="width: 14%;">Azioni</th>
                 <th>Visualizza</th>
                 <th>Stampa</th>
             </tr>
