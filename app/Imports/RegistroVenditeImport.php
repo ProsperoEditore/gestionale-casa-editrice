@@ -56,7 +56,9 @@ $titoloInputNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $titoloIn
 
 $candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
     $titoloDbNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $libro->titolo));
-    return str_contains($titoloDbNormalizzato, $titoloInputNormalizzato);
+    return str_contains($titoloDbNormalizzato, $titoloInputNormalizzato) ||
+       str_contains($titoloInputNormalizzato, $titoloDbNormalizzato) ||
+       similar_text($titoloDbNormalizzato, $titoloInputNormalizzato, $percent) && $percent > 75;
 });
 
             if ($candidati->count() === 1) {
