@@ -45,7 +45,8 @@
     <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
+            <form method="POST" action="{{ route('registro-vendite.risolviConflitti', $registroVendita->id) }}">
+
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">Risolvi conflitti importazione</h5>
