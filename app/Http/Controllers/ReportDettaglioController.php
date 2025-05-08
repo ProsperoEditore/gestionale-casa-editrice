@@ -115,7 +115,6 @@ class ReportDettaglioController extends Controller
         $report = Report::with(['libro', 'contratto'])->findOrFail($reportId);
         $contratto = $report->contratto;
     
-        // Recupera le percentuali delle royalties
         $percentuali = [
             'diretta' => $contratto->royalties_vendite_dirette ?? 0,
             'indiretta' => $contratto->royalties_vendite_indirette ?? 0,
@@ -161,14 +160,7 @@ class ReportDettaglioController extends Controller
                 $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
     
                 for ($i = $iniziale; $i <= $finale; $i++) {
-                    if ($i <= $s1) {
-                        $percentuale = $p1;
-                    } elseif ($i <= $s2) {
-                        $percentuale = $p2;
-                    } else {
-                        $percentuale = $p3;
-                    }
-    
+                    $percentuale = $i <= $s1 ? $p1 : ($i <= $s2 ? $p2 : $p3);
                     $royalties_totali += round($prezzo_unitario * ($percentuale / 100), 2);
                 }
             } elseif ($canale === 'vendite dirette') {
@@ -190,9 +182,15 @@ class ReportDettaglioController extends Controller
             'royalties' => $dettagli->sum('royalties'),
         ];
     
+        // Formatta il nome del file PDF
+        $titolo = preg_replace('/[^A-Za-z0-9_\-]/', '_', $report->libro->titolo); // evita caratteri speciali
+        $inizio = $dataInizio ? Carbon::parse($dataInizio)->format('d-m-Y') : 'inizio';
+        $fine = $dataFine ? Carbon::parse($dataFine)->format('d-m-Y') : 'oggi';
+        $nomeFile = "Report_{$titolo}_da_{$inizio}_a_{$fine}.pdf";
+    
         $pdf = Pdf::loadView('report.dettagli.pdf', compact('report', 'dettagli', 'percentuali', 'totali'))
             ->setPaper('a4', 'landscape');
     
-        return $pdf->download('Report_' . $report->libro->titolo . '.pdf');
+        return $pdf->download($nomeFile);
     }
-}  
+}
