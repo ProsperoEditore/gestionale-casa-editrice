@@ -37,65 +37,80 @@
     @endif
 
     @if(session('righe_ambigue'))
-    @php
-        $righe = session('righe_ambigue');
-        Session::forget('righe_ambigue');
-    @endphp
+@php
+    $righe = session('righe_ambigue');
+    Session::forget('righe_ambigue');
+@endphp
 
-
-        <!-- MODALE Bootstrap per righe ambigue -->
-        <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title">Risolvi conflitti importazione</h5>
-                        </div>
-                        <div class="modal-body">
-                            <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Periodo</th>
-                                        <th>Quantità</th>
-                                        <th>Seleziona libro corretto</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($righe as $index => $riga)
-                                        <tr>
-                                            <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
-                                            <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
-                                            <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
-                                            <td>
-                                                <select name="righe[{{ $index }}][isbn]" class="form-select" required>
-                                                    <option value="">-- Seleziona --</option>
-                                                    @foreach($riga['opzioni'] as $libro)
-                                                        <option value="{{ $libro['isbn'] }}">{{ $libro['titolo'] }} ({{ $libro['isbn'] }})</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Conferma e importa</button>
-                        </div>
-                    </form>
+<!-- MODALE Bootstrap per righe ambigue -->
+<div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Risolvi conflitti importazione</h5>
                 </div>
-            </div>
+                <div class="modal-body">
+                    <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Periodo</th>
+                                <th>Quantità</th>
+                                <th>Seleziona libro corretto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($righe as $index => $riga)
+                                <tr>
+                                    <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
+                                    <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
+                                    <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
+                                    <td>
+                                        <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
+                                            <option value="">-- Seleziona --</option>
+                                            @foreach($riga['opzioni'] as $libro)
+                                                <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
+                                                    {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Conferma e importa</button>
+                </div>
+            </form>
         </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
-                modal.show();
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
+        modal.show();
+
+        // Aggiorna campo titolo nascosto al cambio di selezione
+        document.querySelectorAll('.libro-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                let index = this.dataset.index;
+                let selected = this.options[this.selectedIndex];
+                let titolo = selected.getAttribute('data-titolo') || '';
+                document.getElementById('titolo-hidden-' + index).value = titolo;
             });
-        </script>
-    @endif
+        });
+    });
+</script>
+@endif
+
+
 
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
