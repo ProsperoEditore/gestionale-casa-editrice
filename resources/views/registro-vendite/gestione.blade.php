@@ -38,84 +38,57 @@
     @endif
 
     @if(session('righe_ambigue'))
-@php
-    $righe = session('righe_ambigue');
-@endphp
+        @php $righe = session('righe_ambigue'); @endphp
 
-
-<!-- MODALE Bootstrap per righe ambigue -->
-<div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">Risolvi conflitti importazione</h5>
+        <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title">Risolvi conflitti importazione</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Periodo</th>
+                                        <th>Quantità</th>
+                                        <th>Seleziona libro corretto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($righe as $index => $riga)
+                                        <tr>
+                                            <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
+                                            <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
+                                            <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
+                                            <td>
+                                                <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
+                                                    <option value="">-- Seleziona --</option>
+                                                    @foreach($riga['opzioni'] as $libro)
+                                                        <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
+                                                            {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Conferma e importa</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-body">
-                    <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Periodo</th>
-                                <th>Quantità</th>
-                                <th>Seleziona libro corretto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($righe as $index => $riga)
-                                <tr>
-                                    <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
-                                    <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
-                                    <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
-                                    <td>
-                                        <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
-                                            <option value="">-- Seleziona --</option>
-                                            @foreach($riga['opzioni'] as $libro)
-                                                <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
-                                                    {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Conferma e importa</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
-        modal.show();
-
-        // Aggiorna campo titolo nascosto al cambio di selezione
-        document.querySelectorAll('.libro-select').forEach(function(select) {
-            select.addEventListener('change', function() {
-                let index = this.dataset.index;
-                let selected = this.options[this.selectedIndex];
-                let titolo = selected.getAttribute('data-titolo') || '';
-                document.getElementById('titolo-hidden-' + index).value = titolo;
-            });
-        });
-
-        // Elimina la sessione solo dopo che il popup è stato mostrato
-        fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
-    });
-</script>
-
-@endif
-
-
+    @endif
 
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
@@ -123,53 +96,46 @@
             <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per titolo...">
             <button class="btn btn-outline-primary">Cerca</button>
         </form>
+
         <form id="registroVenditeForm" action="{{ route('registro-vendite.salvaDettagli', ['id' => $registroVendita->id]) }}" method="POST">
             @csrf
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
-        <button type="submit" class="btn btn-primary">Salva</button>
+            <button type="submit" class="btn btn-primary">Salva</button>
 
-        <h5>Elenco Vendite</h5>
+            <h5>Elenco Vendite</h5>
 
             <table class="table table-bordered">
                 <thead class="table-dark">
                     <tr>
-                        <th style="width:12%;">Data</th>
-                        <th style="width:10%;">Periodo</th>
-                        <th style="width:10%;">ISBN</th>
-                        <th style="width:30%;">Titolo</th>
-                        <th style="width:8%;">Quantità</th>
-                        <th style="width:10%;">Prezzo</th>
-                        <th style="width:10%;">Valore Lordo</th>
+                        <th>Data</th>
+                        <th>Periodo</th>
+                        <th>ISBN</th>
+                        <th>Titolo</th>
+                        <th>Quantità</th>
+                        <th>Prezzo</th>
+                        <th>Valore Lordo</th>
                         <th>Azioni</th>
                     </tr>
                 </thead>
                 <tbody id="registroVenditeBody">
-    @if($dettagli->count() > 0)
-        @foreach($dettagli as $dettaglio)
-            <tr data-id="{{ $dettaglio->id }}">
-                <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
-                <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
-                <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
-                <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
-                <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
-                <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
-                <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
-                <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-                </td>
-            </tr>
-        @endforeach
-    @else
-        <tr>
-            <td colspan="8" class="text-center">Nessuna vendita presente.</td>
-        </tr>
-    @endif
-</tbody>
-
+                    @foreach($dettagli as $dettaglio)
+                        <tr data-id="{{ $dettaglio->id }}">
+                            <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
+                            <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
+                            <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
+                            <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
+                            <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
+                            <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
+                            <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
+                            <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
             </table>
 
-            <!-- 🔽 Paginazione -->
             <div class="d-flex justify-content-center">
                 {{ $dettagli->links() }}
             </div>
@@ -209,7 +175,6 @@ $(document).ready(function() {
         });
     }
 
-    // inizializza autocomplete per righe esistenti
     $(".titolo").each(function(){
         initAutocomplete(this);
     });
@@ -226,9 +191,7 @@ $(document).ready(function() {
             <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
         </tr>`;
         $("#registroVenditeBody").prepend(newRow);
-
-        let addedRow = $("#registroVenditeBody tr").first();
-        initAutocomplete(addedRow.find(".titolo"));
+        initAutocomplete($("#registroVenditeBody tr").first().find(".titolo"));
     });
 
     $(document).on("input", ".quantita, .prezzo", function() {
@@ -236,34 +199,50 @@ $(document).ready(function() {
     });
 
     $(document).on("click", ".delete-row", function() {
-    let row = $(this).closest("tr");
-    let dettaglioId = row.data("id");
+        let row = $(this).closest("tr");
+        let dettaglioId = row.data("id");
 
-    if (dettaglioId) {
-        if(confirm("Vuoi davvero eliminare questa riga?")) {
-            $.ajax({
-                url: `/registro-vendite/dettaglio/${dettaglioId}`,
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(result) {
-                    if(result.success) {
-                        row.remove();
-                    } else {
-                        alert('Errore nell\'eliminazione della riga.');
+        if (dettaglioId) {
+            if(confirm("Vuoi davvero eliminare questa riga?")) {
+                $.ajax({
+                    url: `/registro-vendite/dettaglio/${dettaglioId}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(result) {
+                        if(result.success) {
+                            row.remove();
+                        } else {
+                            alert('Errore nell\'eliminazione della riga.');
+                        }
+                    },
+                    error: function() {
+                        alert('Errore nella richiesta.');
                     }
-                },
-                error: function() {
-                    alert('Errore nella richiesta.');
-                }
-            });
+                });
+            }
+        } else {
+            row.remove();
         }
-    } else {
-        row.remove();
-    }
-});
+    });
 
+    // Mostra popup se ci sono righe ambigue
+    @if(session('righe_ambigue'))
+        let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
+        modal.show();
+
+        document.querySelectorAll('.libro-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                let index = this.dataset.index;
+                let selected = this.options[this.selectedIndex];
+                let titolo = selected.getAttribute('data-titolo') || '';
+                document.getElementById('titolo-hidden-' + index).value = titolo;
+            });
+        });
+
+        fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
+    @endif
 });
 </script>
 @endsection

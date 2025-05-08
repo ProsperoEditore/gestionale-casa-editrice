@@ -210,8 +210,8 @@ class RegistroVenditeController extends Controller
             // Controlla se ci sono righe ambigue da gestire
             $righeAmbigue = Session::get('righe_ambigue', []);
             if (!empty($righeAmbigue)) {
-                return redirect()->route('registro-vendite.gestione', $registro->id)
-                    ->with('righe_ambigue', $righeAmbigue);
+                Session::put('righe_ambigue', $righeAmbigue);
+                return redirect()->route('registro-vendite.gestione', $registro->id);                
             }
             
     
