@@ -24,45 +24,63 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         self::$riga++;
-
+    
         $dataRaw = trim($row['data'] ?? $row['Data'] ?? '');
         $isbn = trim($row['isbn'] ?? $row['ISBN'] ?? '');
+        $titoloInput = trim($row['titolo'] ?? $row['Titolo'] ?? '');
         $quantita = $row['quantita'] ?? $row['Quantità'] ?? 0;
         $periodo = $row['periodo'] ?? $row['Periodo'] ?? 'N/D';
-
-        // ✅ Salta righe completamente vuote
-        if (empty($isbn) && empty($quantita)) {
+    
+        if (empty($isbn) && empty($titoloInput) && empty($quantita)) {
             return null;
         }
-
-        // ✅ Parsing sicuro della data
+    
         $data = $this->parseData($dataRaw);
         if (is_null($data)) {
             self::$errori[] = "Errore alla riga " . self::$riga . ": formato data non valido.";
             return null;
         }
-
-        // ✅ Verifica ISBN
-        $libro = Libro::where('isbn', $isbn)->first();
-        if (!$libro) {
-            self::$errori[] = "Errore alla riga " . self::$riga . ": ISBN '{$isbn}' non trovato nel catalogo.";
-            return null;
+    
+        // 🔎 Se c'è ISBN, usa quello
+        if (!empty($isbn)) {
+            $libro = Libro::where('isbn', $isbn)->first();
+            if (!$libro) {
+                self::$errori[] = "Errore alla riga " . self::$riga . ": ISBN '{$isbn}' non trovato.";
+                return null;
+            }
+        } else {
+            // 🧠 Cerca per titolo parziale
+            $candidati = Libro::where('titolo', 'LIKE', '%' . $titoloInput . '%')->get();
+    
+            if ($candidati->count() === 1) {
+                $libro = $candidati->first();
+            } elseif ($candidati->isEmpty()) {
+                self::$errori[] = "Errore alla riga " . self::$riga . ": titolo '{$titoloInput}' non trovato.";
+                return null;
+            } else {
+                $opzioni = $candidati->pluck('titolo', 'isbn')->toArray();
+                $messaggio = "Ambiguità alla riga " . self::$riga . ": più titoli trovati per '{$titoloInput}'. Opzioni: ";
+                foreach ($opzioni as $opIsbn => $opTitolo) {
+                    $messaggio .= "[{$opIsbn} => {$opTitolo}] ";
+                }
+                self::$errori[] = $messaggio;
+                return null;
+            }
         }
-
-        $titolo = $libro->titolo;
-        $prezzo = $libro->prezzo ?? 0;
-
+    
         return new RegistroVenditeDettaglio([
             'registro_vendita_id' => $this->registroVendita->id,
             'data' => $data,
             'periodo' => (string) $periodo,
-            'isbn' => $isbn,
-            'titolo' => $titolo,
+            'isbn' => $libro->isbn,
+            'titolo' => $libro->titolo,
             'quantita' => $quantita,
-            'prezzo' => $prezzo,
-            'valore_lordo' => $quantita * $prezzo,
+            'prezzo' => $libro->prezzo ?? 0,
+            'valore_lordo' => $quantita * ($libro->prezzo ?? 0),
         ]);
     }
+    
+    
 
     private function parseData($data)
     {
