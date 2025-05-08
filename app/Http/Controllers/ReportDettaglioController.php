@@ -47,6 +47,7 @@ class ReportDettaglioController extends Controller
             $item->prezzo_unitario = $item->prezzo;
             $item->canale = ucfirst($canale);
             $item->luogo = $luogo;
+            $item->data = $item->registroVendite->data ?? null;
     
             $quantita = $item->quantita;
             $prezzo_unitario = $item->prezzo;
@@ -142,6 +143,7 @@ class ReportDettaglioController extends Controller
             $item->canale = ucfirst($canale);
             $item->luogo = $luogo;
             $item->periodo_testo = $item->periodo;
+            $item->data = $item->registroVendite->data ?? null;
     
             $quantita = $item->quantita;
             $prezzo_unitario = $item->prezzo;
