@@ -49,7 +49,7 @@
         <tbody>
         @foreach($dettagli as $riga)
             <tr>
-                <td>{{ \Carbon\Carbon::parse($riga->data)->format('d/m/Y') }}</td>
+                <td>{{ $riga->data_formattata }}</td>
                 <td>{{ $riga->periodo_testo }}</td>
                 <td>{{ $riga->luogo }}</td>
                 <td>{{ $riga->quantita }}</td>

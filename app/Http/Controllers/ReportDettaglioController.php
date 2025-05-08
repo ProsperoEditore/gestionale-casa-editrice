@@ -47,9 +47,9 @@ class ReportDettaglioController extends Controller
             $item->prezzo_unitario = $item->prezzo;
             $item->canale = ucfirst($canale);
             $item->luogo = $luogo;
-            $item->data_formattata = optional($item->registroVendite)->data
-                ? \Carbon\Carbon::parse($item->registroVendite->data)->format('d/m/Y')
-                : null;
+            $item->data_formattata = $item->data
+            ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
+            : null;        
 
     
             $quantita = $item->quantita;
@@ -145,9 +145,9 @@ class ReportDettaglioController extends Controller
             $item->canale = ucfirst($canale);
             $item->luogo = $luogo;
             $item->periodo_testo = $item->periodo;
-            $item->data_formattata = optional($item->registroVendite)->data
-                ? \Carbon\Carbon::parse($item->registroVendite->data)->format('d/m/Y')
-                : null;
+            $item->data_formattata = $item->data
+            ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
+            : null;        
         
     
             $quantita = $item->quantita;
