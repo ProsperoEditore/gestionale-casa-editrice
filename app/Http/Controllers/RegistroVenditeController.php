@@ -198,15 +198,23 @@ class RegistroVenditeController extends Controller
         $registro = RegistroVendite::findOrFail($id);
     
         if ($request->hasFile('file')) {
-            // Carica il file Excel
             $file = $request->file('file');
     
-            // Importa i dati
+            // Pulisce vecchi dati in sessione
+            Session::forget(['import_errori', 'righe_ambigue']);
+    
+            // Importa
             Excel::import(new RegistroVenditeImport($registro), $file);
     
-            // Leggi eventuali errori salvati nella sessione dal destruct dell'import
-            $erroriTrovati = session('import_errori', []);
+            // Controlla se ci sono righe ambigue da gestire
+            $righeAmbigue = Session::get('righe_ambigue', []);
+            if (!empty($righeAmbigue)) {
+                return redirect()->route('registro-vendite.gestione', $registro->id)
+                    ->with('righe_ambigue', $righeAmbigue);
+            }
     
+            // Controlla errori standard
+            $erroriTrovati = Session::get('import_errori', []);
             if (!empty($erroriTrovati)) {
                 return redirect()->back()->with([
                     'success' => 'Vendite importate, alcune righe sono state scartate.',
@@ -219,6 +227,30 @@ class RegistroVenditeController extends Controller
     
         return redirect()->back()->with('error', 'Errore nell\'importazione del file.');
     }
+
+    
+    public function risolviConflitti(Request $request, $id)
+{
+    $registro = RegistroVendite::findOrFail($id);
+    $righe = $request->input('righe', []); // array di righe con isbn, titolo, data, periodo, quantita, prezzo
+
+    foreach ($righe as $riga) {
+        RegistroVenditeDettaglio::create([
+            'registro_vendita_id' => $registro->id,
+            'data' => $riga['data'],
+            'periodo' => $riga['periodo'] ?? 'N/D',
+            'isbn' => $riga['isbn'],
+            'titolo' => $riga['titolo'],
+            'quantita' => $riga['quantita'],
+            'prezzo' => $riga['prezzo'],
+            'valore_lordo' => $riga['quantita'] * $riga['prezzo'],
+        ]);
+    }
+
+    return redirect()->route('registro-vendite.gestione', ['id' => $id])
+        ->with('success', 'Righe confermate salvate correttamente.');
+}
+
     
     
 

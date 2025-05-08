@@ -127,6 +127,8 @@ Route::post('/registro-vendite/{id}/import', [RegistroVenditeController::class, 
 Route::post('/registro-vendite/{id}/salva-dettagli', [RegistroVenditeController::class, 'salvaDettagli'])->name('registro-vendite.salvaDettagli');
 Route::delete('/registro-vendite/dettaglio/{id}', [RegistroVenditeController::class, 'destroyDettaglio'])
     ->name('registro-vendite.dettagli.destroy');
+Route::post('/registro-vendite/{id}/risolvi-conflitti', [RegistroVenditeController::class, 'risolviConflitti'])->name('registro-vendite.risolviConflitti');
+
 
 // Autocomplete Libri
 Route::get('/libri/autocomplete', [LibroController::class, 'autocomplete'])->name('libri.autocomplete');

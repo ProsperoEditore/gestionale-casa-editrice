@@ -28,14 +28,70 @@
             @endforeach
         </ul>
     </div>
-@endif
+    @endif
 
-@if(session('success'))
-    <div class="alert alert-success mt-3">
-        {{ session('success') }}
-    </div>
-@endif
+    @if(session('success'))
+        <div class="alert alert-success mt-3">
+            {{ session('success') }}
+        </div>
+    @endif
 
+    @if(session('righe_ambigue'))
+        @php $righe = session('righe_ambigue'); @endphp
+
+        <!-- MODALE Bootstrap per righe ambigue -->
+        <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title">Risolvi conflitti importazione</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Periodo</th>
+                                        <th>Quantità</th>
+                                        <th>Seleziona libro corretto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($righe as $index => $riga)
+                                        <tr>
+                                            <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
+                                            <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
+                                            <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
+                                            <td>
+                                                <select name="righe[{{ $index }}][isbn]" class="form-select" required>
+                                                    <option value="">-- Seleziona --</option>
+                                                    @foreach($riga['opzioni'] as $libro)
+                                                        <option value="{{ $libro['isbn'] }}">{{ $libro['titolo'] }} ({{ $libro['isbn'] }})</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Conferma e importa</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
+                modal.show();
+            });
+        </script>
+    @endif
 
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
@@ -100,6 +156,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 $(document).ready(function() {
@@ -179,13 +236,10 @@ $(document).ready(function() {
             });
         }
     } else {
-        // Se la riga non è ancora salvata, rimuovila semplicemente
         row.remove();
     }
 });
 
 });
 </script>
-
-
 @endsection
