@@ -40,8 +40,8 @@
     @if(session('righe_ambigue'))
 @php
     $righe = session('righe_ambigue');
-    Session::forget('righe_ambigue');
 @endphp
+
 
 <!-- MODALE Bootstrap per righe ambigue -->
 <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
@@ -107,8 +107,12 @@
                 document.getElementById('titolo-hidden-' + index).value = titolo;
             });
         });
+
+        // Elimina la sessione solo dopo che il popup è stato mostrato
+        fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
     });
 </script>
+
 @endif
 
 

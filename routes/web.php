@@ -128,6 +128,10 @@ Route::post('/registro-vendite/{id}/salva-dettagli', [RegistroVenditeController:
 Route::delete('/registro-vendite/dettaglio/{id}', [RegistroVenditeController::class, 'destroyDettaglio'])
     ->name('registro-vendite.dettagli.destroy');
 Route::post('/registro-vendite/{id}/risolvi-conflitti', [RegistroVenditeController::class, 'risolviConflitti'])->name('registro-vendite.risolviConflitti');
+Route::get('/registro-vendite/clear-conflitti-sessione', function () {
+    session()->forget('righe_ambigue');
+    return response()->noContent();
+})->name('registro-vendite.clear-conflitti-sessione');
 
 
 // Autocomplete Libri
