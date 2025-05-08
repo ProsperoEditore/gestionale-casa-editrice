@@ -149,6 +149,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+
+
+<script>
+    let righeAmbigue = {!! json_encode($righe ?? []) !!};
+</script>
+
 <script>
 $(document).ready(function() {
     let libri = @json($libri);
@@ -228,8 +234,7 @@ $(document).ready(function() {
         }
     });
 
-    // Mostra popup se ci sono righe ambigue
-    @if(session('righe_ambigue'))
+    if (righeAmbigue.length > 0) {
         let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
         modal.show();
 
@@ -243,7 +248,8 @@ $(document).ready(function() {
         });
 
         fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
-    @endif
-});
+    }
+
+
 </script>
 @endsection
