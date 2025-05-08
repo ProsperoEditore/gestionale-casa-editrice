@@ -249,7 +249,7 @@ $(document).ready(function() {
 
         fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
     }
-
+});
 
 </script>
 @endsection
