@@ -37,7 +37,11 @@
     @endif
 
     @if(session('righe_ambigue'))
-        @php $righe = session('righe_ambigue'); @endphp
+    @php
+        $righe = session('righe_ambigue');
+        Session::forget('righe_ambigue');
+    @endphp
+
 
         <!-- MODALE Bootstrap per righe ambigue -->
         <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">

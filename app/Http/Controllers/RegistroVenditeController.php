@@ -210,8 +210,8 @@ class RegistroVenditeController extends Controller
             // Controlla se ci sono righe ambigue da gestire
             $righeAmbigue = Session::get('righe_ambigue', []);
             if (!empty($righeAmbigue)) {
-                return redirect()->route('registro-vendite.gestione', $registro->id)
-                    ->with('righe_ambigue', $righeAmbigue);
+                Session::put('righe_ambigue', $righeAmbigue);
+                return redirect()->route('registro-vendite.gestione', $registro->id);                
             }
     
             // Controlla errori standard
@@ -231,28 +231,36 @@ class RegistroVenditeController extends Controller
 
     
     public function risolviConflitti(Request $request, $id)
-{
-    $registro = RegistroVendite::findOrFail($id);
-    $righe = $request->input('righe', []); // array di righe con isbn, titolo, data, periodo, quantita, prezzo
-
-    foreach ($righe as $riga) {
-        RegistroVenditeDettaglio::create([
-            'registro_vendita_id' => $registro->id,
-            'data' => $riga['data'],
-            'periodo' => $riga['periodo'] ?? 'N/D',
-            'isbn' => $riga['isbn'],
-            'titolo' => $riga['titolo'],
-            'quantita' => $riga['quantita'],
-            'prezzo' => $riga['prezzo'],
-            'valore_lordo' => $riga['quantita'] * $riga['prezzo'],
-        ]);
-    }
-
-    return redirect()->route('registro-vendite.gestione', ['id' => $id])
-        ->with('success', 'Righe confermate salvate correttamente.');
-}
-
+    {
+        $registro = RegistroVendite::findOrFail($id);
+        $righe = $request->input('righe', []);
     
+        foreach ($righe as $riga) {
+            if (empty($riga['isbn'])) {
+                continue; // Salta righe senza selezione
+            }
+    
+            $libro = Libro::where('isbn', $riga['isbn'])->first();
+            if (!$libro) {
+                continue; // Salta righe con ISBN non valido
+            }
+    
+            RegistroVenditeDettaglio::create([
+                'registro_vendita_id' => $registro->id,
+                'data' => $riga['data'],
+                'periodo' => $riga['periodo'] ?? 'N/D',
+                'isbn' => $libro->isbn,
+                'titolo' => $libro->titolo,
+                'quantita' => $riga['quantita'],
+                'prezzo' => $libro->prezzo,
+                'valore_lordo' => $riga['quantita'] * $libro->prezzo,
+            ]);
+        }
+    
+        return redirect()->route('registro-vendite.gestione', ['id' => $id])
+            ->with('success', 'Righe confermate salvate correttamente.');
+    }
+     
     
 
     public function edit($id)
