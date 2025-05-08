@@ -2,42 +2,6 @@
 
 @section('content')
 
-
-
-
-<!-- TEST forzato del popup Bootstrap -->
-<div class="modal fade" id="testPopup" tabindex="-1" aria-labelledby="testPopupLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="testPopupLabel">Test Popup</h5>
-      </div>
-      <div class="modal-body">
-        Questo è un test. Se lo vedi, Bootstrap funziona.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log("TEST MODAL START");
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
-            let modal = new bootstrap.Modal(document.getElementById('testPopup'));
-            modal.show();
-        } else {
-            alert("⚠️ Bootstrap Modal non è disponibile!");
-        }
-    });
-</script>
-
-
-
-
-
 <div class="container mt-5">
     <h3 class="text-center mb-4">Gestione Registro Vendite - {{ $registroVendita->anagrafica->nome }}</h3>
 
