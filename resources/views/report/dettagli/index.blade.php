@@ -59,7 +59,7 @@
                 <tbody>
                     @forelse($dettagli as $riga)
                         <tr>
-                            <td>{{ $riga->data }}</td>
+                            <td>{{ \Carbon\Carbon::parse($riga->data)->format('d/m/Y') }}</td>
                             <td>{{ $riga->periodo }}</td>
                             <td>{{ $riga->luogo }}</td>
                             <td>{{ $riga->quantita }}</td>
