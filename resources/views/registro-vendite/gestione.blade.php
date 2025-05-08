@@ -2,6 +2,10 @@
 
 @section('content')
 
+@php
+    $righe = session('righe_ambigue', []);
+@endphp
+
 <div class="container mt-5">
     <h3 class="text-center mb-4">Gestione Registro Vendite - {{ $registroVendita->anagrafica->nome }}</h3>
 
@@ -21,14 +25,14 @@
     </div>
 
     @if(session('import_errori'))
-    <div class="alert alert-danger mt-3">
-        <strong>Alcune righe non sono state importate:</strong>
-        <ul class="mb-0">
-            @foreach(session('import_errori') as $errore)
-                <li>{{ $errore }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="alert alert-danger mt-3">
+            <strong>Alcune righe non sono state importate:</strong>
+            <ul class="mb-0">
+                @foreach(session('import_errori') as $errore)
+                    <li>{{ $errore }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     @if(session('success'))
@@ -37,58 +41,55 @@
         </div>
     @endif
 
-    @if(session('righe_ambigue'))
-        @php $righe = session('righe_ambigue'); @endphp
-
-        <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title">Risolvi conflitti importazione</h5>
-                        </div>
-                        <div class="modal-body">
-                            <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
-                            <table class="table table-bordered">
-                                <thead>
+    <!-- MODALE Bootstrap per righe ambigue -->
+    <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('registro-vendite.risolvi-conflitti', $registroVendita->id) }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Risolvi conflitti importazione</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Periodo</th>
+                                    <th>Quantità</th>
+                                    <th>Seleziona libro corretto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($righe as $index => $riga)
                                     <tr>
-                                        <th>Data</th>
-                                        <th>Periodo</th>
-                                        <th>Quantità</th>
-                                        <th>Seleziona libro corretto</th>
+                                        <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
+                                        <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
+                                        <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
+                                        <td>
+                                            <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
+                                                <option value="">-- Seleziona --</option>
+                                                @foreach($riga['opzioni'] as $libro)
+                                                    <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
+                                                        {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($righe as $index => $riga)
-                                        <tr>
-                                            <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
-                                            <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
-                                            <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
-                                            <td>
-                                                <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
-                                                    <option value="">-- Seleziona --</option>
-                                                    @foreach($riga['opzioni'] as $libro)
-                                                        <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
-                                                            {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Conferma e importa</button>
-                        </div>
-                    </form>
-                </div>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Conferma e importa</button>
+                    </div>
+                </form>
             </div>
         </div>
-    @endif
+    </div>
 
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
@@ -96,7 +97,6 @@
             <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per titolo...">
             <button class="btn btn-outline-primary">Cerca</button>
         </form>
-
         <form id="registroVenditeForm" action="{{ route('registro-vendite.salvaDettagli', ['id' => $registroVendita->id]) }}" method="POST">
             @csrf
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
