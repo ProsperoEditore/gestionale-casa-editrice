@@ -201,26 +201,22 @@ class RegistroVenditeController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
     
-            // Pulisce vecchi dati in sessione
-            Session::forget(['import_errori', 'righe_ambigue']);
+            // ⚠️ NON cancellare subito la sessione
+            // Session::forget(['import_errori', 'righe_ambigue']);
     
-            // Importa
             Excel::import(new RegistroVenditeImport($registro), $file);
     
-            // Controlla se ci sono righe ambigue da gestire
-            $righeAmbigue = Session::get('righe_ambigue', []);
-            if (!empty($righeAmbigue)) {
-                Session::put('righe_ambigue', $righeAmbigue);
-                return redirect()->route('registro-vendite.gestione', $registro->id);                
+            // ✅ Verifica e ritrasmetti righe ambigue
+            if (session()->has('righe_ambigue') && !empty(session('righe_ambigue'))) {
+                return redirect()
+                    ->route('registro-vendite.gestione', $registro->id)
+                    ->with('righe_ambigue', session('righe_ambigue')); // 🔁 reinvia la sessione
             }
-            
     
-            // Controlla errori standard
-            $erroriTrovati = Session::get('import_errori', []);
-            if (!empty($erroriTrovati)) {
+            if (session()->has('import_errori')) {
                 return redirect()->back()->with([
                     'success' => 'Vendite importate, alcune righe sono state scartate.',
-                    'import_errori' => $erroriTrovati
+                    'import_errori' => session('import_errori'),
                 ]);
             }
     
@@ -229,6 +225,7 @@ class RegistroVenditeController extends Controller
     
         return redirect()->back()->with('error', 'Errore nell\'importazione del file.');
     }
+    
 
     
     public function risolviConflitti(Request $request, $id)

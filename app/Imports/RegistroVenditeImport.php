@@ -61,7 +61,7 @@ $candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
 
     return str_contains($titoloDbNormalizzato, $titoloInputNormalizzato) ||
            str_contains($titoloInputNormalizzato, $titoloDbNormalizzato) ||
-           $percentuale > 65;
+           $percentuale > 70;
 });
 
 
