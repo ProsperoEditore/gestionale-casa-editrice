@@ -50,8 +50,15 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
             }
         } else {
             // 🧠 Cerca per titolo parziale
-            $candidati = Libro::where('titolo', 'LIKE', '%' . $titoloInput . '%')->get();
-    
+// Cerca per titolo con normalizzazione
+$libri = Libro::all();
+$titoloInputNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $titoloInput));
+
+$candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
+    $titoloDbNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $libro->titolo));
+    return str_contains($titoloDbNormalizzato, $titoloInputNormalizzato);
+});
+
             if ($candidati->count() === 1) {
                 $libro = $candidati->first();
             } elseif ($candidati->isEmpty()) {
@@ -66,6 +73,7 @@ class RegistroVenditeImport implements ToModel, WithHeadingRow
                 self::$errori[] = $messaggio;
                 return null;
             }
+
         }
     
         return new RegistroVenditeDettaglio([
