@@ -121,13 +121,16 @@ class ReportDettaglioController extends Controller
             'evento' => $contratto->royalties_eventi ?? 0,
         ];
     
+        $dataInizio = $request->input('data_inizio');
+        $dataFine = $request->input('data_fine');
+    
         $dettagli_raw = RegistroVenditeDettaglio::with(['registroVendite.anagrafica'])
-        ->where('isbn', $report->libro->isbn)
-        ->get()
-        ->sortBy(fn($item) => $item->data)
-        ->values();
-    
-    
+            ->where('isbn', $report->libro->isbn)
+            ->when($dataInizio, fn($query) => $query->whereDate('data', '>=', $dataInizio))
+            ->when($dataFine, fn($query) => $query->whereDate('data', '<=', $dataFine))
+            ->get()
+            ->sortBy(fn($item) => $item->data)
+            ->values();
     
         $quantita_cumulata = 0;
     
@@ -190,5 +193,4 @@ class ReportDettaglioController extends Controller
     
         return $pdf->download('Report_' . $report->libro->titolo . '.pdf');
     }
-    
-}
+}  
