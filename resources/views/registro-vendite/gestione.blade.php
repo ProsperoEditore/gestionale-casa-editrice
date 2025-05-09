@@ -153,6 +153,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    let testModal = new bootstrap.Modal(document.getElementById('popupConflitti'));
+testModal.show();
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
 
