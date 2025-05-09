@@ -153,10 +153,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    let testModal = new bootstrap.Modal(document.getElementById('popupConflitti'));
-testModal.show();
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
+
+    if (righeAmbigue.length > 0) {
+        let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
+        modal.show();
+
+        document.querySelectorAll('.libro-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                let index = this.dataset.index;
+                let selected = this.options[this.selectedIndex];
+                let titolo = selected.getAttribute('data-titolo') || '';
+                document.getElementById('titolo-hidden-' + index).value = titolo;
+            });
+        });
+
+        fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
+    }
 
     function aggiornaValoreLordo(row) {
         let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
@@ -220,23 +234,6 @@ testModal.show();
             }
         });
     });
-
-    // Mostra popup se ci sono righe ambigue
-    if (Array.isArray(righeAmbigue) && righeAmbigue.length > 0) {
-        let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
-        modal.show();
-
-        document.querySelectorAll('.libro-select').forEach(function(select) {
-            select.addEventListener('change', function() {
-                let index = this.dataset.index;
-                let selected = this.options[this.selectedIndex];
-                let titolo = selected.getAttribute('data-titolo') || '';
-                document.getElementById('titolo-hidden-' + index).value = titolo;
-            });
-        });
-
-        fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
-    }
 });
 </script>
 @endsection
