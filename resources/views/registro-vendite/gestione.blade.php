@@ -3,7 +3,7 @@
 @section('content')
 
 @php
-    $righe = session('righe_ambigue', []);
+    $righe = session()->pull('righe_ambigue', []);
 @endphp
 
 <div class="container mt-5">
