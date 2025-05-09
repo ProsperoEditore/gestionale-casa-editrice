@@ -152,17 +152,14 @@
 
 
 <script>
-    let righeAmbigue = {!! json_encode($righe ?? []) !!};
-</script>
-
-<script>
-$(document).ready(function() {
-    let libri = @json($libri);
+document.addEventListener('DOMContentLoaded', function () {
+    const righeAmbigue = {!! json_encode($righe ?? []) !!};
+    const libri = @json($libri);
 
     function aggiornaValoreLordo(row) {
-        let quantita = parseFloat(row.find(".quantita").val()) || 0;
-        let prezzo = parseFloat(row.find(".prezzo").val()) || 0;
-        row.find(".valore-lordo").val((quantita * prezzo).toFixed(2));
+        let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
+        let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
+        row.querySelector(".valore-lordo").value = (quantita * prezzo).toFixed(2);
     }
 
     function initAutocomplete(input) {
@@ -177,17 +174,16 @@ $(document).ready(function() {
                 let parentRow = $(this).closest("tr");
                 parentRow.find(".isbn").val(ui.item.isbn);
                 parentRow.find(".prezzo").val(ui.item.prezzo);
-                aggiornaValoreLordo(parentRow);
+                aggiornaValoreLordo(parentRow[0]);
             }
         });
     }
 
-    $(".titolo").each(function(){
-        initAutocomplete(this);
-    });
+    document.querySelectorAll(".titolo").forEach(initAutocomplete);
 
-    $("#addRow").click(function() {
-        let newRow = `<tr>
+    document.getElementById("addRow").addEventListener("click", function() {
+        let newRow = document.createElement("tr");
+        newRow.innerHTML = `
             <td><input type="date" name="data[]" value="{{ date('Y-m-d') }}" class="form-control"></td>
             <td><input type="text" name="periodo[]" class="form-control"></td>
             <td><input type="text" name="isbn[]" class="form-control isbn" readonly></td>
@@ -196,45 +192,35 @@ $(document).ready(function() {
             <td><input type="number" name="prezzo[]" value="0.00" class="form-control prezzo" step="0.01"></td>
             <td><input type="number" name="valore_lordo[]" value="0.00" class="form-control valore-lordo" readonly></td>
             <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
-        </tr>`;
-        $("#registroVenditeBody").prepend(newRow);
-        initAutocomplete($("#registroVenditeBody tr").first().find(".titolo"));
+        `;
+        document.getElementById("registroVenditeBody").prepend(newRow);
+        initAutocomplete(newRow.querySelector(".titolo"));
     });
 
-    $(document).on("input", ".quantita, .prezzo", function() {
-        aggiornaValoreLordo($(this).closest("tr"));
-    });
-
-    $(document).on("click", ".delete-row", function() {
-        let row = $(this).closest("tr");
-        let dettaglioId = row.data("id");
-
-        if (dettaglioId) {
-            if(confirm("Vuoi davvero eliminare questa riga?")) {
-                $.ajax({
-                    url: `/registro-vendite/dettaglio/${dettaglioId}`,
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(result) {
-                        if(result.success) {
-                            row.remove();
-                        } else {
-                            alert('Errore nell\'eliminazione della riga.');
+    document.querySelectorAll(".delete-row").forEach(btn => {
+        btn.addEventListener("click", function() {
+            let row = this.closest("tr");
+            let dettaglioId = row.dataset.id;
+            if (dettaglioId) {
+                if (confirm("Vuoi davvero eliminare questa riga?")) {
+                    fetch(`/registro-vendite/dettaglio/${dettaglioId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
-                    },
-                    error: function() {
-                        alert('Errore nella richiesta.');
-                    }
-                });
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) row.remove();
+                        else alert("Errore nell'eliminazione della riga.");
+                    }).catch(() => alert("Errore nella richiesta."));
+                }
+            } else {
+                row.remove();
             }
-        } else {
-            row.remove();
-        }
+        });
     });
 
-    if (righeAmbigue.length > 0) {
+    // Mostra popup se ci sono righe ambigue
+    if (Array.isArray(righeAmbigue) && righeAmbigue.length > 0) {
         let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
         modal.show();
 
@@ -250,6 +236,5 @@ $(document).ready(function() {
         fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
     }
 });
-
 </script>
 @endsection
