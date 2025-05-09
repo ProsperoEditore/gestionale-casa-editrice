@@ -208,9 +208,9 @@ class RegistroVenditeController extends Controller
     
             // ✅ Verifica e ritrasmetti righe ambigue
             if (session()->has('righe_ambigue') && !empty(session('righe_ambigue'))) {
-                return redirect()
-                    ->route('registro-vendite.gestione', $registro->id)
-                    ->with('righe_ambigue', session('righe_ambigue')); // 🔁 reinvia la sessione
+                session()->reflash(); // 🔁 mantieni tutti i dati della sessione anche dopo il redirect
+                return redirect()->route('registro-vendite.gestione', $registro->id);
+                
             }
     
             if (session()->has('import_errori')) {

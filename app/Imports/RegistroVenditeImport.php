@@ -67,19 +67,24 @@ $candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
 
             if ($candidati->count() === 1) {
                 $libro = $candidati->first();
-            } elseif ($candidati->isEmpty()) {
-                self::$errori[] = "Errore alla riga " . self::$riga . ": titolo '{$titoloInput}' non trovato.";
-                return null;
-            } else {
-                $opzioni = $candidati->pluck('titolo', 'isbn')->toArray();
-                $messaggio = "Ambiguità alla riga " . self::$riga . ": più titoli trovati per '{$titoloInput}'. Opzioni: ";
-                foreach ($opzioni as $opIsbn => $opTitolo) {
-                    $messaggio .= "[{$opIsbn} => {$opTitolo}] ";
+            }else {
+                    // Prepara i dati per il popup
+                    $opzioni = $candidati->map(function ($libro) {
+                        return [
+                            'isbn' => $libro->isbn,
+                            'titolo' => $libro->titolo,
+                        ];
+                    })->values()->all();
+                
+                    Session::push('righe_ambigue', [
+                        'data' => $data,
+                        'periodo' => $periodo,
+                        'quantita' => $quantita,
+                        'opzioni' => $opzioni,
+                    ]);
+                
+                    return null;
                 }
-                self::$errori[] = $messaggio;
-                return null;
-            }
-
         }
     
         return new RegistroVenditeDettaglio([
