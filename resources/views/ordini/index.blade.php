@@ -47,7 +47,7 @@
                             name="pagato" 
                             class="form-control pagato-input" 
                             data-id="{{ $ordine->id }}" 
-                            value="{{ $ordine->pagato }}"
+                            value="{{ $ordine->pagato ? \Carbon\Carbon::parse($ordine->pagato)->format('Y-m-d') : '' }}"
                             style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; border: none;"
                         >
                         @else
@@ -103,6 +103,14 @@ $(document).ready(function () {
         allowClear: true
     });
 
+    // ✅ Imposta CSRF token per tutte le richieste AJAX
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // ✅ Funzione per aggiornare il campo Pagato
     $('.salva-pagato').on('click', function () {
         const id = $(this).data('id');
         const input = $('input.pagato-input[data-id="' + id + '"]');
@@ -112,18 +120,19 @@ $(document).ready(function () {
             url: '/ordini/' + id + '/aggiorna-pagato',
             method: 'PUT',
             data: {
-                _token: '{{ csrf_token() }}',
                 pagato: data
             },
             success: function () {
                 input.css('background-color', data ? '#28a745' : '#ffc107');
                 input.css('color', 'white');
-            }
-            error: function () {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
                 alert('Errore nel salvataggio del campo Pagato');
             }
         });
     });
 });
 </script>
+
 @endsection
