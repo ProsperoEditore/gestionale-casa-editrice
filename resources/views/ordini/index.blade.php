@@ -112,6 +112,7 @@ $(document).ready(function () {
 
     // ✅ Funzione per aggiornare il campo Pagato
     $('.salva-pagato').on('click', function () {
+    console.log("Hai cliccato su Salva");
         const id = $(this).data('id');
         const input = $('input.pagato-input[data-id="' + id + '"]');
         const data = input.val();
