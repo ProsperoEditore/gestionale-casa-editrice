@@ -1,38 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mt-5">
-        <h3 class="text-center mb-4">Anagrafiche</h3>
-        
-        <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
-            <a href="{{ route('anagrafiche.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Anagrafiche</h3>
 
-            <form action="{{ route('anagrafiche.index') }}" method="GET" class="d-flex flex-wrap gap-2">
-                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per nome...">
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
+        <a href="{{ route('anagrafiche.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
-                <select name="categoria" class="form-select">
-                    <option value="">Cerca per categoria...</option>
-                    <option value="magazzino editore" {{ request('categoria') == 'magazzino editore' ? 'selected' : '' }}>Magazzino Editore</option>
-                    <option value="sito" {{ request('categoria') == 'sito' ? 'selected' : '' }}>Sito</option>
-                    <option value="libreria c.e." {{ request('categoria') == 'libreria c.e.' ? 'selected' : '' }}>Libreria C.E.</option>
-                    <option value="libreria cliente" {{ request('categoria') == 'libreria cliente' ? 'selected' : '' }}>Libreria Cliente</option>
-                    <option value="privato" {{ request('categoria') == 'privato' ? 'selected' : '' }}>Privato</option>
-                    <option value="biblioteca" {{ request('categoria') == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
-                    <option value="associazione" {{ request('categoria') == 'associazione' ? 'selected' : '' }}>Associazione</option>
-                    <option value="università" {{ request('categoria') == 'università' ? 'selected' : '' }}>Università</option>
-                    <option value="grossista" {{ request('categoria') == 'grossista' ? 'selected' : '' }}>Grossista</option>
-                    <option value="distributore" {{ request('categoria') == 'distributore' ? 'selected' : '' }}>Distributore</option>
-                    <option value="fiere" {{ request('categoria') == 'fiere' ? 'selected' : '' }}>Fiere</option>
-                    <option value="festival" {{ request('categoria') == 'festival' ? 'selected' : '' }}>Festival</option>
-                    <option value="altro" {{ request('categoria') == 'altro' ? 'selected' : '' }}>Altro</option>
-                </select>
+        <form action="{{ route('anagrafiche.index') }}" method="GET" class="d-flex flex-wrap gap-2">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per nome...">
 
-                <button class="btn btn-outline-primary">Cerca</button>
-            </form>
-        </div>
+            <select name="categoria" class="form-select">
+                <option value="">Cerca per categoria...</option>
+                @foreach([
+                    'magazzino editore','sito','libreria c.e.','libreria cliente','privato','biblioteca',
+                    'associazione','università','grossista','distributore','fiere','festival','altro'
+                ] as $categoria)
+                    <option value="{{ $categoria }}" {{ request('categoria') == $categoria ? 'selected' : '' }}>{{ ucfirst($categoria) }}</option>
+                @endforeach
+            </select>
 
+            <button class="btn btn-outline-primary">Cerca</button>
+        </form>
+    </div>
+
+    <!-- DESKTOP -->
+    <div class="d-none d-md-block table-responsive">
         <table class="table table-bordered text-center">
-            <thead class="thead-dark">
+            <thead class="table-dark">
                 <tr>
                     <th>Categoria</th>
                     <th>Nome</th>
@@ -66,9 +61,38 @@
                 @endforeach
             </tbody>
         </table>
-
-        <div class="d-flex justify-content-center mt-4">
-            {{ $items->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
-        </div>
     </div>
+
+    <!-- MOBILE -->
+    <div class="d-md-none">
+        @foreach($items as $item)
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $item->nome }}</h5>
+                    <p class="mb-1"><strong>Categoria:</strong> {{ $item->categoria }}</p>
+                    <p class="mb-1"><strong>Indirizzo:</strong> {{ $item->indirizzo_spedizione }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ $item->email }}</p>
+                    <p class="mb-1"><strong>Telefono:</strong> {{ $item->telefono }}</p>
+
+                    <div class="d-flex flex-wrap gap-3 mt-2">
+                        <a href="{{ route('anagrafiche.edit', $item->id) }}" class="btn btn-sm btn-warning" title="Modifica">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ route('anagrafiche.destroy', $item->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger" title="Elimina" onclick="return confirm('Sei sicuro?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        {{ $items->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
+    </div>
+</div>
 @endsection

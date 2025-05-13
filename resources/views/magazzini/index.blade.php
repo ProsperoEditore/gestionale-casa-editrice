@@ -86,6 +86,52 @@
     </div>
 </div>
 
+
+<!-- MOBILE -->
+<div class="d-md-none">
+    @foreach($magazzini as $magazzino)
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ $magazzino->anagrafica->nome ?? 'N/A' }}</h5>
+                <p class="mb-1"><strong>Categoria:</strong> {{ $magazzino->anagrafica->categoria ?? 'N/A' }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ $magazzino->anagrafica->email ?? 'N/A' }}</p>
+                <p class="mb-1"><strong>Prossima Scadenza:</strong>
+                    @if(optional($magazzino->anagrafica)->categoria === 'magazzino editore')
+                        <span class="badge bg-secondary">N.D.</span>
+                    @else
+                        <input type="date" class="form-control scadenza-input"
+                            data-id="{{ $magazzino->id }}"
+                            value="{{ $magazzino->prossima_scadenza ? \Carbon\Carbon::parse($magazzino->prossima_scadenza)->format('Y-m-d') : '' }}"
+                            onchange="updateScadenza({{ $magazzino->id }}, this)">
+                    @endif
+                </p>
+
+                @if(auth()->user()->ruolo !== 'utente')
+                    <div class="d-flex flex-wrap gap-3 mt-2">
+                        <strong>Azioni:</strong>
+                        <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger" title="Elimina">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                @endif
+
+                <div class="d-flex flex-wrap gap-3 mt-2">
+                    <strong>Giacenze:</strong>
+                    <a href="{{ route('giacenze.create', ['magazzino' => $magazzino->id]) }}" class="btn btn-sm btn-secondary" title="Vedi Giacenze">
+                        <i class="bi bi-box-seam"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endforeach
+</div>
+
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.scadenza-input').forEach(input => {
