@@ -19,6 +19,7 @@
         </form>
     </div>
 
+    <div class="table-responsive">
     <table class="table table-bordered text-center align-middle" style="table-layout: fixed; width: 100%;">
         <thead class="table-dark">
         <tr>
@@ -55,36 +56,42 @@
                         @endif
                     </td>
 
-
-                    <td class="align-middle" style="width: 16%;">
+                    <td>
                         @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-                            <div class="mb-1">
-                                <button class="btn btn-sm btn-primary salva-pagato" data-id="{{ $ordine->id }}">Salva</button>
-                            </div>
+                            <button class="btn p-0 border-0 bg-transparent text-primary mb-1 salva-pagato" data-id="{{ $ordine->id }}" title="Salva">
+                                <i class="bi bi-check-lg fs-5"></i>
+                            </button>
                         @endif
-                        <div class="d-flex gap-1">
-                            <a href="{{ route('ordini.edit', $ordine->id) }}" class="btn btn-warning btn-sm">Modifica</a>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('ordini.edit', $ordine->id) }}" class="text-warning" title="Modifica">
+                                <i class="bi bi-pencil fs-5"></i>
+                            </a>
                             <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
+                                <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
                             </form>
                         </div>
                     </td>
 
-
-
                     <td>
-                        <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="btn btn-info">Visualizza</a>
+                        <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="text-info" title="Visualizza">
+                            <i class="bi bi-eye fs-5"></i>
+                        </a>
                     </td>
 
                     <td>
-                        <a href="{{ route('ordini.stampa', $ordine->id) }}" class="btn btn-primary btn-sm">Stampa</a>
+                        <a href="{{ route('ordini.stampa', $ordine->id) }}" class="text-dark" title="Stampa">
+                            <i class="bi bi-printer fs-5"></i>
+                        </a>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    </div>
 
     <div class="d-flex justify-content-center mt-4">
         {{ $ordini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
@@ -103,16 +110,13 @@ $(document).ready(function () {
         allowClear: true
     });
 
-    // ✅ Imposta CSRF token per tutte le richieste AJAX
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    // ✅ Funzione per aggiornare il campo Pagato
     $('.salva-pagato').on('click', function () {
-    console.log("Hai cliccato su Salva");
         const id = $(this).data('id');
         const input = $('input.pagato-input[data-id="' + id + '"]');
         const data = input.val();
@@ -135,5 +139,4 @@ $(document).ready(function () {
     });
 });
 </script>
-
 @endsection
