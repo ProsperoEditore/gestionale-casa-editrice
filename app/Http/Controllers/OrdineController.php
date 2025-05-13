@@ -382,11 +382,15 @@ class OrdineController extends Controller
         $rows = Excel::toCollection(null, $file)->first();
     
         foreach ($rows as $row) {
+            // Normalizza le intestazioni rimuovendo spazi e forzando lowercase
+            $row = collect($row)->keyBy(fn($v, $k) => strtolower(trim($k)));
+
             // Estrazione dei dati
             $isbn = $row['isbn'] ?? null;
-            $quantita = $row['quantita'];
+            $quantita = $row['quantita'] ?? null;
             $titolo = $row['titolo'] ?? null;
             $sconto = $row['sconto'] ?? 0;
+
     
             if (empty($quantita)) {
                 continue; // Ignora righe senza quantità
