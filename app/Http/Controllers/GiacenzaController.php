@@ -121,9 +121,11 @@ class GiacenzaController extends Controller
                 }
             }
     
-                $giacenza->data_ultimo_aggiornamento = now();
-                $giacenza->save();
-                $savedIds[] = ['id' => $giacenza->id, 'isbn' => $giacenza->isbn];
+                if ($modificata || $isNuova) {
+                    $giacenza->data_ultimo_aggiornamento = now();
+                    $giacenza->save();
+                    $savedIds[] = ['id' => $giacenza->id, 'isbn' => $giacenza->isbn];
+                }
             
         }
     
