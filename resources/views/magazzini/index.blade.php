@@ -58,18 +58,23 @@
                             </td>
 
                             @if(auth()->user()->ruolo !== 'utente')
-                                <td>
+                                <td class="align-middle">
                                     <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">Elimina</button>
+                                        <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">
+                                            <i class="bi bi-trash fs-5"></i>
+                                        </button>
                                     </form>
                                 </td>
                             @endif
 
-                            <td>
-                                <a href="{{ route('giacenze.create', ['magazzino' => $magazzino->id]) }}" class="btn btn-secondary btn-sm">Vedi Giacenze</a>
+                            <td class="align-middle">
+                                <a href="{{ route('giacenze.create', ['magazzino' => $magazzino->id]) }}" class="text-secondary" title="Vedi Giacenze">
+                                    <i class="bi bi-box-seam fs-5"></i>
+                                </a>
                             </td>
+
                         </tr>
                     @endforeach
                 </tbody>

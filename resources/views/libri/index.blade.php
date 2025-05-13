@@ -47,12 +47,16 @@
                         <td>{{ number_format($item->prezzo, 2, ',', '.') }} €</td>
                         <td>{{ $item->anno_pubblicazione }}</td>
                         <td>{{ $item->stato }}</td>
-                        <td>
-                            <a href="{{ route('libri.edit', $item->id) }}" class="btn btn-warning btn-sm">Modifica</a>
+                        <td class="align-middle">
+                            <a href="{{ route('libri.edit', $item->id) }}" class="text-warning me-1" title="Modifica">
+                                <i class="bi bi-pencil fs-5"></i>
+                            </a>
                             <form action="{{ route('libri.destroy', $item->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questo libro?')">Elimina</button>
+                                <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo libro?')">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
