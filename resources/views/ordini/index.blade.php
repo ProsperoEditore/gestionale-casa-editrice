@@ -19,8 +19,9 @@
         </form>
     </div>
 
-    <div class="table-responsive">
-    <table class="table table-bordered text-center align-middle" style="table-layout: fixed; width: 100%;">
+<!-- VISUALIZZAZIONE DESKTOP -->
+<div class="d-none d-md-block table-responsive">
+    <table class="table table-bordered text-center align-middle text-nowrap">
         <thead class="table-dark">
         <tr>
             <th>Codice Ordine</th>
@@ -60,28 +61,28 @@
 
                             @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
                                 <button class="btn p-0 border-0 bg-transparent text-primary salva-pagato" data-id="{{ $ordine->id }}" title="Salva">
-                                    <i class="bi bi-save fs-5"></i>
+                                    <i class="bi bi-save fs-4"></i>
                                 </button>
                             @endif
 
                             <a href="{{ route('ordini.edit', $ordine->id) }}" class="text-warning" title="Modifica">
-                                <i class="bi bi-pencil fs-5"></i>
+                                <i class="bi bi-pencil fs-4"></i>
                             </a>
 
                             <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina">
-                                    <i class="bi bi-trash fs-5"></i>
+                                    <i class="bi bi-trash fs-4"></i>
                                 </button>
                             </form>
 
                             <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="text-info" title="Visualizza">
-                                <i class="bi bi-eye fs-5"></i>
+                                <i class="bi bi-eye fs-4"></i>
                             </a>
 
                             <a href="{{ route('ordini.stampa', $ordine->id) }}" class="text-dark" title="Stampa">
-                                <i class="bi bi-printer fs-5"></i>
+                                <i class="bi bi-printer fs-4"></i>
                             </a>
 
                         </div>
@@ -92,6 +93,59 @@
         </tbody>
     </table>
     </div>
+
+
+<!-- VISUALIZZAZIONE MOBILE -->
+<div class="d-md-none">
+    @foreach($ordini as $ordine)
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ $ordine->codice }} - {{ ucfirst($ordine->tipo_ordine) }}</h5>
+                <p class="mb-1"><strong>Data:</strong> {{ $ordine->data }}</p>
+                <p class="mb-1"><strong>Anagrafica:</strong> {{ $ordine->anagrafica->nome }}</p>
+                <p class="mb-1"><strong>Pagato:</strong>
+                    @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                        <input type="date" class="form-control pagato-input"
+                            data-id="{{ $ordine->id }}"
+                            value="{{ $ordine->pagato ? \Carbon\Carbon::parse($ordine->pagato)->format('Y-m-d') : '' }}"
+                            style="background-color: {{ $ordine->pagato ? '#28a745' : '#ffc107' }}; color: white; border: none;" />
+                    @else
+                        <span class="text-muted">ND</span>
+                    @endif
+                </p>
+                <div class="d-flex flex-wrap gap-3 mt-2">
+                    @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                        <button class="btn btn-sm btn-primary salva-pagato" data-id="{{ $ordine->id }}" title="Salva">
+                            <i class="bi bi-save"></i>
+                        </button>
+                    @endif
+
+                    <a href="{{ route('ordini.edit', $ordine->id) }}" class="btn btn-sm btn-warning" title="Modifica">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+
+                    <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger" title="Elimina">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+
+                    <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="btn btn-sm btn-info" title="Visualizza">
+                        <i class="bi bi-eye"></i>
+                    </a>
+
+                    <a href="{{ route('ordini.stampa', $ordine->id) }}" class="btn btn-sm btn-dark" title="Stampa">
+                        <i class="bi bi-printer"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endforeach
+</div>
+
+
 
     <div class="d-flex justify-content-center mt-4">
         {{ $ordini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
