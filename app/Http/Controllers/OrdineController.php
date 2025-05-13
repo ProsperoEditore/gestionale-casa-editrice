@@ -10,6 +10,7 @@ use App\Models\MarchioEditoriale;
 use App\Models\Giacenza;
 use App\Models\Magazzino;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
