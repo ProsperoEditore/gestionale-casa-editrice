@@ -23,16 +23,15 @@
     <table class="table table-bordered text-center align-middle" style="table-layout: fixed; width: 100%;">
         <thead class="table-dark">
         <tr>
-            <th style="width: 8%;">Codice Ordine</th>
-            <th style="width: 10%;">Data</th>
-            <th style="width: 12%;">Tipo ordine</th>
-            <th style="width: 24%;">Anagrafica</th>
-            <th style="width: 14%;">Pagato</th>
-            <th style="width: 14%;">Azioni</th>
-            <th style="width: 9%;">Visualizza</th>
-            <th style="width: 9%;">Stampa</th>
+            <th>Codice Ordine</th>
+            <th>Data</th>
+            <th>Tipo ordine</th>
+            <th>Anagrafica</th>
+            <th>Pagato</th>
+            <th>Azioni</th>
         </tr>
         </thead>
+
         <tbody>
             @foreach($ordini as $ordine)
                 <tr>
@@ -56,16 +55,19 @@
                         @endif
                     </td>
 
-                    <td>
-                        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-                            <button class="btn p-0 border-0 bg-transparent text-primary mb-1 salva-pagato" data-id="{{ $ordine->id }}" title="Salva">
-                                <i class="bi bi-check-lg fs-5"></i>
-                            </button>
-                        @endif
-                        <div class="d-flex justify-content-center gap-2">
+                    <td class="align-middle">
+                        <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap text-nowrap">
+
+                            @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                                <button class="btn p-0 border-0 bg-transparent text-primary salva-pagato" data-id="{{ $ordine->id }}" title="Salva">
+                                    <i class="bi bi-save fs-5"></i>
+                                </button>
+                            @endif
+
                             <a href="{{ route('ordini.edit', $ordine->id) }}" class="text-warning" title="Modifica">
                                 <i class="bi bi-pencil fs-5"></i>
                             </a>
+
                             <form action="{{ route('ordini.destroy', $ordine->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
@@ -73,20 +75,18 @@
                                     <i class="bi bi-trash fs-5"></i>
                                 </button>
                             </form>
+
+                            <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="text-info" title="Visualizza">
+                                <i class="bi bi-eye fs-5"></i>
+                            </a>
+
+                            <a href="{{ route('ordini.stampa', $ordine->id) }}" class="text-dark" title="Stampa">
+                                <i class="bi bi-printer fs-5"></i>
+                            </a>
+
                         </div>
                     </td>
 
-                    <td>
-                        <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="text-info" title="Visualizza">
-                            <i class="bi bi-eye fs-5"></i>
-                        </a>
-                    </td>
-
-                    <td>
-                        <a href="{{ route('ordini.stampa', $ordine->id) }}" class="text-dark" title="Stampa">
-                            <i class="bi bi-printer fs-5"></i>
-                        </a>
-                    </td>
                 </tr>
             @endforeach
         </tbody>
