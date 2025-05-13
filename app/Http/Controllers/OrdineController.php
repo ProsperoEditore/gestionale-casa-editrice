@@ -372,55 +372,49 @@ class OrdineController extends Controller
     
     
 
-    public function importLibri(Request $request, $id)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx'
-        ]);
-    
-        $file = $request->file('file');
-        $rows = Excel::toCollection(null, $file)->first();
-    
-        foreach ($rows as $row) {
-            // Normalizza le intestazioni rimuovendo spazi e forzando lowercase
-            $row = collect($row)->keyBy(fn($v, $k) => strtolower(trim($k)));
+public function importLibri(Request $request, $id)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx'
+    ]);
 
-            // Estrazione dei dati
-            $isbn = $row['isbn'] ?? null;
-            $quantita = $row['quantita'] ?? null;
-            $titolo = $row['titolo'] ?? null;
-            $sconto = $row['sconto'] ?? 0;
+    $file = $request->file('file');
+    $rows = Excel::toCollection(null, $file)->first();
 
-    
-            if (empty($quantita)) {
-                continue; // Ignora righe senza quantità
-            }
-    
-            // Trova il libro usando ISBN o Titolo
-            $libro = null;
-            if ($isbn) {
-                $libro = Libro::where('isbn', $isbn)->first();
-            } elseif ($titolo) {
-                // Usa LIKE per trovare titoli simili
-                $libro = Libro::where('titolo', 'like', '%' . $titolo . '%')->first();
-            }
-    
-            // Se un libro è trovato, salvalo nell'ordine
-            if ($libro) {
-                OrdineLibro::create([
-                    'ordine_id' => $id,
-                    'libro_id' => $libro->id,
-                    'isbn' => $libro->isbn,
-                    'titolo' => $libro->titolo,
-                    'quantita' => $quantita,
-                    'prezzo_copertina' => $libro->prezzo_copertina,
-                    'sconto' => $sconto,
-                ]);
-            }
+    $ordine = Ordine::findOrFail($id);
+
+    foreach ($rows as $row) {
+        // Normalizza le intestazioni
+        $row = collect($row)->keyBy(fn($v, $k) => strtolower(trim($k)));
+
+        $isbn = $row['isbn'] ?? null;
+        $quantita = $row['quantita'] ?? null;
+        $titolo = $row['titolo'] ?? null;
+        $sconto = $row['sconto'] ?? 0;
+
+        if (empty($quantita)) continue;
+
+        $libro = null;
+        if ($isbn) {
+            $libro = Libro::where('isbn', $isbn)->first();
+        } elseif ($titolo) {
+            $libro = Libro::where('titolo', 'like', '%' . $titolo . '%')->first();
         }
-    
-        return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri importati correttamente.');
+
+        if ($libro) {
+            $ordine->libri()->attach($libro->id, [
+                'isbn' => $libro->isbn,
+                'titolo' => $libro->titolo,
+                'quantita' => $quantita,
+                'prezzo_copertina' => $libro->prezzo_copertina,
+                'sconto' => $sconto,
+            ]);
+        }
     }
+
+    return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri importati correttamente.');
+}
+
     
 
     public function show($id)
