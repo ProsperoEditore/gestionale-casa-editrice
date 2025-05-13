@@ -49,6 +49,7 @@
                         <td>{{ $item->nome }}</td>
                         <td>{{ $item->indirizzo_spedizione }}</td>
                         <td>{{ $item->email }}</td>
+                        <td>{{ $item->telefono }}</td>
                         <td>
                             <a href="{{ route('anagrafiche.edit', $item->id) }}" class="text-warning me-2" title="Modifica">
                                 <i class="bi bi-pencil fs-5"></i>

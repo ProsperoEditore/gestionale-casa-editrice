@@ -29,14 +29,19 @@
                     <td>{{ $contratto->royalties_vendite_indirette }}%</td>
                     <td>{{ $contratto->royalties_vendite_dirette }}%</td>
                     <td>{{ $contratto->royalties_eventi }}%</td>
-                    <td>
-                        <a href="{{ route('contratti.edit', $contratto->id) }}" class="btn btn-warning btn-sm">Modifica</a>
+                    <td class="align-middle">
+                        <a href="{{ route('contratti.edit', $contratto->id) }}" class="text-warning me-1" title="Modifica">
+                            <i class="bi bi-pencil fs-5"></i>
+                        </a>
                         <form action="{{ route('contratti.destroy', $contratto->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Sei sicuro di voler eliminare questo contratto?')">Elimina</button>
+                            <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo contratto?')">
+                                <i class="bi bi-trash fs-5"></i>
+                            </button>
                         </form>
                     </td>
+
                 </tr>
             @endforeach
 
