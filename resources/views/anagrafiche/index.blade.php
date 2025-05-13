@@ -49,13 +49,16 @@
                         <td>{{ $item->nome }}</td>
                         <td>{{ $item->indirizzo_spedizione }}</td>
                         <td>{{ $item->email }}</td>
-                        <td>{{ $item->telefono }}</td>
                         <td>
-                            <a href="{{ route('anagrafiche.edit', $item->id) }}" class="btn btn-warning btn-sm">Modifica</a>
+                            <a href="{{ route('anagrafiche.edit', $item->id) }}" class="text-warning me-2" title="Modifica">
+                                <i class="bi bi-pencil fs-5"></i>
+                            </a>
                             <form action="{{ route('anagrafiche.destroy', $item->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
+                                <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
