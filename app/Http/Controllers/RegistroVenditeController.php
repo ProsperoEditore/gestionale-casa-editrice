@@ -233,27 +233,28 @@ class RegistroVenditeController extends Controller
         $registro = RegistroVendite::findOrFail($id);
         $righe = $request->input('righe', []);
     
-        foreach ($righe as $riga) {
-            if (empty($riga['isbn'])) {
-                continue; // Salta righe senza selezione
+            foreach ($righe as $riga) {
+                if (empty($riga['isbn']) || $riga['isbn'] === '__SKIP__') {
+                    continue; // ❌ Salta righe ignorate o senza selezione
+                }
+
+                $libro = Libro::where('isbn', $riga['isbn'])->first();
+                if (!$libro) {
+                    continue; // ⚠️ Salta righe con ISBN non valido
+                }
+
+                RegistroVenditeDettaglio::create([
+                    'registro_vendita_id' => $registro->id,
+                    'data' => $riga['data'],
+                    'periodo' => $riga['periodo'] ?? 'N/D',
+                    'isbn' => $libro->isbn,
+                    'titolo' => $libro->titolo,
+                    'quantita' => $riga['quantita'],
+                    'prezzo' => $libro->prezzo,
+                    'valore_lordo' => $riga['quantita'] * $libro->prezzo,
+                ]);
             }
-    
-            $libro = Libro::where('isbn', $riga['isbn'])->first();
-            if (!$libro) {
-                continue; // Salta righe con ISBN non valido
-            }
-    
-            RegistroVenditeDettaglio::create([
-                'registro_vendita_id' => $registro->id,
-                'data' => $riga['data'],
-                'periodo' => $riga['periodo'] ?? 'N/D',
-                'isbn' => $libro->isbn,
-                'titolo' => $libro->titolo,
-                'quantita' => $riga['quantita'],
-                'prezzo' => $libro->prezzo,
-                'valore_lordo' => $riga['quantita'] * $libro->prezzo,
-            ]);
-        }
+
     
         return redirect()->route('registro-vendite.gestione', ['id' => $id])
             ->with('success', 'Righe confermate salvate correttamente.');

@@ -63,24 +63,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($righe as $index => $riga)
-                                    <tr>
-                                        <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
-                                        <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
-                                        <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
-                                        <td>
-                                            <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
-                                                <option value="">-- Seleziona --</option>
-                                                @foreach($riga['opzioni'] as $libro)
-                                                    <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
-                                                        {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
-                                        </td>
-                                    </tr>
-                                @endforeach
+                                    @foreach($righe as $index => $riga)
+                                        <tr>
+                                            <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
+                                            <td><input type="text" name="righe[{{ $index }}][periodo]" value="{{ $riga['periodo'] ?? 'N/D' }}" class="form-control"></td>
+                                            <td><input type="number" name="righe[{{ $index }}][quantita]" value="{{ $riga['quantita'] }}" class="form-control"></td>
+                                            <td>
+                                                @if (!empty($riga['opzioni']))
+                                                    <select name="righe[{{ $index }}][isbn]" class="form-select libro-select" data-index="{{ $index }}" required>
+                                                        <option value="">-- Seleziona --</option>
+                                                        @foreach($riga['opzioni'] as $libro)
+                                                            <option value="{{ $libro['isbn'] }}" data-titolo="{{ $libro['titolo'] }}">
+                                                                {{ $libro['titolo'] }} ({{ $libro['isbn'] }})
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="hidden" name="righe[{{ $index }}][titolo]" id="titolo-hidden-{{ $index }}" value="">
+                                                @else
+                                                    <div class="text-danger mb-1">Nessuna corrispondenza trovata</div>
+                                                    <input type="hidden" name="righe[{{ $index }}][isbn]" value="__SKIP__">
+                                                    <input type="hidden" name="righe[{{ $index }}][titolo]" value="">
+                                                    <span class="badge bg-warning text-dark">Riga ignorata</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
                             </tbody>
                         </table>
                     </div>
