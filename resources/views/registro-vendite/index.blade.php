@@ -11,7 +11,8 @@
     <button class="btn btn-outline-primary">Cerca</button>
   </form>
 
-  <div class="table-responsive">
+  <!-- DESKTOP -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-bordered text-center align-middle">
       <thead class="table-dark">
         <tr>
@@ -27,7 +28,6 @@
             <td>{{ $item->canale_vendita }}</td>
             <td>
               <div class="d-flex justify-content-center gap-2 text-nowrap">
-
                 <form action="{{ route('registro-vendite.destroy', $item->id) }}" method="POST" class="d-inline">
                   @csrf
                   @method('DELETE')
@@ -35,17 +35,39 @@
                     <i class="bi bi-trash fs-5"></i>
                   </button>
                 </form>
-
                 <a class="text-info" href="{{ route('registro-vendite.gestione', $item->id) }}" title="Gestione Registro">
                   <i class="bi bi-journal-text fs-5"></i>
                 </a>
-
               </div>
             </td>
           </tr>
         @endforeach
       </tbody>
     </table>
+  </div>
+
+  <!-- MOBILE -->
+  <div class="d-md-none">
+    @foreach($items as $item)
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ $item->anagrafica->nome }}</h5>
+          <p class="mb-1"><strong>Canale:</strong> {{ $item->canale_vendita }}</p>
+          <div class="d-flex flex-wrap gap-3 mt-2">
+            <form action="{{ route('registro-vendite.destroy', $item->id) }}" method="POST" class="d-inline">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn btn-sm btn-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo registro?')">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+            <a class="btn btn-sm btn-info" href="{{ route('registro-vendite.gestione', $item->id) }}" title="Gestione Registro">
+              <i class="bi bi-journal-text"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    @endforeach
   </div>
 
   <div class="d-flex justify-content-center mt-4">
