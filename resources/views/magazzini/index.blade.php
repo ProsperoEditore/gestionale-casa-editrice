@@ -32,7 +32,7 @@
                     <tr>
                         <th>Categoria</th>
                         <th>Nome</th>
-                        <th>Email</th>
+                        <th>Contatti</th>
                         <th>Prossima Scadenza</th>
                         @if(auth()->user()->ruolo !== 'utente')
                             <th>Azioni</th>
@@ -45,7 +45,10 @@
                         <tr>
                             <td>{{ $magazzino->anagrafica->categoria ?? 'N/A' }}</td>
                             <td>{{ $magazzino->anagrafica->nome ?? 'N/A' }}</td>
-                            <td>{{ $magazzino->anagrafica->email ?? 'N/A' }}</td>
+                            <td>
+                                {{ $magazzino->anagrafica->email ?? 'N/A' }}<br>
+                                <small>{{ $magazzino->anagrafica->telefono ?? 'N/A' }}</small>
+                            </td>
                             <td class="d-flex align-items-center justify-content-center gap-2">
                                 @if(optional($magazzino->anagrafica)->categoria === 'magazzino editore')
                                     <span class="badge bg-secondary">N.D.</span>
@@ -94,7 +97,11 @@
             <div class="card-body">
                 <h5 class="card-title">{{ $magazzino->anagrafica->nome ?? 'N/A' }}</h5>
                 <p class="mb-1"><strong>Categoria:</strong> {{ $magazzino->anagrafica->categoria ?? 'N/A' }}</p>
-                <p class="mb-1"><strong>Email:</strong> {{ $magazzino->anagrafica->email ?? 'N/A' }}</p>
+                <p class="mb-1"><strong>Contatti:</strong><br>
+                    {{ $magazzino->anagrafica->email ?? 'N/A' }}<br>
+                    <small>{{ $magazzino->anagrafica->telefono ?? 'N/A' }}</small>
+                </p>
+
                 <p class="mb-1"><strong>Prossima Scadenza:</strong>
                     @if(optional($magazzino->anagrafica)->categoria === 'magazzino editore')
                         <span class="badge bg-secondary">N.D.</span>
@@ -132,7 +139,7 @@
         <div class="d-flex justify-content-center mt-3">
         {{ $magazzini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
-    
+
 </div>
 
 
