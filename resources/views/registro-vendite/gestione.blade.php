@@ -24,19 +24,24 @@
         </div>
     </div>
 
-@if(session('import_errori') || session('import_errori_persistenti'))
-    <div class="alert alert-danger mt-3">
-        <strong>Alcune righe non sono state importate:</strong>
-        <ul class="mb-0">
-            @foreach(session('import_errori') ?? [] as $errore)
-                <li>{{ $errore }}</li>
-            @endforeach
-            @foreach(session('import_errori_persistenti') ?? [] as $errore)
-                <li>{{ $errore }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+        @if(session('import_errori') || session('import_errori_persistenti'))
+            <div id="erroriImport" class="alert alert-danger mt-3 position-relative">
+                <strong>⚠️ Alcune righe non sono state importate:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach(session('import_errori') ?? [] as $errore)
+                        <li>{{ $errore }}</li>
+                    @endforeach
+                    @foreach(session('import_errori_persistenti') ?? [] as $errore)
+                        <li>{{ $errore }}</li>
+                    @endforeach
+                </ul>
+            <button id="chiudiErroriImport" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2">
+                ❌ Chiudi elenco errori
+            </button>
+
+            </div>
+        @endif
+
 
 
     @if(session('success'))
@@ -248,4 +253,29 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btnChiudi = document.getElementById("chiudiErroriImport");
+    const divErrori = document.getElementById("erroriImport");
+
+    if (btnChiudi && divErrori) {
+        btnChiudi.addEventListener("click", function () {
+            // Nascondi visivamente
+            divErrori.style.display = "none";
+
+            // Cancella dalla sessione via AJAX
+            fetch("{{ route('registro-vendite.clear-errori-sessione') }}")
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert("Errore nella rimozione dell'elenco errori.");
+                    }
+                })
+                .catch(() => alert("Errore nella richiesta."));
+        });
+    }
+});
+</script>
+
 @endsection

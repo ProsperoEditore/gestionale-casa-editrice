@@ -132,6 +132,11 @@ Route::get('/registro-vendite/clear-conflitti-sessione', function () {
     session()->forget('righe_ambigue');
     return response()->noContent();
 })->name('registro-vendite.clear-conflitti-sessione');
+Route::get('/registro-vendite/clear-errori-sessione', function () {
+    session()->forget('import_errori_persistenti');
+    return response()->json(['success' => true]);
+})->name('registro-vendite.clear-errori-sessione');
+
 
 
 // Autocomplete Libri

@@ -21,99 +21,128 @@ class RegistroVenditeImport implements ToCollection, WithHeadingRow
         $this->registroVendita = $registroVendita;
     }
 
-    public function collection(Collection $rows)
-    {
-        $righeAmbigue = [];
+public function collection(Collection $rows)
+{
+    $righeAmbigue = [];
 
-        foreach ($rows as $index => $row) {
-            $rigaExcel = $index + 2; // corrisponde alla riga del file (dopo header)
+    foreach ($rows as $index => $row) {
+        $rigaExcel = $index + 2;
 
-            $dataRaw = trim($row['data'] ?? '');
-            $isbn = trim($row['isbn'] ?? '');
-            $titoloInput = trim($row['titolo'] ?? '');
-            $quantita = $row['quantita'] ?? 0;
-            $periodo = $row['periodo'] ?? 'N/D';
+        $dataRaw = trim($row['data'] ?? '');
+        $isbn = trim($row['isbn'] ?? '');
+        $titoloInput = trim($row['titolo'] ?? '');
+        $quantita = $row['quantita'] ?? 0;
+        $periodo = $row['periodo'] ?? 'N/D';
 
-            if (empty($isbn) && empty($titoloInput) && empty($quantita)) {
+        if (empty($isbn) && empty($titoloInput) && empty($quantita)) {
+            continue;
+        }
+
+        $data = $this->parseData($dataRaw);
+        if (is_null($data)) {
+            self::$errori[] = "Errore alla riga $rigaExcel: formato data non valido.";
+            continue;
+        }
+
+        $libro = null;
+
+        if (!empty($isbn)) {
+            $libro = Libro::where('isbn', $isbn)->first();
+            if (!$libro) {
+                self::$errori[] = "Errore alla riga $rigaExcel: ISBN '{$isbn}' non trovato.";
                 continue;
             }
+        } else {
+            $libri = Libro::all();
+            $titoloInputNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $titoloInput));
 
-            $data = $this->parseData($dataRaw);
-            if (is_null($data)) {
-                self::$errori[] = "Errore alla riga $rigaExcel: formato data non valido.";
-                continue;
-            }
+            $candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
+                $titoloDbNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $libro->titolo));
+                similar_text($titoloDbNormalizzato, $titoloInputNormalizzato, $percentuale);
+                return str_contains($titoloDbNormalizzato, $titoloInputNormalizzato) ||
+                       str_contains($titoloInputNormalizzato, $titoloDbNormalizzato) ||
+                       $percentuale > 75;
+            });
 
-            $libro = null;
+            if ($candidati->count() === 1) {
+                $match = $candidati->first();
 
-            if (!empty($isbn)) {
-                $libro = Libro::where('isbn', $isbn)->first();
-                if (!$libro) {
-                    self::$errori[] = "Errore alla riga $rigaExcel: ISBN '{$isbn}' non trovato.";
-                    continue;
+                // verifica parole significative contenute nel titolo reale
+                $paroleInput = preg_split('/\s+/', strtolower($titoloInput));
+                $matchTitoloLower = strtolower($match->titolo);
+
+                $trovato = false;
+                foreach ($paroleInput as $parola) {
+                    if (strlen($parola) >= 4 && str_contains($matchTitoloLower, $parola)) {
+                        $trovato = true;
+                        break;
+                    }
                 }
-            } else {
-                // ricerca per titolo
-                $libri = Libro::all();
-                $titoloInputNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $titoloInput));
 
-                $candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
-                    $titoloDbNormalizzato = strtolower(preg_replace('/[^a-z0-9]/i', '', $libro->titolo));
-                    similar_text($titoloDbNormalizzato, $titoloInputNormalizzato, $percentuale);
-                    return str_contains($titoloDbNormalizzato, $titoloInputNormalizzato) ||
-                           str_contains($titoloInputNormalizzato, $titoloDbNormalizzato) ||
-                           $percentuale > 75;
-                });
-
-                if ($candidati->count() === 1) {
-                    $libro = $candidati->first();
-                } elseif ($candidati->count() > 1) {
-                    $opzioni = $candidati->map(function ($libro) {
-                        return [
-                            'isbn' => $libro->isbn,
-                            'titolo' => $libro->titolo,
-                        ];
-                    })->values()->all();
-
+                if ($trovato) {
+                    $libro = $match;
+                } else {
                     $righeAmbigue[] = [
                         'data' => $data,
                         'periodo' => $periodo,
                         'quantita' => $quantita,
                         'titolo' => $titoloInput,
-                        'isbn' => $isbn,
-                        'opzioni' => $opzioni,
+                        'isbn' => '',
+                        'opzioni' => [[
+                            'isbn' => $match->isbn,
+                            'titolo' => $match->titolo,
+                        ]],
                     ];
                     continue;
-                } else {
-                    self::$errori[] = "Errore alla riga $rigaExcel: titolo '{$titoloInput}' non trovato.";
-                    continue;
                 }
-            }
+            } elseif ($candidati->count() > 1) {
+                $opzioni = $candidati->map(function ($libro) {
+                    return [
+                        'isbn' => $libro->isbn,
+                        'titolo' => $libro->titolo,
+                    ];
+                })->values()->all();
 
-            if ($libro) {
-                RegistroVenditeDettaglio::create([
-                    'registro_vendita_id' => $this->registroVendita->id,
+                $righeAmbigue[] = [
                     'data' => $data,
                     'periodo' => $periodo,
-                    'isbn' => $libro->isbn,
-                    'titolo' => $libro->titolo,
                     'quantita' => $quantita,
-                    'prezzo' => $libro->prezzo ?? 0,
-                    'valore_lordo' => $quantita * ($libro->prezzo ?? 0),
-                ]);
+                    'titolo' => $titoloInput,
+                    'isbn' => '',
+                    'opzioni' => $opzioni,
+                ];
+                continue;
+            } else {
+                self::$errori[] = "Errore alla riga $rigaExcel: titolo '{$titoloInput}' non trovato.";
+                continue;
             }
         }
 
-        if (!empty($righeAmbigue)) {
-            Session::put('righe_ambigue', $righeAmbigue);
-        }
-
-        if (!empty(self::$errori)) {
-            Session::flash('import_errori', self::$errori);
-        } else {
-            Session::flash('success', 'Vendite importate con successo!');
+        if ($libro) {
+            RegistroVenditeDettaglio::create([
+                'registro_vendita_id' => $this->registroVendita->id,
+                'data' => $data,
+                'periodo' => $periodo,
+                'isbn' => $libro->isbn,
+                'titolo' => $libro->titolo,
+                'quantita' => $quantita,
+                'prezzo' => $libro->prezzo ?? 0,
+                'valore_lordo' => $quantita * ($libro->prezzo ?? 0),
+            ]);
         }
     }
+
+    if (!empty($righeAmbigue)) {
+        Session::put('righe_ambigue', $righeAmbigue);
+    }
+
+    if (!empty(self::$errori)) {
+        Session::flash('import_errori', self::$errori);
+    } else {
+        Session::flash('success', 'Vendite importate con successo!');
+    }
+}
+
 
     private function parseData($data)
     {
