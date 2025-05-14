@@ -43,18 +43,20 @@
         </thead>
         <tbody id="giacenzeTableBody">
         @foreach ($giacenze as $giacenza)
-                        <tr data-id="{{ $giacenza->id }}" data-original='@json([
-                "isbn" => $giacenza->isbn,
-                "titolo" => $giacenza->titolo,
-                "quantita" => $giacenza->quantita,
-                "prezzo" => $giacenza->prezzo,
-                "note" => $giacenza->note,
-                $magazzino->anagrafica->categoria === 'magazzino editore'
-                    ? "costo_produzione" : "sconto"
-                    => $magazzino->anagrafica->categoria === 'magazzino editore'
-                        ? $giacenza->costo_produzione
-                        : $giacenza->sconto,
-            ])'>
+@php
+    $categoria = $magazzino->anagrafica->categoria;
+    $originalData = [
+        'isbn' => $giacenza->isbn,
+        'titolo' => $giacenza->titolo,
+        'quantita' => $giacenza->quantita,
+        'prezzo' => $giacenza->prezzo,
+        'note' => $giacenza->note,
+        $categoria === 'magazzino editore' ? 'costo_produzione' : 'sconto' =>
+            $categoria === 'magazzino editore' ? $giacenza->costo_produzione : $giacenza->sconto,
+    ];
+@endphp
+
+<tr data-id="{{ $giacenza->id }}" data-original='@json($originalData)'>
 
                 <td><input type="text" class="form-control marchio" value="{{ $giacenza->libro->marchio_editoriale->nome ?? 'N/D' }}" readonly></td>
                 <td><input type="text" class="form-control isbn" value="{{ $giacenza->isbn }}" readonly></td>
