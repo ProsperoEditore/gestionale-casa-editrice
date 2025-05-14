@@ -80,8 +80,11 @@ $candidati = $libri->filter(function ($libro) use ($titoloInputNormalizzato) {
                         'data' => $data,
                         'periodo' => $periodo,
                         'quantita' => $quantita,
+                        'titolo' => $titoloInput,
+                        'isbn' => $isbn,
                         'opzioni' => $opzioni,
                     ]);
+
                 
                     return null;
                 }
