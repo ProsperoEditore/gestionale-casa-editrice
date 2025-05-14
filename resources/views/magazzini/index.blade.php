@@ -25,9 +25,9 @@
         </form>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-bordered text-center">
+        <div class="card d-none d-md-block">
+            <div class="card-body">
+                <table class="table table-bordered text-center">
                 <thead class="thead-dark">
                     <tr>
                         <th>Categoria</th>
@@ -81,14 +81,14 @@
             </table>
         </div>
         <div class="d-flex justify-content-center mt-3">
-        {{ $magazzini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
+            {{ $magazzini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>
 
 
 <!-- MOBILE -->
-<div class="d-md-none">
+<div class="d-block d-md-none">
     @foreach($magazzini as $magazzino)
         <div class="card mb-3">
             <div class="card-body">
@@ -128,6 +128,11 @@
             </div>
         </div>
     @endforeach
+
+        <div class="d-flex justify-content-center mt-3">
+        {{ $magazzini->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
+    </div>
+    
 </div>
 
 
