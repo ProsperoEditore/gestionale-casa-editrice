@@ -207,11 +207,15 @@ class RegistroVenditeController extends Controller
             Excel::import(new RegistroVenditeImport($registro), $file);
     
             // ✅ Verifica e ritrasmetti righe ambigue
-            if (session()->has('righe_ambigue') && !empty(session('righe_ambigue'))) {
-                session()->reflash(); // 🔁 mantieni tutti i dati della sessione anche dopo il redirect
-                return redirect()->route('registro-vendite.gestione', $registro->id);
-                
-            }
+                if (session()->has('righe_ambigue') && !empty(session('righe_ambigue'))) {
+                    if (session()->has('import_errori')) {
+                        // Salva errori in sessione normale (non flash)
+                        session(['import_errori_persistenti' => session('import_errori')]);
+                    }
+                    session()->reflash();
+                    return redirect()->route('registro-vendite.gestione', $registro->id);
+                }
+
     
             if (session()->has('import_errori')) {
                 return redirect()->back()->with([
