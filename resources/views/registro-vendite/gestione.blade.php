@@ -265,14 +265,21 @@ document.addEventListener("DOMContentLoaded", function () {
             divErrori.style.display = "none";
 
             // Cancella dalla sessione via AJAX
-            fetch("{{ route('registro-vendite.clear-errori-sessione') }}")
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert("Errore nella rimozione dell'elenco errori.");
-                    }
-                })
-                .catch(() => alert("Errore nella richiesta."));
+            fetch("{{ route('registro-vendite.clear-errori-sessione') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Errore nella rimozione dell'elenco errori.");
+                }
+            })
+            .catch(() => alert("Errore nella richiesta."));
+
         });
     }
 });
