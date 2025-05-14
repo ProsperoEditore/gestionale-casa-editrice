@@ -31,51 +31,52 @@
             </thead>
             <tbody>
                 @foreach($scarichi as $item)
-                <tr>
-                    <td>{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</td>
-                    <td>{{ $item->ordine->codice ?? $item->altro_ordine }}</td>
+                    <tr>
+                        <td>{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</td>
+                        <td>{{ $item->ordine->codice ?? $item->altro_ordine }}</td>
 
-                    {{-- Stato --}}
-                    <td>
-                        <select name="stato"
-                            class="form-select stato-scarico"
-                            data-id="{{ $item->id }}"
-                            style="background-color:
-                                {{ $item->stato === 'Spedito' ? '#51cf66' :
-                                ($item->stato === 'In attesa' ? '#ffe066' : '#ff6b6b') }};">
-                            <option value="">selezionare uno stato</option>
-                            <option value="In attesa" {{ $item->stato === 'In attesa' ? 'selected' : '' }}>In attesa</option>
-                            <option value="Spedito" {{ $item->stato === 'Spedito' ? 'selected' : '' }}>Spedito</option>
-                        </select>
-                    </td>
+                        {{-- Stato --}}
+                        <td>
+                            <select name="stato"
+                                class="form-select stato-scarico"
+                                data-id="{{ $item->id }}"
+                                style="background-color:
+                                    {{ $item->stato === 'Spedito' ? '#51cf66' :
+                                    ($item->stato === 'In attesa' ? '#ffe066' : '#ff6b6b') }};">
+                                <option value="">selezionare uno stato</option>
+                                <option value="In attesa" {{ $item->stato === 'In attesa' ? 'selected' : '' }}>In attesa</option>
+                                <option value="Spedito" {{ $item->stato === 'Spedito' ? 'selected' : '' }}>Spedito</option>
+                            </select>
+                        </td>
 
-                    {{-- Data stato --}}
-                    <td>
-                        {{ $item->data_stato_info ? \Carbon\Carbon::parse($item->data_stato_info)->format('d/m/Y') : '' }}
-                    </td>
+                        {{-- Data stato --}}
+                        <td class="data-stato-info">
+                            {{ $item->data_stato_info ? \Carbon\Carbon::parse($item->data_stato_info)->format('d/m/Y') : '' }}
+                        </td>
 
-                    {{-- Info spedizione --}}
-                    <td>
-                        <form action="{{ route('scarichi.updateInfoSpedizione', $item->id) }}" method="POST" class="d-flex flex-wrap gap-2">
-                            @csrf
-                            @method('PATCH')
-                            <input type="text" name="info_spedizione" class="form-control me-2" value="{{ $item->info_spedizione }}">
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <i class="bi bi-save"></i>
-                            </button>
-                        </form>
-                    </td>
+                        {{-- Info spedizione --}}
+                        <td>
+                            <form action="{{ route('scarichi.updateInfoSpedizione', $item->id) }}" method="POST" class="d-flex flex-wrap gap-2 align-items-center">
+                                @csrf
+                                @method('PATCH')
+                                <input type="text" name="info_spedizione" class="form-control" value="{{ $item->info_spedizione }}">
+                        </td>
 
-                    {{-- Elimina --}}
-                    <td>
-                        <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+                        {{-- Azioni --}}
+                        <td class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-save"></i>
+                                </button>
+                            </form>
+
+                            <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
                 @endforeach
 
             </tbody>
