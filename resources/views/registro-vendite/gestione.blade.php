@@ -24,16 +24,20 @@
         </div>
     </div>
 
-    @if(session('import_errori'))
-        <div class="alert alert-danger mt-3">
-            <strong>Alcune righe non sono state importate:</strong>
-            <ul class="mb-0">
-                @foreach(session('import_errori') as $errore)
-                    <li>{{ $errore }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+@if(session('import_errori') || session('import_errori_persistenti'))
+    <div class="alert alert-danger mt-3">
+        <strong>Alcune righe non sono state importate:</strong>
+        <ul class="mb-0">
+            @foreach(session('import_errori') ?? [] as $errore)
+                <li>{{ $errore }}</li>
+            @endforeach
+            @foreach(session('import_errori_persistenti') ?? [] as $errore)
+                <li>{{ $errore }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 
     @if(session('success'))
         <div class="alert alert-success mt-3">
