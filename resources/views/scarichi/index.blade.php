@@ -31,39 +31,53 @@
             </thead>
             <tbody>
                 @foreach($scarichi as $item)
-                    <tr>
-                        <td>{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</td>
-                        <td>{{ $item->ordine->codice ?? $item->altro_ordine }}</td>
-                        <td colspan="3">
-                            <form action="{{ route('scarichi.updateInfoSpedizione', $item->id) }}" method="POST" class="d-flex flex-wrap gap-2">
-                                @csrf
-                                @method('PATCH')
-                                <select name="stato" class="form-select me-2"
-                                    style="background-color:
-                                        {{ $item->stato === 'Spedito' ? '#51cf66' :
-                                        ($item->stato === 'In attesa' ? '#ffe066' : '#ff6b6b') }};">
-                                    <option value="">selezionare uno stato</option>
-                                    <option value="In attesa" {{ $item->stato === 'In attesa' ? 'selected' : '' }}>In attesa</option>
-                                    <option value="Spedito" {{ $item->stato === 'Spedito' ? 'selected' : '' }}>Spedito</option>
-                                </select>
+                <tr>
+                    <td>{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</td>
+                    <td>{{ $item->ordine->codice ?? $item->altro_ordine }}</td>
 
-                                <input type="text" name="info_spedizione" class="form-control me-2" value="{{ $item->info_spedizione }}">
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-save"></i>
-                                </button>
-                            </form>
-                        </td>
+                    {{-- Stato --}}
+                    <td>
+                        <select name="stato"
+                            class="form-select stato-scarico"
+                            data-id="{{ $item->id }}"
+                            style="background-color:
+                                {{ $item->stato === 'Spedito' ? '#51cf66' :
+                                ($item->stato === 'In attesa' ? '#ffe066' : '#ff6b6b') }};">
+                            <option value="">selezionare uno stato</option>
+                            <option value="In attesa" {{ $item->stato === 'In attesa' ? 'selected' : '' }}>In attesa</option>
+                            <option value="Spedito" {{ $item->stato === 'Spedito' ? 'selected' : '' }}>Spedito</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+                    {{-- Data stato --}}
+                    <td>
+                        {{ $item->data_stato_info ? \Carbon\Carbon::parse($item->data_stato_info)->format('d/m/Y') : '' }}
+                    </td>
+
+                    {{-- Info spedizione --}}
+                    <td>
+                        <form action="{{ route('scarichi.updateInfoSpedizione', $item->id) }}" method="POST" class="d-flex flex-wrap gap-2">
+                            @csrf
+                            @method('PATCH')
+                            <input type="text" name="info_spedizione" class="form-control me-2" value="{{ $item->info_spedizione }}">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-save"></i>
+                            </button>
+                        </form>
+                    </td>
+
+                    {{-- Elimina --}}
+                    <td>
+                        <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
                 @endforeach
+
             </tbody>
         </table>
     </div>
@@ -127,13 +141,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 _token: '{{ csrf_token() }}',
                 stato: stato
             },
-            success: function () {
-                let bgColor = '#f8d7da'; // rosso di default
-                if (stato === 'Spedito') bgColor = '#d4edda';     // verde
-                else if (stato === 'In attesa') bgColor = '#fff3cd'; // giallo
+            success: function (data) {
+                // Aggiorna solo il colore dello sfondo
+                let bgColor = '#f8d7da'; // rosso
+                if (stato === 'Spedito') bgColor = '#51cf66';
+                else if (stato === 'In attesa') bgColor = '#ffe066';
 
                 select.css('background-color', bgColor);
-                location.reload();
+
+                // Aggiorna la data in tempo reale
+                const row = select.closest('tr');
+                const dataCell = row.find('td').eq(3); // la cella "Data stato/info"
+                const today = new Date().toLocaleDateString('it-IT');
+                dataCell.text(today);
             },
             error: function () {
                 alert("Errore nel salvataggio dello stato.");
@@ -141,5 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
 </script>
 @endsection
