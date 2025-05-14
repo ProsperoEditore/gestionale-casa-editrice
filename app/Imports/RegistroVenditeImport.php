@@ -104,7 +104,7 @@ public function collection(Collection $rows)
                 ];
                 continue;
             } else {
-                self::$errori[] = "Errore alla riga $rigaExcel: titolo '{$titoloInput}' non trovato.";
+                self::$errori[] = "Errore alla riga $rigaExcel: titolo '{$titoloInput}' non trovato (quantità: {$quantita}).";
                 continue;
             }
         }
