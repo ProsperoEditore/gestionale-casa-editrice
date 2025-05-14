@@ -82,17 +82,8 @@ public function collection(Collection $rows)
                 if ($trovato) {
                     $libro = $match;
                 } else {
-                    $righeAmbigue[] = [
-                        'data' => $data,
-                        'periodo' => $periodo,
-                        'quantita' => $quantita,
-                        'titolo' => $titoloInput,
-                        'isbn' => '',
-                        'opzioni' => [[
-                            'isbn' => $match->isbn,
-                            'titolo' => $match->titolo,
-                        ]],
-                    ];
+                    // Trattalo come "nessuna corrispondenza" (non aggiungere nemmeno opzioni)
+                    self::$errori[] = "Errore alla riga $rigaExcel: titolo '{$titoloInput}' non riconosciuto in modo sicuro.";
                     continue;
                 }
             } elseif ($candidati->count() > 1) {
