@@ -18,16 +18,22 @@
     <hr>
 
     <h4>Aggiungi manualmente</h4>
-    <button id="addRow" class="btn btn-success">Aggiungi Riga</button>
-    <button id="saveTable" class="btn btn-primary">Salva</button>
+    <button id="addRow" class="btn btn-success">
+    <i class="bi bi-plus-circle"></i> <span class="d-none d-md-inline">Aggiungi Riga</span>
+</button>
+    <button id="saveTable" class="btn btn-primary">
+    <i class="bi bi-save"></i> <span class="d-none d-md-inline">Salva</span>
+</button>
+
     <a href="{{ route('giacenze.export', ['magazzino' => $magazzino->id]) }}" class="btn btn-outline-success">Esporta Excel</a>
     <form action="{{ route('giacenze.create', $magazzino->id) }}" method="GET" class="d-flex" style="max-width: 300px;">
         <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per titolo...">
         <button class="btn btn-outline-primary">Cerca</button>
     </form>
 
-    <div class="table-responsive">
-    <table id="giacenzeTable" class="table table-bordered mt-3">
+<div class="table-responsive" style="overflow-x: auto;">
+<table id="giacenzeTable" class="table table-bordered mt-3">
+
         <thead>
             <tr>
                 <th class="sortable" data-column="0">Marchio ▲▼</th>
@@ -69,7 +75,7 @@
                     {{ $giacenza->data_ultimo_aggiornamento ? \Carbon\Carbon::parse($giacenza->data_ultimo_aggiornamento)->format('Y-m-d') : '-' }}
                 </td>
                 <td><input type="text" class="form-control note" value="{{ $giacenza->note }}"></td>
-                <td><button class="btn btn-danger btn-sm deleteRow">Elimina</button></td>
+                <td><button class="btn btn-danger btn-sm deleteRow"><i class="bi bi-trash"></i></button></td>
             </tr>
         @endforeach
         </tbody>
@@ -108,6 +114,48 @@
         overflow-x: auto;
     }
 </style>
+
+
+
+<style>
+@media (max-width: 768px) {
+    #giacenzeTable th, #giacenzeTable td {
+        font-size: 12px;
+        padding: 4px;
+    }
+
+    #giacenzeTable input.form-control {
+        font-size: 12px;
+        padding: 2px 4px;
+    }
+
+    .btn-sm {
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+
+    h2, h4 {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    form.d-flex {
+        flex-direction: column;
+    }
+
+    form.d-flex input,
+    form.d-flex button {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+</style>
+
+
 
 
 
@@ -158,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <td><input type="text" class="form-control costo_sconto"></td>
             <td class="data-aggiornamento">-</td>
             <td><input type="text" class="form-control note"></td>
-            <td><button class="btn btn-danger btn-sm deleteRow">Elimina</button></td>
+            <td><button class="btn btn-danger btn-sm deleteRow"><i class="bi bi-trash"></i></button></td>
         `;
         table.insertBefore(row, table.firstChild);
 
