@@ -178,10 +178,9 @@ class RegistroVenditeController extends Controller
     
         if ($request->has('search') && $request->input('search') != '') {
             $searchTerm = $request->input('search');
-            $query->whereHas('libro', function($q) use ($searchTerm) {
-                $q->where('titolo', 'like', '%' . $searchTerm . '%');
-            });
+            $query->where('titolo', 'like', '%' . $searchTerm . '%');
         }
+
     
         // 👇 Qui aggiungi orderBy PRIMA di paginate
         $dettagli = $query->orderBy('data', 'desc')->paginate(100)->appends($request->query());

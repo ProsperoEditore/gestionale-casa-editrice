@@ -252,6 +252,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
 
+            document.querySelectorAll("#registroVenditeBody tr").forEach(function(row) {
+            row.querySelectorAll(".quantita, .prezzo").forEach(function(input) {
+                input.addEventListener("input", function () {
+                    aggiornaValoreLordo(row);
+                });
+            });
+        });
+
+
     if (righeAmbigue.length > 0) {
         let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
         modal.show();
@@ -273,12 +282,14 @@ document.addEventListener('DOMContentLoaded', function () {
         let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
         const valore = (quantita * prezzo).toFixed(2);
         const valoreInput = row.querySelector(".valore-lordo");
+
         if (document.activeElement !== valoreInput) {
             valoreInput.value = valore;
         }
 
-            aggiornaTotaleValoreVendita();
+        aggiornaTotaleValoreVendita();
     }
+
 
     function initAutocomplete(input) {
         $(input).autocomplete({
