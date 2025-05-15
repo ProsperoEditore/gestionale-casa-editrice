@@ -268,16 +268,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById("addRow").addEventListener("click", function() {
         let newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td data-label="Data"><input type="date" name="data[]" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Data"></td>
-            <td data-label="Periodo"><input type="text" name="periodo[]" class="form-control" placeholder="Periodo"></td>
-            <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn" placeholder="ISBN" readonly></td>
-            <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" placeholder="Cerca titolo..."></td>
-            <td data-label="Quantità"><input type="number" name="quantita[]" value="0" class="form-control quantita" placeholder="Quantità"></td>
-            <td data-label="Prezzo"><input type="number" name="prezzo[]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo"></td>
-            <td data-label="Valore Lordo"><input type="number" name="valore_lordo[]" value="0.00" class="form-control valore-lordo" readonly placeholder="Valore Lordo"></td>
-            <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
-        `;
+            newRow.innerHTML = `
+                <td data-label="Data"><input type="date" name="data[]" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Data"></td>
+                <td data-label="Periodo"><input type="text" name="periodo[]" class="form-control" placeholder="Periodo"></td>
+                <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn" placeholder="ISBN" readonly></td>
+                <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" placeholder="Cerca titolo..."></td>
+                <td data-label="Quantità"><input type="number" name="quantita[]" value="0" class="form-control quantita" placeholder="Quantità"></td>
+                <td data-label="Prezzo"><input type="number" name="prezzo[]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo" readonly></td>
+                <td data-label="Valore Vendita"><input type="number" name="valore_lordo[]" value="0.00" class="form-control valore-lordo" step="0.01" placeholder="Valore vendita"></td>
+                <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+            `;
 
         document.getElementById("registroVenditeBody").prepend(newRow);
         initAutocomplete(newRow.querySelector(".titolo"));
