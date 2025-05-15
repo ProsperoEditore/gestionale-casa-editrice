@@ -71,6 +71,7 @@
 
 <style>
     .btn-prospero {
+        padding-left: 1rem;
         background-color: #000000;
         color: #ffffff !important;
         border: none;
@@ -83,6 +84,7 @@
     }
 
     .btn-prospero-secondary {
+        padding-left: 1rem;
         background-color: #f2f2f2;
         color: #000000;
         border: 1px solid #cccccc;
