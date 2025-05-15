@@ -122,29 +122,29 @@
                     @auth         
             @if (auth()->user()->access_anagrafiche)
                 <li class="mb-2">
-                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary w-100 text-start">Anagrafiche</a>
+                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Anagrafiche</a>
                 </li>
             @endif
             @if (auth()->user()->access_contratti)
                 <li class="mb-2">
-                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start">Contratti</a>
+                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Contratti</a>
                 </li>
             @endif
             @if (auth()->user()->access_marchi)
                 <li class="mb-2">
-                    <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary w-100 text-start">Marchi editoriali</a>
+                    <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Marchi editoriali</a>
                 </li>
             @endif
             @if (auth()->user()->access_libri)
                 <li class="mb-2">
-                    <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary w-100 text-start">Libri</a>
+                    <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Libri</a>
                 </li>
             @endif
 
             {{--
                 @if (auth()->user()->access_schede_libro)
                     <li class="mb-2">
-                        <a href="{{ route('schede-libro.index') }}" class="btn btn-prospero-secondary w-100 text-start">Schede libro</a>
+                        <a href="{{ route('schede-libro.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Schede libro</a>
                     </li>
                 @endif
             --}}
@@ -152,42 +152,42 @@
 
             @if (auth()->user()->access_magazzini)
                 <li class="mb-2">
-                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary w-100 text-start">Magazzini e Conti deposito</a>
+                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Magazzini e Conti deposito</a>
                 </li>
             @endif
             @if (auth()->user()->access_ordini)
                 <li class="mb-2">
-                    <a href="{{ route('ordini.index') }}" class="btn btn-prospero-secondary w-100 text-start">Ordini</a>
+                    <a href="{{ route('ordini.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Ordini</a>
                 </li>
             @endif
             @if (auth()->user()->access_scarichi)
                 <li class="mb-2">
-                    <a href="{{ route('scarichi.index') }}" class="btn btn-prospero-secondary w-100 text-start">Spedizioni</a>
+                    <a href="{{ route('scarichi.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Spedizioni</a>
                 </li>
             @endif
             @if (auth()->user()->access_registro_tirature)
                 <li class="mb-2">
-                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start">Registro tirature</a>
+                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro tirature</a>
                 </li>
             @endif
             @if (auth()->user()->access_registro_vendite)
                 <li class="mb-2">
-                    <a href="{{ route('registro-vendite.index') }}" class="btn btn-prospero-secondary w-100 text-start">Registro vendite</a>
+                    <a href="{{ route('registro-vendite.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro vendite</a>
                 </li>
             @endif
             @if (auth()->user()->access_report)
                 <li class="mb-2">
-                    <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary w-100 text-start">Report</a>
+                    <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Report</a>
                 </li>
             @endif
             @if (auth()->user()->ruolo === 'admin')
                 <li class="mb-2">
-                    <a href="{{ route('utenti.index') }}" class="btn btn-prospero w-100 text-start">Gestione utenti</a>
+                    <a href="{{ route('utenti.index') }}" class="btn btn-prospero w-100 text-start"> Gestione utenti</a>
                 </li>
             @endif
             @if (auth()->user()->ruolo === 'admin')
                 <li class="mb-2">
-                    <a href="{{ route('backup.index') }}" class="btn btn-prospero w-100 text-start">Backup database</a>
+                    <a href="{{ route('backup.index') }}" class="btn btn-prospero w-100 text-start"> Backup database</a>
                 </li>
             @endif
         @endauth
