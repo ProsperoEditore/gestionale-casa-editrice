@@ -32,7 +32,7 @@
 
                     <div class="mb-3"><label class="form-label">Nome</label><input type="text" name="nome" value="{{ $item->nome }}" class="form-control" required></div>
                     <div class="mb-3"><label class="form-label">Indirizzo di Fatturazione</label><input type="text" name="indirizzo_fatturazione" value="{{ $item->indirizzo_fatturazione }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Indirizzo di Spedizione</label><input type="text" name="indirizzo_spedizione" value="{{ $item->indirizzo_spedizione }}" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Indirizzo di Spedizione</label><input type="text" name="indirizzo_spedizione" value="{{ $item->indirizzo_spedizione }}" class="form-control"></div>
                     <div class="mb-3"><label class="form-label">Partita IVA</label><input type="text" name="partita_iva" value="{{ $item->partita_iva }}" class="form-control"></div>
                     <div class="mb-3"><label class="form-label">Codice Fiscale</label><input type="text" name="codice_fiscale" id="codice_fiscale" value="{{ $item->codice_fiscale }}" class="form-control"></div>
                     <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" value="{{ $item->email }}" class="form-control"></div>

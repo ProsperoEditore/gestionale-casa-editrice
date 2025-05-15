@@ -78,6 +78,18 @@
     }
 </style>
 
+<style>
+    .offcanvas-body {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .offcanvas .d-grid {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+</style>
+
 
 </head>
 <body>
@@ -90,58 +102,81 @@
             </a>
         </div>
 
-        <h2 class="fs-5 fw-bold text-center">Menu Gestionale</h2>
         <ul class="list-unstyled mt-3">
 
-            @auth         
-                @if (auth()->user()->access_anagrafiche)
-                    <li><a href="{{ route('anagrafiche.index') }}">Anagrafiche</a></li>
-                @endif
-                @if (auth()->user()->access_contratti)
-                    <li><a href="{{ route('contratti.index') }}">Contratti</a></li>
-                @endif
-                @if (auth()->user()->access_marchi)
-                    <li><a href="{{ route('marchi-editoriali.index') }}">Marchi editoriali</a></li>
-                @endif
-                @if (auth()->user()->access_libri)
-                    <li><a href="{{ route('libri.index') }}">Libri</a></li>
-                @endif
+                    @auth         
+            @if (auth()->user()->access_anagrafiche)
+                <li class="mb-2">
+                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary w-100 text-start">Anagrafiche</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_contratti)
+                <li class="mb-2">
+                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start">Contratti</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_marchi)
+                <li class="mb-2">
+                    <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary w-100 text-start">Marchi editoriali</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_libri)
+                <li class="mb-2">
+                    <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary w-100 text-start">Libri</a>
+                </li>
+            @endif
 
-                {{--
-                    @if (auth()->user()->access_schede_libro)
-                        <li><a href="{{ route('schede-libro.index') }}">Schede libro</a></li>
-                    @endif
-                --}}
-                {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
+            {{--
+                @if (auth()->user()->access_schede_libro)
+                    <li class="mb-2">
+                        <a href="{{ route('schede-libro.index') }}" class="btn btn-prospero-secondary w-100 text-start">Schede libro</a>
+                    </li>
+                @endif
+            --}}
+            {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
 
+            @if (auth()->user()->access_magazzini)
+                <li class="mb-2">
+                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary w-100 text-start">Magazzini e Conti deposito</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_ordini)
+                <li class="mb-2">
+                    <a href="{{ route('ordini.index') }}" class="btn btn-prospero-secondary w-100 text-start">Ordini</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_scarichi)
+                <li class="mb-2">
+                    <a href="{{ route('scarichi.index') }}" class="btn btn-prospero-secondary w-100 text-start">Spedizioni</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_registro_tirature)
+                <li class="mb-2">
+                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start">Registro tirature</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_registro_vendite)
+                <li class="mb-2">
+                    <a href="{{ route('registro-vendite.index') }}" class="btn btn-prospero-secondary w-100 text-start">Registro vendite</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_report)
+                <li class="mb-2">
+                    <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary w-100 text-start">Report</a>
+                </li>
+            @endif
+            @if (auth()->user()->ruolo === 'admin')
+                <li class="mb-2">
+                    <a href="{{ route('utenti.index') }}" class="btn btn-prospero w-100 text-start">Gestione utenti</a>
+                </li>
+            @endif
+            @if (auth()->user()->ruolo === 'admin')
+                <li class="mb-2">
+                    <a href="{{ route('backup.index') }}" class="btn btn-prospero w-100 text-start">Backup database</a>
+                </li>
+            @endif
+        @endauth
 
-                @if (auth()->user()->access_magazzini)
-                    <li><a href="{{ route('magazzini.index') }}">Magazzini e Conti deposito</a></li>
-                @endif
-                @if (auth()->user()->access_ordini)
-                    <li><a href="{{ route('ordini.index') }}">Ordini</a></li>
-                @endif
-                @if (auth()->user()->access_scarichi)
-                    <li><a href="{{ route('scarichi.index') }}">Spedizioni</a></li>
-                @endif
-                @if (auth()->user()->access_registro_tirature)
-                    <li><a href="{{ route('registro-tirature.index') }}">Registro tirature</a></li>
-                @endif
-                @if (auth()->user()->access_registro_vendite)
-                    <li><a href="{{ route('registro-vendite.index') }}">Registro vendite</a></li>
-                @endif
-                @if (auth()->user()->access_report)
-                    <li><a href="{{ route('report.index') }}">Report</a></li>
-                @endif
-                @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('utenti.index') }}">Gestione utenti</a></li>
-                @endif
-                @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('backup.index') }}">Backup database</a></li>
-                @endif
-
-
-            @endauth
         </ul>
     </div>
 
