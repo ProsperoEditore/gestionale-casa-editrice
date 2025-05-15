@@ -117,6 +117,12 @@
 
             <h5>Elenco Vendite</h5>
 
+            @if($dettagli->isEmpty())
+                <div class="alert alert-warning mt-3">
+                    Nessuna riga da visualizzare. Aggiungi righe oppure verifica i filtri di ricerca.
+                </div>
+            @endif
+
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-dark">
@@ -220,6 +226,17 @@
         padding: 10px;
     }
 }
+
+
+input[readonly] {
+    background-color: #f0f0f0 !important;
+    color: #6c757d !important;
+}
+
+input.valore-lordo {
+    color: red !important;
+}
+
 </style>
 
 
@@ -254,7 +271,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function aggiornaValoreLordo(row) {
         let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
         let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
-        row.querySelector(".valore-lordo").value = (quantita * prezzo).toFixed(2);
+        const valore = (quantita * prezzo).toFixed(2);
+        const valoreInput = row.querySelector(".valore-lordo");
+        if (document.activeElement !== valoreInput) {
+            valoreInput.value = valore;
+        }
+
             aggiornaTotaleValoreVendita();
     }
 
