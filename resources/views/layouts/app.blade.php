@@ -28,6 +28,8 @@
             background-color: #f8f8f8;
             padding: 1.5rem 1rem;
             border-right: 1px solid #e0e0e0;
+            max-height: 100vh;
+            overflow-y: auto;
         }
         .sidebar a {
             color: #333;
@@ -37,6 +39,18 @@
         }
         .sidebar a:hover {
             color: #007bff;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #f8f8f8;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 10px;
         }
         .logo {
             max-height: 200px;
@@ -58,10 +72,11 @@
 <style>
     .btn-prospero {
         background-color: #000000;
-        color: #ffffff !important; 
+        color: #ffffff !important;
         border: none;
         font-weight: 600;
     }
+
     .btn-prospero:hover {
         background-color: #333333;
         color: #ffffff;
@@ -95,7 +110,7 @@
 <body>
 
     {{-- Sidebar Desktop --}}
-    <div class="d-none d-lg-block position-fixed h-100 sidebar overflow-auto">
+    <div class="d-none d-lg-block position-fixed sidebar">
         <div class="text-center">
             <a href="{{ route('home') }}">
             <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero Editore" class="logo img-fluid">
@@ -273,8 +288,5 @@
     @stack('scripts')
 
 </body>
-
-
-
 
 </html>
