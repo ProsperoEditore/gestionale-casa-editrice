@@ -127,71 +127,67 @@
         <span class="fw-bold">GHE PENSI MI</span>
     </nav>
 
-    {{-- Offcanvas Menu Mobile --}}
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Menu Gestionale</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-        <div class="text-center">
+{{-- Offcanvas Menu Mobile --}}
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Menu Gestionale</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="text-center mb-4">
             <a href="{{ route('home') }}">
-            <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero Editore" class="logo img-fluid">
+                <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero Editore" class="img-fluid" style="max-width: 120px;">
             </a>
         </div>
-            <ul class="list-unstyled">
+        <div class="d-grid gap-2">
             @auth         
                 @if (auth()->user()->access_anagrafiche)
-                    <li><a href="{{ route('anagrafiche.index') }}">Anagrafiche</a></li>
+                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-dark">Anagrafiche</a>
                 @endif
                 @if (auth()->user()->access_contratti)
-                    <li><a href="{{ route('contratti.index') }}">Contratti</a></li>
+                    <a href="{{ route('contratti.index') }}" class="btn btn-dark">Contratti</a>
                 @endif
                 @if (auth()->user()->access_marchi)
-                    <li><a href="{{ route('marchi-editoriali.index') }}">Marchi editoriali</a></li>
+                    <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-dark">Marchi editoriali</a>
                 @endif
                 @if (auth()->user()->access_libri)
-                    <li><a href="{{ route('libri.index') }}">Libri</a></li>
+                    <a href="{{ route('libri.index') }}" class="btn btn-dark">Libri</a>
                 @endif
 
-                {{--
+                {{-- 
                     @if (auth()->user()->access_schede_libro)
-                        <li><a href="{{ route('schede-libro.index') }}">Schede libro</a></li>
+                        <a href="{{ route('schede-libro.index') }}" class="btn btn-dark">Schede libro</a>
                     @endif
                 --}}
                 {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
 
-
                 @if (auth()->user()->access_magazzini)
-                    <li><a href="{{ route('magazzini.index') }}">Magazzini e Conti deposito</a></li>
+                    <a href="{{ route('magazzini.index') }}" class="btn btn-dark">Magazzini e Conti deposito</a>
                 @endif
                 @if (auth()->user()->access_ordini)
-                    <li><a href="{{ route('ordini.index') }}">Ordini</a></li>
+                    <a href="{{ route('ordini.index') }}" class="btn btn-dark">Ordini</a>
                 @endif
                 @if (auth()->user()->access_scarichi)
-                    <li><a href="{{ route('scarichi.index') }}">Spedizioni</a></li>
+                    <a href="{{ route('scarichi.index') }}" class="btn btn-dark">Spedizioni</a>
                 @endif
                 @if (auth()->user()->access_registro_tirature)
-                    <li><a href="{{ route('registro-tirature.index') }}">Registro tirature</a></li>
+                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-dark">Registro tirature</a>
                 @endif
                 @if (auth()->user()->access_registro_vendite)
-                    <li><a href="{{ route('registro-vendite.index') }}">Registro vendite</a></li>
+                    <a href="{{ route('registro-vendite.index') }}" class="btn btn-dark">Registro vendite</a>
                 @endif
                 @if (auth()->user()->access_report)
-                    <li><a href="{{ route('report.index') }}">Report</a></li>
+                    <a href="{{ route('report.index') }}" class="btn btn-dark">Report</a>
                 @endif
                 @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('utenti.index') }}">Gestione Utenti</a></li>
+                    <a href="{{ route('utenti.index') }}" class="btn btn-secondary">Gestione Utenti</a>
+                    <a href="{{ route('backup.index') }}" class="btn btn-secondary">Backup database</a>
                 @endif
-                @if (auth()->user()->ruolo === 'admin')
-                    <li><a href="{{ route('backup.index') }}">Backup database</a></li>
-                @endif
-
-
             @endauth
-            </ul>
         </div>
     </div>
+</div>
+
 
     {{-- Contenuto principale --}}
     <div class="main-content">
