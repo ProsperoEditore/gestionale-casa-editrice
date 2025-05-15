@@ -24,54 +24,47 @@
         </div>
     </div>
 
-        @if(session('import_errori') || session('import_errori_persistenti'))
-            <div id="erroriImport" class="alert alert-danger mt-3 position-relative">
-                <strong>⚠️ Alcune righe non sono state importate:</strong>
-                <ul class="mb-0 mt-2">
-                    @foreach(session('import_errori') ?? [] as $errore)
-                        <li>{{ $errore }}</li>
-                    @endforeach
-                    @foreach(session('import_errori_persistenti') ?? [] as $errore)
-                        <li>{{ $errore }}</li>
-                    @endforeach
-                </ul>
-            <button id="chiudiErroriImport" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2">
-                ❌ Chiudi elenco errori
-            </button>
-
-            </div>
-        @endif
-
-
+    @if(session('import_errori') || session('import_errori_persistenti'))
+        <div id="erroriImport" class="alert alert-danger mt-3 position-relative">
+            <strong>⚠️ Alcune righe non sono state importate:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach(session('import_errori') ?? [] as $errore)
+                    <li>{{ $errore }}</li>
+                @endforeach
+                @foreach(session('import_errori_persistenti') ?? [] as $errore)
+                    <li>{{ $errore }}</li>
+                @endforeach
+            </ul>
+            <button id="chiudiErroriImport" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2">❌ Chiudi elenco errori</button>
+        </div>
+    @endif
 
     @if(session('success'))
-        <div class="alert alert-success mt-3">
-            {{ session('success') }}
-        </div>
+        <div class="alert alert-success mt-3">{{ session('success') }}</div>
     @endif
 
     <!-- MODALE Bootstrap per righe ambigue -->
     <div class="modal fade" id="popupConflitti" tabindex="-1" aria-labelledby="popupLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-            <form method="POST" action="{{ route('registro-vendite.risolviConflitti', $registroVendita->id) }}">
-
+                <form method="POST" action="{{ route('registro-vendite.risolviConflitti', $registroVendita->id) }}">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">Risolvi conflitti importazione</h5>
                     </div>
                     <div class="modal-body">
                         <p>Alcune righe hanno titoli ambigui. Seleziona il libro corretto:</p>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Periodo</th>
-                                    <th>Quantità</th>
-                                    <th>Seleziona libro corretto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Periodo</th>
+                                        <th>Quantità</th>
+                                        <th>Seleziona libro corretto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     @foreach($righe as $index => $riga)
                                         <tr>
                                             <td><input type="date" name="righe[{{ $index }}][data]" value="{{ $riga['data'] }}" class="form-control"></td>
@@ -97,9 +90,9 @@
                                             </td>
                                         </tr>
                                     @endforeach
-
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Conferma e importa</button>
@@ -110,49 +103,51 @@
     </div>
 
     <div class="mt-4">
-        <button type="button" id="addRow" class="btn btn-success">Aggiungi Riga</button>
-        <form action="{{ route('registro-vendite.gestione', ['id' => $registroVendita->id]) }}" method="GET" class="d-flex" style="max-width: 300px;">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cerca per titolo...">
+        <button type="button" id="addRow" class="btn btn-success mb-3">Aggiungi Riga</button>
+
+        <form action="{{ route('registro-vendite.gestione', ['id' => $registroVendita->id]) }}" method="GET" class="d-flex flex-wrap gap-2 mb-3" style="max-width: 100%;">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per titolo...">
             <button class="btn btn-outline-primary">Cerca</button>
         </form>
+
         <form id="registroVenditeForm" action="{{ route('registro-vendite.salvaDettagli', ['id' => $registroVendita->id]) }}" method="POST">
             @csrf
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
-            <button type="submit" class="btn btn-primary">Salva</button>
+            <button type="submit" class="btn btn-primary mb-3">Salva</button>
 
             <h5>Elenco Vendite</h5>
 
-            <table class="table table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Data</th>
-                        <th>Periodo</th>
-                        <th>ISBN</th>
-                        <th>Titolo</th>
-                        <th>Quantità</th>
-                        <th>Prezzo</th>
-                        <th>Valore Lordo</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody id="registroVenditeBody">
-                    @foreach($dettagli as $dettaglio)
-                        <tr data-id="{{ $dettaglio->id }}">
-                            <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
-                            <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
-                            <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
-                            <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
-                            <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
-                            <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
-                            <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
-                            <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-                            </td>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Data</th>
+                            <th>Periodo</th>
+                            <th>ISBN</th>
+                            <th>Titolo</th>
+                            <th>Quantità</th>
+                            <th>Prezzo</th>
+                            <th>Valore Lordo</th>
+                            <th>Azioni</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="registroVenditeBody">
+                        @foreach($dettagli as $dettaglio)
+                            <tr data-id="{{ $dettaglio->id }}">
+                                <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
+                                <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
+                                <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
+                                <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
+                                <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
+                                <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
+                                <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
+                                <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
+                                <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <div class="d-flex justify-content-center">
                 {{ $dettagli->links() }}
@@ -160,6 +155,26 @@
         </form>
     </div>
 </div>
+
+<style>
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+    .form-control, .form-select {
+        font-size: 13px;
+        padding: 6px 8px;
+    }
+    .btn {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    h3, h5 {
+        font-size: 18px;
+    }
+}
+</style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
