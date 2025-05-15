@@ -275,20 +275,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
+    } 
+
+function aggiornaValoreLordo(row) {
+    let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
+    let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
+    const valore = (quantita * prezzo).toFixed(2);
+    const valoreInput = row.querySelector(".valore-lordo");
+
+    if (document.activeElement !== valoreInput) {
+        valoreInput.value = valore;
     }
 
-    function aggiornaValoreLordo(row) {
-        let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
-        let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
-        const valore = (quantita * prezzo).toFixed(2);
-        const valoreInput = row.querySelector(".valore-lordo");
+    aggiornaTotaleValoreVendita();
+}
 
-        if (document.activeElement !== valoreInput) {
-            valoreInput.value = valore;
-        }
-
-        aggiornaTotaleValoreVendita();
-    }
 
 
     function initAutocomplete(input) {
