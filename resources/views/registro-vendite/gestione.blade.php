@@ -135,14 +135,14 @@
                         @foreach($dettagli as $dettaglio)
                             <tr data-id="{{ $dettaglio->id }}">
                                 <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
-                                <td><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
-                                <td><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
-                                <td><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
-                                <td><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
-                                <td><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
-                                <td><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
-                                <td><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
-                                <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+                                    <td data-label="Data"><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
+                                    <td data-label="Periodo"><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
+                                    <td data-label="ISBN"><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
+                                    <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
+                                    <td data-label="Quantità"><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
+                                    <td data-label="Prezzo"><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
+                                    <td data-label="Valore Lordo"><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
+                                    <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -158,23 +158,60 @@
 
 <style>
 @media (max-width: 768px) {
-    .table th, .table td {
-        font-size: 12px;
-        padding: 6px;
+    .table-responsive {
+        overflow-x: auto;
     }
-    .form-control, .form-select {
-        font-size: 13px;
+
+    table.table thead {
+        display: none;
+    }
+
+    table.table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    table.table tbody tr td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 6px 8px;
+        font-size: 14px;
+        border: none;
+        border-bottom: 1px solid #eee;
     }
-    .btn {
+
+    table.table tbody tr td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        flex-shrink: 0;
+        margin-right: 10px;
+        color: #555;
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
         font-size: 13px;
-        padding: 6px 10px;
     }
+
+    .form-control,
+    .form-select {
+        font-size: 14px;
+    }
+
     h3, h5 {
         font-size: 18px;
     }
+
+    .container {
+        padding: 10px;
+    }
 }
 </style>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
