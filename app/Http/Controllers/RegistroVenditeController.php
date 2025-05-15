@@ -183,11 +183,13 @@ class RegistroVenditeController extends Controller
 
     
         // 👇 Qui aggiungi orderBy PRIMA di paginate
+        $totaleValoreLordo = $query->sum('valore_lordo');
         $dettagli = $query->orderBy('data', 'desc')->paginate(100)->appends($request->query());
+
         
         $libri = Libro::with('marchio_editoriale')->get();
     
-        return view('registro-vendite.gestione', compact('registroVendita', 'dettagli', 'libri'));
+        return view('registro-vendite.gestione', compact('registroVendita', 'dettagli', 'libri', 'totaleValoreLordo'));
     }
 
     

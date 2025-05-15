@@ -115,6 +115,13 @@
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
             <button type="submit" class="btn btn-primary mb-3">Salva</button>
 
+        <div class="mb-3 text-end">
+            <strong>Totale valore venduto (tutte le pagine):</strong>
+            <input type="text" id="totale-valore-vendita" class="form-control d-inline-block text-end fw-bold" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
+        </div>
+
+
+
             <h5>Elenco Vendite</h5>
 
             @if($dettagli->isEmpty())
@@ -152,16 +159,6 @@
                             </tr>
                         @endforeach
                     </tbody>
-
-                    <tfoot>
-                        <tr>
-                            <td colspan="6" class="text-end fw-bold">Totale valore venduto:</td>
-                            <td colspan="2">
-                                <input type="text" id="totale-valore-vendita" class="form-control fw-bold text-end" readonly>
-                            </td>
-                        </tr>
-                    </tfoot>
-
                 </table>
             </div>
 
@@ -327,6 +324,7 @@ function aggiornaValoreLordo(row) {
     document.getElementById("addRow").addEventListener("click", function() {
         let newRow = document.createElement("tr");
             newRow.innerHTML = `
+                <input type="hidden" name="id[]" value="">
                 <td data-label="Data"><input type="date" name="data[]" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Data"></td>
                 <td data-label="Periodo"><input type="text" name="periodo[]" class="form-control" placeholder="Periodo"></td>
                 <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn" placeholder="ISBN" readonly></td>
@@ -340,9 +338,9 @@ function aggiornaValoreLordo(row) {
         document.getElementById("registroVenditeBody").prepend(newRow);
 
         // Listener su campi modificabili per aggiornare il totale
-            newRow.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
-                input.addEventListener("input", () => {
-                    aggiornaTotaleValoreVendita();
+            newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
+                input.addEventListener("input", function () {
+                    aggiornaValoreLordo(newRow);
                 });
             });
 
@@ -398,8 +396,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(() => alert("Errore nella richiesta."));
-
-            aggiornaTotaleValoreVendita();
 
         });
     }
