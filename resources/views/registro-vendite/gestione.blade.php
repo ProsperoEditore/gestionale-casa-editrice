@@ -146,6 +146,16 @@
                             </tr>
                         @endforeach
                     </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" class="text-end fw-bold">Totale valore venduto:</td>
+                            <td colspan="2">
+                                <input type="text" id="totale-valore-vendita" class="form-control fw-bold text-end" readonly>
+                            </td>
+                        </tr>
+                    </tfoot>
+
                 </table>
             </div>
 
@@ -245,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
         let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
         row.querySelector(".valore-lordo").value = (quantita * prezzo).toFixed(2);
+            aggiornaTotaleValoreVendita();
     }
 
     function initAutocomplete(input) {
@@ -264,7 +275,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    document.querySelectorAll(".titolo").forEach(initAutocomplete);
+    function aggiornaTotaleValoreVendita() {
+    let totale = 0;
+    document.querySelectorAll('.valore-lordo').forEach(function (input) {
+        let valore = parseFloat(input.value) || 0;
+        totale += valore;
+    });
+    document.getElementById('totale-valore-vendita').value = totale.toFixed(2);
+    }
+
+    document.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
+        input.addEventListener("input", () => {
+            aggiornaTotaleValoreVendita();
+        });
+    });
 
     document.getElementById("addRow").addEventListener("click", function() {
         let newRow = document.createElement("tr");
@@ -280,6 +304,14 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
         document.getElementById("registroVenditeBody").prepend(newRow);
+
+        // Listener su campi modificabili per aggiornare il totale
+            newRow.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
+                input.addEventListener("input", () => {
+                    aggiornaTotaleValoreVendita();
+                });
+            });
+
         initAutocomplete(newRow.querySelector(".titolo"));
     });
 
@@ -332,6 +364,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(() => alert("Errore nella richiesta."));
+
+            aggiornaTotaleValoreVendita();
 
         });
     }
