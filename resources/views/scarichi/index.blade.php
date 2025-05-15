@@ -59,13 +59,17 @@
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <i class="bi bi-save"></i>
                                 </button>
-                                <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-                                </form>
                             </div>
                         </div>
-                    </form>
+                        </form> <!-- CHIUDE SOLO PATCH -->
+
+                        <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline mt-2 ms-auto text-end">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
                 </div>
             </div>
         </div>
