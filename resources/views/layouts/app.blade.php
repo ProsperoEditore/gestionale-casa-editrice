@@ -58,7 +58,7 @@
 <style>
     .btn-prospero {
         background-color: #000000;
-        color: #ffffff;
+        color: #ffffff !important; 
         border: none;
         font-weight: 600;
     }
@@ -95,7 +95,7 @@
 <body>
 
     {{-- Sidebar Desktop --}}
-    <div class="d-none d-lg-block position-fixed h-100 sidebar">
+    <div class="d-none d-lg-block position-fixed h-100 sidebar overflow-auto">
         <div class="text-center">
             <a href="{{ route('home') }}">
             <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero Editore" class="logo img-fluid">
