@@ -52,6 +52,10 @@
             background-color: #ccc;
             border-radius: 10px;
         }
+        .sidebar a.btn {
+            padding-left: 1rem !important;
+            text-align: left;
+        }
         .logo {
             max-height: 200px;
             margin-bottom: 1rem;
