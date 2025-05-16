@@ -19,9 +19,9 @@
             <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td>{{ $item->nome }}</td>
-                        <td>{{ $item->email }}</td>
-                        <td class="align-middle">
+                        <td data-label="Nome">{{ $item->nome }}</td>
+                        <td data-label="Email">{{ $item->email }}</td>
+                        <td data-label="Azioni" class="align-middle">
                             <a href="{{ route('marchi-editoriali.edit', $item->id) }}" class="text-warning me-1" title="Modifica">
                                 <i class="bi bi-pencil fs-5"></i>
                             </a>
@@ -38,4 +38,44 @@
             </tbody>
         </table>
     </div>
+
+    <style>
+    @media (max-width: 767.98px) {
+        table.table thead {
+            display: none;
+        }
+
+        table.table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            background: #fff;
+        }
+
+        table.table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border: none !important;
+            width: 100%;
+        }
+
+        table.table tbody td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #333;
+        }
+
+        table.table tbody td[data-label="Azioni"]::before {
+            display: none;
+        }
+
+        table.table tbody td:last-child {
+            justify-content: center;
+        }
+    }
+    </style>
 @endsection

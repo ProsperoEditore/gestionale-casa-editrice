@@ -23,13 +23,13 @@
         <tbody>
             @foreach($contratti as $contratto)
                 <tr>
-                    <td>{{ $contratto->nome_contratto }}</td>
-                    <td>{{ $contratto->sconto_proprio_libro }}%</td>
-                    <td>{{ $contratto->sconto_altri_libri }}%</td>
-                    <td>{{ $contratto->royalties_vendite_indirette }}%</td>
-                    <td>{{ $contratto->royalties_vendite_dirette }}%</td>
-                    <td>{{ $contratto->royalties_eventi }}%</td>
-                    <td class="align-middle">
+                    <td data-label="Nome Contratto">{{ $contratto->nome_contratto }}</td>
+                    <td data-label="Sconto Proprio Libro">{{ $contratto->sconto_proprio_libro }}%</td>
+                    <td data-label="Sconto Altri Libri">{{ $contratto->sconto_altri_libri }}%</td>
+                    <td data-label="Royalties Indirette">{{ $contratto->royalties_vendite_indirette }}%</td>
+                    <td data-label="Royalties Dirette">{{ $contratto->royalties_vendite_dirette }}%</td>
+                    <td data-label="Royalties Eventi">{{ $contratto->royalties_eventi }}%</td>
+                    <td data-label="Azioni" class="align-middle">
                         <a href="{{ route('contratti.edit', $contratto->id) }}" class="text-warning me-1" title="Modifica">
                             <i class="bi bi-pencil fs-5"></i>
                         </a>
@@ -41,11 +41,49 @@
                             </button>
                         </form>
                     </td>
-
                 </tr>
             @endforeach
-
         </tbody>
     </table>
 </div>
+
+<style>
+@media (max-width: 767.98px) {
+    table.table thead {
+        display: none;
+    }
+
+    table.table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        padding: 0.8rem;
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+
+    table.table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border: none !important;
+        width: 100%;
+    }
+
+    table.table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #333;
+    }
+
+    table.table tbody td:last-child {
+        justify-content: center;
+    }
+
+    table.table tbody td[data-label="Azioni"]::before {
+        display: none;
+    }
+}
+</style>
 @endsection
