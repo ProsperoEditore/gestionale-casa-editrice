@@ -51,7 +51,7 @@
                                 'access_marchi' => 'Marchi Editoriali',
                                 'access_libri' => 'Libri',
                                 'access_schede_libro' => 'Schede libro',
-                                'access_magazzini' => 'Magazzini e Conti Deposito',
+                                'access_magazzini' => 'Magazzini e Depositi',
                                 'access_ordini' => 'Ordini',
                                 'access_scarichi' => 'Scarichi',
                                 'access_registro_tirature' => 'Registro Tirature',
