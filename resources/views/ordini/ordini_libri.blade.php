@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Gestione Libri - Ordine {{ $ordine->codice }}</h3>
+    <h3 class="text-center mb-4">Gestione ordine {{ $ordine->codice }}</h3>
 
     @if($ordine->exists)
     <div class="alert alert-warning mt-3 text-center">
@@ -97,42 +97,108 @@
                 </tr>
             </thead>
             <tbody id="ordiniBody">
-                @foreach($ordine->libri as $libro)
-                <tr>
-                    <td><input type="text" name="isbn[]" class="form-control isbn-field" value="{{ $libro->isbn }}" readonly></td>
-                    <td>
-                        <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="Cerca titolo..." value="{{ $libro->titolo }}">
-                        <input type="hidden" name="libro_id[]" class="libro-id" value="{{ $libro->id }}">
-                        <input type="hidden" name="isbn[]" class="isbn-field" value="{{ $libro->isbn }}">
-                        <input type="hidden" name="prezzo[]" class="prezzo-field" value="{{ $libro->prezzo }}">
-                    </td>
+@foreach($ordine->libri as $libro)
+<tr>
+    <td data-label="ISBN">
+        <input type="text" name="isbn[]" class="form-control isbn-field" value="{{ $libro->isbn }}" readonly>
+    </td>
+    <td data-label="Titolo">
+        <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="Cerca titolo..." value="{{ $libro->titolo }}">
+        <input type="hidden" name="libro_id[]" class="libro-id" value="{{ $libro->id }}">
+        <input type="hidden" name="isbn[]" class="isbn-field" value="{{ $libro->isbn }}">
+        <input type="hidden" name="prezzo[]" class="prezzo-field" value="{{ $libro->prezzo }}">
+    </td>
+    <td data-label="Quantità">
+        <input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}">
+        <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
+    </td>
+    <td data-label="Prezzo Copertina">
+        <input type="text" name="prezzo[]" class="form-control prezzo-field" value="{{ $libro->prezzo }}" readonly>
+    </td>
+    <td data-label="Valore Lordo">
+        <input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" value="{{ $libro->pivot->valore_vendita_lordo }}" readonly>
+    </td>
+    <td data-label="Sconto (%)">
+        <input type="text" name="sconto[]" class="form-control sconto-field" value="{{ $libro->pivot->sconto }}">
+    </td>
+    <td data-label="Valore Scontato">
+        <input type="text" name="netto_a_pagare[]" class="form-control netto_a_pagare" value="{{ $libro->pivot->netto_a_pagare }}" readonly>
+    </td>
+    <td data-label="Info">
+        <select name="info_spedizione[]" class="form-control">
+            <option value="">Seleziona...</option>
+            <option value="spedito da magazzino editore" {{ $libro->pivot->info_spedizione == 'spedito da magazzino editore' ? 'selected' : '' }}>Spedito da magazzino editore</option>
+            <option value="consegna a mano" {{ $libro->pivot->info_spedizione == 'consegna a mano' ? 'selected' : '' }}>Consegna a mano</option>
+            <option value="spedito da tipografia" {{ $libro->pivot->info_spedizione == 'spedito da tipografia' ? 'selected' : '' }}>Spedito da tipografia</option>
+            <option value="spedito da magazzino terzo" {{ $libro->pivot->info_spedizione == 'spedito da magazzino terzo' ? 'selected' : '' }}>Spedito da magazzino terzo</option>
+            <option value="fuori catalogo" {{ $libro->pivot->info_spedizione == 'fuori catalogo' ? 'selected' : '' }}>Fuori catalogo</option>
+            <option value="momentaneamente non disponibile" {{ $libro->pivot->info_spedizione == 'momentaneamente non disponibile' ? 'selected' : '' }}>Momentaneamente non disponibile</option>
+        </select>
+    </td>
+    <td data-label="Azioni">
+        <button type="button" class="btn btn-danger removeRow">Elimina</button>
+    </td>
+</tr>
+@endforeach
 
-                    <td>
-                        <input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}">
-                        <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
-                    </td>
-                    <td><input type="text" name="prezzo[]" class="form-control prezzo-field" value="{{ $libro->prezzo }}" readonly></td>
-                    <td><input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" value="{{ $libro->pivot->valore_vendita_lordo }}" readonly></td>
-                    <td><input type="text" name="sconto[]" class="form-control sconto-field" value="{{ $libro->pivot->sconto }}"></td>
-                    <td><input type="text" name="netto_a_pagare[]" class="form-control netto_a_pagare" value="{{ $libro->pivot->netto_a_pagare }}" readonly></td>
-                    <td>
-                        <select name="info_spedizione[]" class="form-control">
-                            <option value="">Seleziona...</option>
-                            <option value="spedito da magazzino editore" {{ $libro->pivot->info_spedizione == 'spedito da magazzino editore' ? 'selected' : '' }}>Spedito da magazzino editore</option>
-                            <option value="consegna a mano" {{ $libro->pivot->info_spedizione == 'consegna a mano' ? 'selected' : '' }}>Consegna a mano</option>
-                            <option value="spedito da tipografia" {{ $libro->pivot->info_spedizione == 'spedito da tipografia' ? 'selected' : '' }}>Spedito da tipografia</option>
-                            <option value="spedito da magazzino terzo" {{ $libro->pivot->info_spedizione == 'spedito da magazzino terzo' ? 'selected' : '' }}>Spedito da magazzino terzo</option>
-                            <option value="fuori catalogo" {{ $libro->pivot->info_spedizione == 'fuori catalogo' ? 'selected' : '' }}>Fuori catalogo</option>
-                            <option value="momentaneamente non disponibile" {{ $libro->pivot->info_spedizione == 'momentaneamente non disponibile' ? 'selected' : '' }}>Momentaneamente non disponibile</option>
-                        </select>
-                    </td>
-                    <td><button type="button" class="btn btn-danger removeRow">Elimina</button></td>
-                </tr>
-                @endforeach
             </tbody>
         </table>
     </form>
 </div>
+
+
+<style>
+@media (max-width: 767.98px) {
+    table.table thead {
+        display: none;
+    }
+
+    table.table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        padding: 0.8rem;
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+
+    table.table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border: none !important;
+        width: 100%;
+    }
+
+    table.table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        color: #333;
+    }
+
+    table.table tbody td input,
+    table.table tbody td select,
+    table.table tbody td button {
+        width: 60%;
+        max-width: 100%;
+        margin-left: 0.5rem;
+    }
+
+    table.table tbody td .stock-info {
+        font-size: 0.75em;
+        margin-top: 0.3rem;
+    }
+
+    table.table tbody td:last-child {
+        justify-content: center;
+    }
+}
+</style>
+
+
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
@@ -207,34 +273,35 @@ $(function() {
     });
 
     $("#addRow").on("click", function() {
-        const newRow = `<tr>
-            <td><input type="text" name="isbn[]" class="form-control isbn-field" readonly></td>
-            <td>
-                <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="Cerca titolo...">
-                <input type="hidden" name="libro_id[]" class="libro-id">
-                <input type="hidden" class="prezzo-field">
-            </td>
-            <td>
-                <input type="number" name="quantita[]" class="form-control quantita-field">
-                <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
-            </td>
-            <td><input type="text" name="prezzo[]" class="form-control prezzo-field" readonly></td>
-            <td><input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" readonly></td>
-            <td><input type="text" name="sconto[]" class="form-control sconto-field"></td>
-            <td><input type="text" name="netto_a_pagare[]" class="form-control netto_a_pagare" readonly></td>
-            <td>
-                <select name="info_spedizione[]" class="form-control">
-                    <option value="">Seleziona...</option>
-                    <option value="spedito da magazzino editore">Spedito da magazzino editore</option>
-                    <option value="consegna a mano">Consegna a mano</option>
-                    <option value="spedito da tipografia">Spedito da tipografia</option>
-                    <option value="spedito da magazzino terzo">Spedito da magazzino terzo</option>
-                    <option value="fuori catalogo">Fuori catalogo</option>
-                    <option value="momentaneamente non disponibile">Momentaneamente non disponibile</option>
-                </select>
-            </td>
-            <td><button type="button" class="btn btn-danger removeRow">Elimina</button></td>
-        </tr>`;
+    const newRow = `<tr>
+        <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn-field" readonly></td>
+        <td data-label="Titolo">
+            <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="Cerca titolo...">
+            <input type="hidden" name="libro_id[]" class="libro-id">
+            <input type="hidden" class="prezzo-field">
+        </td>
+        <td data-label="Quantità">
+            <input type="number" name="quantita[]" class="form-control quantita-field">
+            <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
+        </td>
+        <td data-label="Prezzo Copertina"><input type="text" name="prezzo[]" class="form-control prezzo-field" readonly></td>
+        <td data-label="Valore Lordo"><input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" readonly></td>
+        <td data-label="Sconto (%)"><input type="text" name="sconto[]" class="form-control sconto-field"></td>
+        <td data-label="Valore Scontato"><input type="text" name="netto_a_pagare[]" class="form-control netto_a_pagare" readonly></td>
+        <td data-label="Info">
+            <select name="info_spedizione[]" class="form-control">
+                <option value="">Seleziona...</option>
+                <option value="spedito da magazzino editore">Spedito da magazzino editore</option>
+                <option value="consegna a mano">Consegna a mano</option>
+                <option value="spedito da tipografia">Spedito da tipografia</option>
+                <option value="spedito da magazzino terzo">Spedito da magazzino terzo</option>
+                <option value="fuori catalogo">Fuori catalogo</option>
+                <option value="momentaneamente non disponibile">Momentaneamente non disponibile</option>
+            </select>
+        </td>
+        <td data-label="Azioni"><button type="button" class="btn btn-danger removeRow">Elimina</button></td>
+    </tr>`;
+
         $("#ordiniBody").append(newRow);
     });
 });
