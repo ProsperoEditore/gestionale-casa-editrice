@@ -379,41 +379,15 @@ public function importLibri(Request $request, $id)
         'file' => 'required|mimes:xlsx'
     ]);
 
-    $file = $request->file('file');
-    $rows = Excel::toCollection(null, $file)->first();
+    $ordine = \App\Models\Ordine::findOrFail($id);
 
-    $ordine = Ordine::findOrFail($id);
+    Excel::import(new OrdineLibriImport($ordine), $request->file('file'));
 
-    foreach ($rows as $row) {
-        // Normalizza le intestazioni
-        $row = collect($row)->keyBy(fn($v, $k) => strtolower(trim($k)));
-
-        $isbn = $row['isbn'] ?? null;
-        $quantita = $row['quantita'] ?? null;
-        $titolo = $row['titolo'] ?? null;
-        $sconto = $row['sconto'] ?? 0;
-
-        if (empty($quantita)) continue;
-
-        $libro = null;
-        if ($isbn) {
-            $libro = Libro::where('isbn', $isbn)->first();
-        } elseif ($titolo) {
-            $libro = Libro::where('titolo', 'like', '%' . $titolo . '%')->first();
-        }
-
-        if ($libro) {
-            $ordine->libri()->attach($libro->id, [
-                'isbn' => $libro->isbn,
-                'titolo' => $libro->titolo,
-                'quantita' => $quantita,
-                'prezzo_copertina' => $libro->prezzo_copertina,
-                'sconto' => $sconto,
-            ]);
-        }
+    if (session()->has('righe_ambigue_ordini')) {
+        session()->reflash(); // Mantiene righe ambigue + errori
     }
 
-    return redirect()->route('ordini.gestione_libri', $id)->with('success', 'Libri importati correttamente.');
+    return redirect()->route('ordini.gestione_libri', $id);
 }
 
     

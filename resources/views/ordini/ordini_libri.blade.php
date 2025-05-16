@@ -18,6 +18,29 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Importa libri da Excel</h5>
+
+
+@php
+    $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
+@endphp
+
+@if(session('import_errori'))
+    <div class="alert alert-danger mt-3">
+        <strong>⚠️ Errori durante l'importazione:</strong>
+        <ul>
+            @foreach(session('import_errori') as $err)
+                <li>{{ $err }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+@if(count($righeAmbigue) > 0)
+    @include('ordini.partials.popup_conflitti', ['righeAmbigue' => $righeAmbigue])
+@endif
+
+
+
             <form action="{{ route('ordini.import.libri', $ordine->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="file" name="file" accept=".xlsx" required class="form-control mb-2">
