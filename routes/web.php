@@ -118,6 +118,8 @@ Route::delete('/registro-tirature/{registroTirature}/dettagli/{dettaglio}', [Reg
 Route::post('/registro-tirature/{registroTirature}/import-excel', [RegistroTiraturaDettaglioController::class, 'importExcel'])->name('registro-tirature.dettagli.import');
 Route::get('/registro-tirature/{registroTirature}/export-excel', [RegistroTiraturaDettaglioController::class, 'exportExcel'])->name('registro-tirature.dettagli.exportExcel');
 Route::get('/registro-tirature/{id}/export-pdf', [RegistroTiraturaDettaglioController::class, 'exportPDF'])->name('registro-tirature.dettagli.exportPDF');
+Route::post('/registro-tirature/{registro}/risolvi-conflitti', [RegistroTiraturaDettaglioController::class, 'risolviConflitti'])->name('registro-tirature.dettagli.risolviConflitti');
+
 
 // Registro Vendite
 Route::resource('registro-vendite', RegistroVenditeController::class)->except(['store']);

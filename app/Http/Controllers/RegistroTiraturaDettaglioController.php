@@ -108,13 +108,62 @@ public function destroy(RegistroTirature $registroTirature, RegistroTiraturaDett
         'file' => 'required|file|mimes:xlsx,xls',
     ]);
 
-    Excel::import(new RegistroTiraturaDettaglioImport($registroTirature), $request->file('file'));
+    Excel::import(new RegistroTiraturaDettaglioImportAdvanced($registroTirature), $request->file('file'));
+
+        if (session()->has('righe_ambigue_tirature')) {
+            session()->reflash(); // conserva righe + errori
+            return redirect()->route('registro-tirature.show', $registroTirature->id);
+        }
+
+        if (session()->has('import_errori')) {
+            return redirect()->back()->with([
+                'success' => 'Alcune righe sono state scartate.',
+                'import_errori' => session('import_errori'),
+            ]);
+        }
+
 
     return redirect()->route('registro-tirature.show', $registroTirature->id)
         ->with('success', 'File importato con successo.');
     }
 
-    public function exportExcel(RegistroTirature $registroTirature)
+
+public function risolviConflitti(Request $request, RegistroTirature $registro)
+{
+    foreach ($request->input('righe', []) as $riga) {
+        if (!isset($riga['data']) || !isset($riga['copie_stampate'])) continue;
+        if (empty($riga['id']) || $riga['id'] === '__SKIP__') continue;
+
+
+        $libro = \App\Models\Libro::find($riga['id']);
+        if (!$libro) continue;
+
+        $copie = intval($riga['copie_stampate']);
+        $prezzo = floatval($libro->prezzo);
+        $impRel = $copie * $prezzo * 0.3;
+        $imp = $impRel / 1.04;
+        $iva = $impRel - $imp;
+
+        RegistroTiraturaDettaglio::create([
+            'registro_tirature_id' => $registro->id,
+            'titolo_id' => $libro->id,
+            'data' => $riga['data'],
+            'copie_stampate' => $copie,
+            'prezzo_vendita_iva' => $prezzo,
+            'imponibile_relativo' => $impRel,
+            'imponibile' => $imp,
+            'iva_4percento' => $iva,
+        ]);
+    }
+
+    return redirect()->route('registro-tirature.show', $registro->id)
+        ->with('success', 'Righe ambigue salvate con successo.');
+    }
+
+
+
+
+public function exportExcel(RegistroTirature $registroTirature)
     {
     return Excel::download(new RegistroTiraturaDettaglioExport($registroTirature->id), 'registro_tirature.xlsx');
     }
