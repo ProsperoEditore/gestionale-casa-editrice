@@ -75,6 +75,13 @@ class RegistroTiraturaDettaglioImport implements ToCollection, WithHeadingRow
             }
 
             if ($libro) {
+
+                    // ✅ Aggiorna costo_produzione se presente
+                if (isset($row['costo_produzione']) && is_numeric(str_replace(',', '.', $row['costo_produzione']))) {
+                    $libro->costo_produzione = str_replace(',', '.', $row['costo_produzione']);
+                    $libro->save();
+                }
+
                 $prezzo = floatval($libro->prezzo);
                 $imponibileRelativo = $copie * $prezzo * 0.3;
                 $imponibile = $imponibileRelativo / 1.04;
