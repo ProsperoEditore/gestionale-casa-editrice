@@ -154,6 +154,10 @@
         display: none;
     }
 
+    table.table tbody td[data-label="Azioni"]::before {
+        display: none;
+    }
+
     table.table tbody tr {
         display: block;
         margin-bottom: 1rem;
@@ -195,6 +199,16 @@
     table.table tbody td:last-child {
         justify-content: center;
     }
+
+    table.table tbody td[data-label="Azioni"] {
+    justify-content: center !important;
+    text-align: center;
+    }
+    
+    table.table tbody td[data-label="Azioni"] button {
+    margin: 0 auto;
+    }
+
 }
 </style>
 
