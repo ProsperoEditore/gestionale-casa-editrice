@@ -4,9 +4,10 @@
     <div class="container mt-5">
         <h3 class="text-center mb-4">Libri</h3>
         
-        <div class="d-flex justify-content-between mb-3">
+        <div class="mb-3">
             <a href="{{ route('libri.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
-            <form action="{{ route('libri.index') }}" method="GET" style="min-width: 300px;" class="d-flex align-items-center">
+
+            <form action="{{ route('libri.index') }}" method="GET" style="min-width: 300px;" class="d-flex align-items-center mt-2">
                 <select name="search" id="titolo_search" class="form-control select2" onchange="this.form.submit()">
                     <option value="">Cerca per titolo...</option>
                     @foreach($tuttiTitoli as $libro)
@@ -17,14 +18,13 @@
                 </select>
             </form>
 
-            
-            <!-- Form per l'importazione da Excel -->
-            <form action="{{ route('libri.import') }}" method="POST" enctype="multipart/form-data" class="d-flex">
+            <form action="{{ route('libri.import') }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 mt-2">
                 @csrf
-                <input type="file" name="file" class="form-control me-2" required>
+                <input type="file" name="file" class="form-control" required>
                 <button type="submit" class="btn btn-primary">Importa Excel</button>
             </form>
         </div>
+
 
     <table class="table table-bordered text-center">
         <thead class="thead-dark">

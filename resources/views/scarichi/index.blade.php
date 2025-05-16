@@ -4,18 +4,72 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Spedizioni</h3>
 
-    <div class="d-flex flex-wrap gap-2 mb-3">
-        <a href="{{ route('scarichi.create') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> <span class="d-none d-md-inline">Aggiungi</span>
-        </a>
+<div class="mb-3">
+    <a href="{{ route('scarichi.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
-        <form action="{{ route('scarichi.index') }}" method="GET" class="d-flex flex-wrap gap-2" style="max-width: 100%;">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca destinatario...">
-            <button class="btn btn-outline-primary">
-                <i class="bi bi-search"></i> <span class="d-none d-md-inline">Cerca</span>
-            </button>
-        </form>
-    </div>
+    <form action="{{ route('scarichi.index') }}" method="GET" style="min-width: 300px;" class="d-flex align-items-center mt-2">
+        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca destinatario...">
+        <button class="btn btn-outline-primary ms-2" type="submit">Cerca</button>
+    </form>
+</div>
+
+
+<!-- VISUALIZZAZIONE DESKTOP -->
+<div class="d-none d-md-block table-responsive">
+    <table class="table table-bordered text-center align-middle text-nowrap">
+        <thead class="table-dark">
+            <tr>
+                <th>Destinatario</th>
+                <th>Ordine</th>
+                <th>Stato</th>
+                <th>Info consegna</th>
+                <th>Data stato/info</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($scarichi as $item)
+                <tr>
+                    <td>{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</td>
+                    <td>{{ $item->ordine->codice ?? $item->altro_ordine }}</td>
+                    <td>
+                        <form action="{{ route('scarichi.updateInfoSpedizione', $item->id) }}" method="POST" class="d-inline-block">
+                            @csrf
+                            @method('PATCH')
+                            <select name="stato" class="form-select form-select-sm stato-scarico"
+                                    data-id="{{ $item->id }}"
+                                    style="background-color:
+                                        {{ $item->stato === 'Spedito' ? '#51cf66' :
+                                           ($item->stato === 'In attesa' ? '#ffe066' : '#ff6b6b') }};">
+                                <option value="">seleziona...</option>
+                                <option value="In attesa" {{ $item->stato === 'In attesa' ? 'selected' : '' }}>In attesa</option>
+                                <option value="Spedito" {{ $item->stato === 'Spedito' ? 'selected' : '' }}>Spedito</option>
+                            </select>
+                    </td>
+                    <td>
+                        <input type="text" name="info_spedizione" class="form-control form-control-sm" value="{{ $item->info_spedizione }}">
+                    </td>
+                    <td class="data-stato-info">
+                        {{ $item->data_stato_info ? \Carbon\Carbon::parse($item->data_stato_info)->format('d/m/Y') : 'N.D.' }}
+                    </td>
+                    <td class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i></button>
+                        </form>
+
+                        <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Eliminare la spedizione?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
 
     <div class="row">
         @foreach($scarichi as $item)
