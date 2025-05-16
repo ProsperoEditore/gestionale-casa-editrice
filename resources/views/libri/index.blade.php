@@ -26,48 +26,92 @@
             </form>
         </div>
 
-        <table class="table table-bordered text-center">
-            <thead class="thead-dark">
+    <table class="table table-bordered text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>ISBN</th>
+                <th>Titolo</th>
+                <th>Marchio Editoriale</th>
+                <th>Prezzo</th>
+                <th>Anno Pubblicazione</th>
+                <th>Stato</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($items as $item)
                 <tr>
-                    <th>ISBN</th>
-                    <th>Titolo</th>
-                    <th>Marchio Editoriale</th>
-                    <th>Prezzo</th>
-                    <th>Anno Pubblicazione</th>
-                    <th>Stato</th>
-                    <th>Azioni</th>
+                    <td data-label="ISBN">{{ $item->isbn }}</td>
+                    <td data-label="Titolo">{{ $item->titolo }}</td>
+                    <td data-label="Marchio Editoriale">{{ $item->marchio_editoriale->nome ?? 'N/D' }}</td>
+                    <td data-label="Prezzo">{{ number_format($item->prezzo, 2, ',', '.') }} €</td>
+                    <td data-label="Anno Pubblicazione">{{ $item->anno_pubblicazione }}</td>
+                    <td data-label="Stato">{{ $item->stato }}</td>
+                    <td data-label="Azioni" class="align-middle">
+                        <a href="{{ route('libri.edit', $item->id) }}" class="text-warning me-1" title="Modifica">
+                            <i class="bi bi-pencil fs-5"></i>
+                        </a>
+                        <form action="{{ route('libri.destroy', $item->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo libro?')">
+                                <i class="bi bi-trash fs-5"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($items as $item)
-                    <tr>
-                        <td>{{ $item->isbn }}</td>
-                        <td>{{ $item->titolo }}</td>
-                        <td>{{ $item->marchio_editoriale->nome ?? 'N/D' }}</td>
-                        <td>{{ number_format($item->prezzo, 2, ',', '.') }} €</td>
-                        <td>{{ $item->anno_pubblicazione }}</td>
-                        <td>{{ $item->stato }}</td>
-                        <td class="align-middle">
-                            <a href="{{ route('libri.edit', $item->id) }}" class="text-warning me-1" title="Modifica">
-                                <i class="bi bi-pencil fs-5"></i>
-                            </a>
-                            <form action="{{ route('libri.destroy', $item->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo libro?')">
-                                    <i class="bi bi-trash fs-5"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center mt-4">
-    {{ $items->onEachSide(1)->links('pagination::bootstrap-5') }}
+            @endforeach
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center mt-4">
+        {{ $items->onEachSide(1)->links('pagination::bootstrap-5') }}
+    </div>
 </div>
 
-    </div>
+<style>
+@media (max-width: 767.98px) {
+    table.table thead {
+        display: none;
+    }
+
+    table.table tbody tr:not(:last-child) {
+    margin-bottom: 1.2rem;  
+    }
+
+    table.table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        padding: 0.8rem;
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+
+    table.table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border: none !important;
+        width: 100%;
+    }
+
+    table.table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #333;
+    }
+
+    table.table tbody td[data-label="Azioni"]::before {
+        display: none;
+    }
+
+    table.table tbody td:last-child {
+        justify-content: center;
+    }
+}
+</style>
 
 
     <!-- Select2 -->
