@@ -158,7 +158,7 @@
 
             @if (auth()->user()->access_magazzini)
                 <li class="mb-2">
-                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Magazzini e Conti deposito</a>
+                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Magazzini e Depositi</a>
                 </li>
             @endif
             @if (auth()->user()->access_ordini)
@@ -212,7 +212,6 @@
 {{-- Offcanvas Menu Mobile --}}
 <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Menu Gestionale</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
@@ -244,7 +243,7 @@
                 {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
 
                 @if (auth()->user()->access_magazzini)
-                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary">Magazzini e Conti deposito</a>
+                    <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary">Magazzini e Depositi</a>
                 @endif
                 @if (auth()->user()->access_ordini)
                     <a href="{{ route('ordini.index') }}" class="btn btn-prospero-secondary">Ordini</a>
