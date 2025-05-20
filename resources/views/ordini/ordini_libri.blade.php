@@ -104,6 +104,12 @@
             <button type="submit" class="btn btn-primary">Salva</button>
         </div>
 
+        <div class="mb-3">
+            <label for="barcode-scan-ordini" class="form-label">Scansiona ISBN</label>
+            <input type="text" id="barcode-scan-ordini" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
+        </div>
+
+
         <h5 class="mt-5">Elenco Libri</h5>
         <table class="table table-bordered">
             <thead class="table-dark">
@@ -348,4 +354,76 @@ $(function() {
     });
 });
 </script>
+
+<script>
+document.getElementById('barcode-scan-ordini').addEventListener('change', function(e) {
+    const codice = e.target.value.trim();
+
+    fetch('/api/libro-da-barcode?isbn=' + codice)
+        .then(res => res.json())
+        .then(libro => {
+            if (!libro) return alert('Libro non trovato.');
+
+            aggiungiRigaOrdine(libro); // questa funzione deve esistere
+        });
+
+    e.target.value = '';
+});
+</script>
+
+<script>
+function aggiungiRigaOrdine(libro) {
+    const disponibilita = disponibilitaEditore[libro.id] || 0;
+
+    const newRow = `
+    <tr>
+        <td data-label="ISBN">
+            <input type="text" name="isbn[]" class="form-control isbn-field" value="${libro.isbn}" readonly>
+        </td>
+        <td data-label="Titolo">
+            <input type="text" name="titolo[]" class="form-control titolo-autocomplete" value="${libro.titolo}" placeholder="Cerca titolo...">
+            <input type="hidden" name="libro_id[]" class="libro-id" value="${libro.id}">
+            <input type="hidden" class="isbn-field" value="${libro.isbn}">
+            <input type="hidden" class="prezzo-field" value="${libro.prezzo}">
+        </td>
+        <td data-label="Quantità">
+            <input type="number" name="quantita[]" class="form-control quantita-field" value="1">
+            <div class="stock-info text-muted" style="font-size: 0.8em; opacity: 0.6;">Disponibili: ${disponibilita}</div>
+        </td>
+        <td data-label="Prezzo Copertina">
+            <input type="text" name="prezzo[]" class="form-control prezzo-field" value="${libro.prezzo}" readonly>
+        </td>
+        <td data-label="Valore Lordo">
+            <input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" value="${libro.prezzo}" readonly>
+        </td>
+        <td data-label="Sconto (%)">
+            <input type="text" name="sconto[]" class="form-control sconto-field" value="0">
+        </td>
+        <td data-label="Valore Scontato">
+            <input type="text" name="netto_a_pagare[]" class="form-control netto_a_pagare" value="${libro.prezzo}" readonly>
+        </td>
+        <td data-label="Info">
+            <select name="info_spedizione[]" class="form-control">
+                <option value="">Seleziona...</option>
+                <option value="spedito da magazzino editore">Spedito da magazzino editore</option>
+                <option value="consegna a mano">Consegna a mano</option>
+                <option value="spedito da tipografia">Spedito da tipografia</option>
+                <option value="spedito da magazzino terzo">Spedito da magazzino terzo</option>
+                <option value="fuori catalogo">Fuori catalogo</option>
+                <option value="momentaneamente non disponibile">Momentaneamente non disponibile</option>
+            </select>
+        </td>
+        <td data-label="Azioni">
+            <button type="button" class="btn btn-danger removeRow" title="Elimina">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </tr>`;
+
+    $('#ordiniBody').append(newRow);
+}
+</script>
+
+
+
 @endsection
