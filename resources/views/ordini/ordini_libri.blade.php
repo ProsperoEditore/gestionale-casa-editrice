@@ -253,22 +253,33 @@
 <script>
 $(function() {
     $(document).on("focus", ".titolo-autocomplete", function() {
-                $(this).autocomplete({
+        $(this).autocomplete({
             source: libri.map(libro => ({
                 label: libro.titolo + ' — ' + libro.isbn,
                 value: libro.titolo,
                 id: libro.id,
                 isbn: libro.isbn,
-                prezzo: libro.prezzo
+                prezzo: libro.prezzo,
+                marchio_nome: libro.marchio_nome
             })),
             select: function(event, ui) {
                 const row = $(this).closest("tr");
+
                 row.find(".isbn-field").val(ui.item.isbn);
                 row.find(".prezzo-field").val(ui.item.prezzo);
+                row.find("input[name='prezzo[]']").val(ui.item.prezzo);
                 row.find(".libro-id").val(ui.item.id);
+                row.find(".quantita-field").val(1);
+                row.find(".valore_vendita_lordo").val(ui.item.prezzo.toFixed(2));
+                row.find(".sconto-field").val(0);
+                row.find(".netto_a_pagare").val(ui.item.prezzo.toFixed(2));
+
+                const disponibilita = disponibilitaEditore[ui.item.id] || 0;
+                row.find(".stock-info").text(`Disponibili: ${disponibilita}`).show();
             }
         });
     });
+
 
     $(document).on("input", ".quantita-field, .sconto-field", function() {
         const row = $(this).closest("tr");
@@ -369,7 +380,7 @@ $(document).on("change", ".isbn-field", function () {
             row.find(".titolo-autocomplete").val(libro.titolo);
             row.find(".libro-id").val(libro.id);
             row.find(".prezzo-field").val(libro.prezzo);
-            row.find(".prezzo-field[name='prezzo[]']").val(libro.prezzo);
+            row.find("input[name='prezzo[]']").val(libro.prezzo);
             row.find(".quantita-field").val(1);
             row.find(".valore_vendita_lordo").val(libro.prezzo.toFixed(2));
             row.find(".sconto-field").val(0);

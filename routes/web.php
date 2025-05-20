@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Models\Libro;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AnagraficaController;
@@ -104,7 +106,25 @@ Route::get('/ordini/search', [OrdineController::class, 'search'])->name('ordini.
 Route::put('/ordini/{id}/aggiorna-pagato', [OrdineController::class, 'aggiornaPagato'])->name('ordini.aggiornaPagato');
 Route::post('/ordini/{id}/risolvi-conflitti', [OrdineController::class, 'risolviConflitti'])->name('ordini.risolviConflitti');
 
+Route::get('/api/libro-da-barcode', function (Request $request) {
+    $isbn = $request->input('isbn');
 
+    $libro = Libro::with('marchio_editoriale')
+        ->where('isbn', $isbn)
+        ->first();
+
+    if (!$libro) {
+        return response()->json(null);
+    }
+
+    return response()->json([
+        'id' => $libro->id,
+        'isbn' => $libro->isbn,
+        'titolo' => $libro->titolo,
+        'prezzo' => $libro->prezzo,
+        'marchio_nome' => $libro->marchio_editoriale->nome ?? null,
+    ]);
+});
 
 
 
