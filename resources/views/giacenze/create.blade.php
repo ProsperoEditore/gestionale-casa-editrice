@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("addRow").addEventListener("click", function() {
         let table = document.getElementById("giacenzeTableBody");
         let row = document.createElement("tr");
-        row.innerHTML = 
+        row.innerHTML = `
             <td><input type="text" class="form-control marchio" readonly></td>
             <td><input type="text" class="form-control isbn" readonly></td>
             <td><input type="text" class="form-control titolo autocomplete-titolo" placeholder="cerca/scansiona titolo..."></td>
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
                 <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
             </td>
-        ;
+        `;
         table.insertBefore(row, table.firstChild);
 
         $(row).find(".autocomplete-titolo").autocomplete({
@@ -230,11 +230,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 const matches = libri.filter(libro =>
                     libro.titolo.toLowerCase().includes(request.term.toLowerCase())
                 );
-                response(matches.map(libro => ({
-                    label: ${libro.titolo} [${libro.isbn}],
-                    value: libro.titolo,
-                    id: libro.id
-                })));
+            response(matches.map(libro => ({
+                label: `${libro.titolo} [${libro.isbn}]`,
+                value: libro.titolo,
+                id: libro.id
+            })));
+
             },
             select: function(event, ui) {
                 const libroSelezionato = libri.find(libro =>
@@ -269,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let giacenzaId = row.getAttribute("data-id");
 
             if (giacenzaId) {
-                fetch(/giacenze/${giacenzaId}, {
+                fetch(`/giacenze/${giacenzaId}`, {
                     method: "DELETE",
                     headers: {
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -335,8 +336,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (data.success) {
             alert("Salvataggio riuscito!");
             data.saved_ids.forEach(match => {
-                const row = document.querySelector(#giacenzeTableBody tr[data-id="${match.id}"]) ||
-                            [...document.querySelectorAll("#giacenzeTableBody tr")].find(r => r.querySelector(".isbn")?.value === match.isbn);
+                const row = document.querySelector(`#giacenzeTableBody tr[data-id="${match.id}"]`) ||
+                    [...document.querySelectorAll("#giacenzeTableBody tr")].find(r => r.querySelector(".isbn")?.value === match.isbn);
+
 
                 if (row) {
                     row.setAttribute("data-id", match.id);
@@ -446,7 +448,7 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
             const categoria = "{{ $magazzino->anagrafica->categoria }}";
             const newRow = document.createElement("tr");
 
-            newRow.innerHTML = 
+            newRow.innerHTML = ` 
                 <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
                 <td><input type="text" class="form-control isbn" value="${libro.isbn}" readonly></td>
                 <td><input type="text" class="form-control titolo autocomplete-titolo" value="${libro.titolo}" placeholder="cerca/scansiona titolo..."></td>
@@ -460,7 +462,7 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
                     <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
                 </td>
 
-            ;
+            `;
 
             table.insertBefore(newRow, table.firstChild);
             newRow.querySelector('.quantita').focus();
@@ -489,7 +491,7 @@ document.addEventListener('click', function (e) {
             )
         };
 
-        fetch(`/giacenze/${id ? 'singola/' + id : 'singola-create'}/${{{ $magazzino->id }}}`, {
+        fetch(`/giacenze/${id ? 'singola/' + id : 'singola-create'}/{{ $magazzino->id }}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
