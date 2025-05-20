@@ -153,8 +153,9 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
             return response()->json(['success' => false, 'message' => 'Giacenza non trovata.']);
         }
     } else {
-        // POST: crea nuova oppure aggiorna se esiste già per isbn
-        $giacenza = Giacenza::where('magazzino_id', $magazzino_id)->where('isbn', $data['isbn'])->first();
+        $giacenza = Giacenza::where('magazzino_id', $magazzino_id)
+                            ->where('isbn', $data['isbn'])
+                            ->first();
         if (!$giacenza) {
             $giacenza = new Giacenza();
             $giacenza->magazzino_id = $magazzino_id;
@@ -169,7 +170,10 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
     $giacenza->note = $data['note'] ?? null;
     $giacenza->data_ultimo_aggiornamento = now();
 
-    if ($giacenza->magazzino->anagrafica->categoria === 'magazzino editore') {
+    // ✅ CARICA la categoria del magazzino in modo sicuro
+    $categoria = Magazzino::with('anagrafica')->find($magazzino_id)?->anagrafica?->categoria;
+
+    if ($categoria === 'magazzino editore') {
         $giacenza->costo_produzione = $data['costo_produzione'] ?? 0;
         $giacenza->sconto = null;
     } else {
@@ -181,6 +185,7 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
 
     return response()->json(['success' => true, 'id' => $giacenza->id]);
 }
+
 
 
 
