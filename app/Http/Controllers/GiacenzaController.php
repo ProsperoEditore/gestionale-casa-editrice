@@ -134,60 +134,61 @@ class GiacenzaController extends Controller
     }
     
 
-public function storeSingola(Request $request, $magazzino_id, $id = null){
+public function storeSingola(Request $request, $magazzino_id, $id = null)
+{
+    try {
+        $data = $request->input('giacenza');
 
-\Log::debug('Chiamata ricevuta in storeSingola', ['data' => $request->all(), 'id' => $id, 'magazzino_id' => $magazzino_id]);
-
-
-    $data = $request->input('giacenza');
-
-    if (empty($data['isbn']) || empty($data['titolo'])) {
-        return response()->json(['success' => false, 'message' => 'Dati mancanti.']);
-    }
-
-    $libro = Libro::where('isbn', $data['isbn'])->first();
-    if (!$libro) {
-        return response()->json(['success' => false, 'message' => 'Libro non trovato.']);
-    }
-
-    if ($request->isMethod('put') && $id) {
-        $giacenza = Giacenza::find($id);
-        if (!$giacenza) {
-            return response()->json(['success' => false, 'message' => 'Giacenza non trovata.']);
+        if (empty($data['isbn']) || empty($data['titolo'])) {
+            return response()->json(['success' => false, 'message' => 'Dati mancanti.', 'debug' => $data]);
         }
-    } else {
-        $giacenza = Giacenza::where('magazzino_id', $magazzino_id)
-                            ->where('isbn', $data['isbn'])
-                            ->first();
-        if (!$giacenza) {
-            $giacenza = new Giacenza();
-            $giacenza->magazzino_id = $magazzino_id;
-            $giacenza->isbn = $data['isbn'];
+
+        $libro = Libro::where('isbn', $data['isbn'])->first();
+        if (!$libro) {
+            return response()->json(['success' => false, 'message' => 'Libro non trovato.']);
         }
+
+        if ($request->isMethod('put') && $id) {
+            $giacenza = Giacenza::find($id);
+            if (!$giacenza) {
+                return response()->json(['success' => false, 'message' => 'Giacenza non trovata.']);
+            }
+        } else {
+            $giacenza = Giacenza::where('magazzino_id', $magazzino_id)->where('isbn', $data['isbn'])->first();
+            if (!$giacenza) {
+                $giacenza = new Giacenza();
+                $giacenza->magazzino_id = $magazzino_id;
+                $giacenza->isbn = $data['isbn'];
+            }
+        }
+
+        $giacenza->libro_id = $libro->id;
+        $giacenza->titolo = $data['titolo'];
+        $giacenza->quantita = $data['quantita'];
+        $giacenza->prezzo = $data['prezzo'];
+        $giacenza->note = $data['note'] ?? null;
+        $giacenza->data_ultimo_aggiornamento = now();
+
+        if ($giacenza->magazzino->anagrafica->categoria === 'magazzino editore') {
+            $giacenza->costo_produzione = $data['costo_produzione'] ?? 0;
+            $giacenza->sconto = null;
+        } else {
+            $giacenza->sconto = $data['sconto'] ?? 0;
+            $giacenza->costo_produzione = null;
+        }
+
+        $giacenza->save();
+
+        return response()->json(['success' => true, 'id' => $giacenza->id]);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Eccezione: ' . $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+        ]);
     }
-
-    $giacenza->libro_id = $libro->id;
-    $giacenza->titolo = $data['titolo'];
-    $giacenza->quantita = $data['quantita'];
-    $giacenza->prezzo = $data['prezzo'];
-    $giacenza->note = $data['note'] ?? null;
-    $giacenza->data_ultimo_aggiornamento = now();
-
-    // ✅ CARICA la categoria del magazzino in modo sicuro
-    $categoria = Magazzino::with('anagrafica')->find($magazzino_id)?->anagrafica?->categoria;
-
-    if ($categoria === 'magazzino editore') {
-        $giacenza->costo_produzione = $data['costo_produzione'] ?? 0;
-        $giacenza->sconto = null;
-    } else {
-        $giacenza->sconto = $data['sconto'] ?? 0;
-        $giacenza->costo_produzione = null;
-    }
-
-    $giacenza->save();
-    \Log::debug('Giacenza salvata', ['giacenza' => $giacenza->toArray()]);
-
-    return response()->json(['success' => true, 'id' => $giacenza->id]);
 }
 
 
