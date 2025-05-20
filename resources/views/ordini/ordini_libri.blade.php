@@ -110,11 +110,6 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         <button type="submit" class="btn btn-primary">Salva</button>
     </div>
 
-    <div class="mb-3">
-        <label for="barcode-scan-ordini" class="form-label">Scansiona ISBN</label>
-        <input type="text" id="barcode-scan-ordini" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
-    </div>
-
 
     <h5 class="mt-5">Elenco Libri</h5>
     <table class="table table-bordered">
@@ -379,6 +374,13 @@ document.getElementById('barcode-scan-ordini').addEventListener('change', functi
 
 <script>
 function aggiungiRigaOrdine(libro) {
+    const isbnEsistente = Array.from(document.querySelectorAll('input[name="isbn[]"]'))
+        .some(input => input.value === libro.isbn);
+    if (isbnEsistente) {
+        alert("Questo libro è già presente nell'ordine.");
+        return;
+    }
+
     const newRow = `
     <tr>
         <td data-label="ISBN">
@@ -425,6 +427,8 @@ function aggiungiRigaOrdine(libro) {
     </tr>`;
 
     $('#ordiniBody').append(newRow);
+    $('#ordiniBody tr:last-child input[name="quantita[]"]').focus();
+
 }
 </script>
 
