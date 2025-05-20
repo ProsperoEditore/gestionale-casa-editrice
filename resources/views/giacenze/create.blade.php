@@ -31,6 +31,14 @@
         <button class="btn btn-outline-primary">Cerca</button>
     </form>
 
+        <hr>
+
+    <h4>Aggiungi con penna ottica</h4>
+    <div class="mt-3 mb-3" style="max-width: 400px;">
+        <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
+    </div>
+
+
 <div class="table-responsive" style="overflow-x: auto;">
 <table id="giacenzeTable" class="table table-bordered mt-3">
 
@@ -394,5 +402,62 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<script>
+document.getElementById('barcode-scan-giacenze').addEventListener('input', function(e) {
+    const codice = e.target.value.trim();
+
+    if (codice.length < 10) return;
+
+    fetch('/api/libro-da-barcode?isbn=' + codice)
+        .then(res => res.json())
+        .then(libro => {
+            if (!libro) {
+                alert('Libro non trovato.');
+                return;
+            }
+
+            // Cerca riga già esistente
+            const righe = document.querySelectorAll('#giacenzeTableBody tr');
+            let rigaEsistente = null;
+
+            righe.forEach(riga => {
+                const isbnCell = riga.querySelector('.isbn');
+                if (isbnCell && isbnCell.value === libro.isbn) {
+                    rigaEsistente = riga;
+                }
+            });
+
+            if (rigaEsistente) {
+                rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                rigaEsistente.querySelector('.quantita')?.focus();
+                rigaEsistente.style.backgroundColor = '#ffffcc'; // giallo chiaro
+                setTimeout(() => rigaEsistente.style.backgroundColor = '', 2000);
+                return;
+            }
+
+            // Altrimenti aggiunge nuova riga
+            const table = document.getElementById("giacenzeTableBody");
+            const categoria = "{{ $magazzino->anagrafica->categoria }}";
+            const newRow = document.createElement("tr");
+
+            newRow.innerHTML = `
+                <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
+                <td><input type="text" class="form-control isbn" value="${libro.isbn}" readonly></td>
+                <td><input type="text" class="form-control titolo autocomplete-titolo" value="${libro.titolo}" placeholder="cerca/scansiona titolo..."></td>
+                <td><input type="number" class="form-control quantita" value="1"></td>
+                <td><input type="text" class="form-control prezzo" value="${libro.prezzo}" readonly></td>
+                <td><input type="text" class="form-control costo_sconto" value="${categoria === 'magazzino editore' ? libro.costo_produzione : ''}"></td>
+                <td class="data-aggiornamento">-</td>
+                <td><input type="text" class="form-control note"></td>
+                <td><button class="btn btn-danger btn-sm deleteRow"><i class="bi bi-trash"></i></button></td>
+            `;
+
+            table.insertBefore(newRow, table.firstChild);
+            newRow.querySelector('.quantita').focus();
+        });
+
+    e.target.value = '';
+});
+</script>
 
 @endsection
