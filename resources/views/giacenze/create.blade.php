@@ -541,18 +541,22 @@ document.addEventListener('click', function (e) {
             )
         };
 
-        const url = `/giacenze/singola/${id ?? ''}/{{ $magazzino->id }}`;
-        const method = "POST"; // 🔧 forza sempre POST per evitare errori server
+        const url = id
+            ? `/giacenze/singola/${id}/{{ $magazzino->id }}`
+            : `/giacenze/singola/{{ $magazzino->id }}`;
+        const method = id ? "PUT" : "POST";
 
 
-        fetch(url, {
-            method: method,
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({ giacenza: payload })
-        })
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ giacenza: payload })
+            })
+
         .then(res => res.json())
         .then(data => {
             if (data.success) {
