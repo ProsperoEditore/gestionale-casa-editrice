@@ -184,9 +184,10 @@
 
 
 <script>
-    const routeSalvaSingola = "{{ route('giacenze.store.singola', ['magazzino' => $magazzino->id]) }}";
-    const routeSalvaTutte = "{{ route('giacenze.store', ['magazzino' => $magazzino->id]) }}";
+    const routeSalvaSingola = @json(route('giacenze.store.singola', ['magazzino' => $magazzino->id]));
+    const routeSalvaTutte = @json(route('giacenze.store', ['magazzino' => $magazzino->id]));
 </script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
