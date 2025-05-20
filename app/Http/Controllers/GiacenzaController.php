@@ -135,6 +135,9 @@ class GiacenzaController extends Controller
     
 
 public function storeSingola(Request $request, $magazzino_id, $id = null)
+
+\Log::debug('Chiamata ricevuta in storeSingola', ['data' => $request->all(), 'id' => $id, 'magazzino_id' => $magazzino_id]);
+
 {
     $data = $request->input('giacenza');
 
@@ -182,6 +185,7 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
     }
 
     $giacenza->save();
+    \Log::debug('Giacenza salvata', ['giacenza' => $giacenza->toArray()]);
 
     return response()->json(['success' => true, 'id' => $giacenza->id]);
 }
