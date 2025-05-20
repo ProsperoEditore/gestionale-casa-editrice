@@ -541,10 +541,9 @@ document.addEventListener('click', function (e) {
             )
         };
 
-        const url = id
-            ? `/giacenze/singola/${id}/{{ $magazzino->id }}`
-            : `/giacenze/singola/{{ $magazzino->id }}`;
-        const method = id ? "PUT" : "POST";
+        const url = `/giacenze/singola/${id ?? ''}/{{ $magazzino->id }}`;
+        const method = "POST"; // 🔧 forza sempre POST per evitare errori server
+
 
         fetch(url, {
             method: method,
