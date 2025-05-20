@@ -83,11 +83,9 @@
                     {{ $giacenza->data_ultimo_aggiornamento ? \Carbon\Carbon::parse($giacenza->data_ultimo_aggiornamento)->format('Y-m-d') : '-' }}
                 </td>
                 <td><input type="text" class="form-control note" value="{{ $giacenza->note }}"></td>
-                <td class="d-flex gap-1 justify-content-center">
-                    <button type="button" class="btn btn-primary btn-sm saveRow" title="Salva">
-                        <i class="bi bi-check-circle"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
+                <td>
+                    <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
+                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
         @endforeach
@@ -168,11 +166,7 @@
 }
 </style>
 
-<style>
-.pointer-events-none {
-    pointer-events: none;
-}
-</style>
+
 
 
 
@@ -184,63 +178,9 @@
 
 
 <script>
-    const routeSalvaSingola = @json(route('giacenze.store.singola', ['magazzino' => $magazzino->id]));
-    console.log("URL salvataggio singola:", routeSalvaSingola);
-    const routeSalvaTutte = @json(route('giacenze.store', ['magazzino' => $magazzino->id]));
-</script>
-
-
-<script>
 document.addEventListener("DOMContentLoaded", function() {
     let libri = @json($libri);
     const categoria = "{{ $magazzino->anagrafica->categoria }}";
-
-document.getElementById("giacenzeTableBody").addEventListener("click", function(event) {
-    const button = event.target.closest(".saveRow");
-    if (!button) return;
-
-    const row = button.closest("tr");
-    const giacenzaId = row.getAttribute("data-id") || null;
-
-    const data = {
-        id: giacenzaId,
-        isbn: row.querySelector(".isbn")?.value || '',
-        titolo: row.querySelector(".titolo")?.value || '',
-        quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
-        prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
-        note: row.querySelector(".note")?.value || null,
-        ...(categoria === "magazzino editore"
-            ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
-            : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
-        )
-    };
-
-    fetch(routeSalvaSingola, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-        },
-        body: JSON.stringify({ giacenza: data })
-    })
-    .then(response => response.json())
-    .then(resp => {
-        if (resp.success) {
-            row.setAttribute("data-id", resp.saved_id);
-            row.querySelector(".data-aggiornamento").innerText = new Date().toISOString().split('T')[0];
-            row.dataset.original = JSON.stringify(data);
-            row.style.backgroundColor = "#d4edda";
-            setTimeout(() => row.style.backgroundColor = "", 1000);
-        } else {
-            alert("Errore: " + resp.message);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-        alert("Errore nella richiesta.");
-    });
-});
-
 
     // 🔥 NUOVA FUNZIONE
     function coloraQuantitaInput(input) {
@@ -268,7 +208,7 @@ document.getElementById("giacenzeTableBody").addEventListener("click", function(
     document.getElementById("addRow").addEventListener("click", function() {
         let table = document.getElementById("giacenzeTableBody");
         let row = document.createElement("tr");
-        row.innerHTML = `
+        row.innerHTML = 
             <td><input type="text" class="form-control marchio" readonly></td>
             <td><input type="text" class="form-control isbn" readonly></td>
             <td><input type="text" class="form-control titolo autocomplete-titolo" placeholder="cerca/scansiona titolo..."></td>
@@ -277,11 +217,11 @@ document.getElementById("giacenzeTableBody").addEventListener("click", function(
             <td><input type="text" class="form-control costo_sconto"></td>
             <td class="data-aggiornamento">-</td>
             <td><input type="text" class="form-control note"></td>
-            <td class="d-flex gap-1 justify-content-center">
-                <button class="btn btn-primary btn-sm saveRow" title="Salva"><i class="bi bi-check-circle"></i></button>
-                <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
+            <td>
+                <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
+                <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
             </td>
-        `;
+        ;
         table.insertBefore(row, table.firstChild);
 
         $(row).find(".autocomplete-titolo").autocomplete({
@@ -291,7 +231,7 @@ document.getElementById("giacenzeTableBody").addEventListener("click", function(
                     libro.titolo.toLowerCase().includes(request.term.toLowerCase())
                 );
                 response(matches.map(libro => ({
-                    label: `${libro.titolo} [${libro.isbn}]`,
+                    label: ${libro.titolo} [${libro.isbn}],
                     value: libro.titolo,
                     id: libro.id
                 })));
@@ -329,7 +269,7 @@ document.getElementById("giacenzeTableBody").addEventListener("click", function(
             let giacenzaId = row.getAttribute("data-id");
 
             if (giacenzaId) {
-                fetch(`/giacenze/${giacenzaId}`, {
+                fetch(/giacenze/${giacenzaId}, {
                     method: "DELETE",
                     headers: {
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -395,7 +335,7 @@ document.getElementById("giacenzeTableBody").addEventListener("click", function(
         if (data.success) {
             alert("Salvataggio riuscito!");
             data.saved_ids.forEach(match => {
-                const row = document.querySelector(`#giacenzeTableBody tr[data-id="${match.id}"]`) ||
+                const row = document.querySelector(#giacenzeTableBody tr[data-id="${match.id}"]) ||
                             [...document.querySelectorAll("#giacenzeTableBody tr")].find(r => r.querySelector(".isbn")?.value === match.isbn);
 
                 if (row) {
@@ -424,6 +364,8 @@ document.getElementById("giacenzeTableBody").addEventListener("click", function(
         console.error("Errore:", error);
         alert("Errore nel salvataggio!");
     });
+});
+
 });
 </script>
 
@@ -501,9 +443,10 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 
             // Altrimenti aggiunge nuova riga
             const table = document.getElementById("giacenzeTableBody");
+            const categoria = "{{ $magazzino->anagrafica->categoria }}";
             const newRow = document.createElement("tr");
 
-            newRow.innerHTML = `
+            newRow.innerHTML = 
                 <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
                 <td><input type="text" class="form-control isbn" value="${libro.isbn}" readonly></td>
                 <td><input type="text" class="form-control titolo autocomplete-titolo" value="${libro.titolo}" placeholder="cerca/scansiona titolo..."></td>
@@ -512,11 +455,12 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
                 <td><input type="text" class="form-control costo_sconto" value="${categoria === 'magazzino editore' ? libro.costo_produzione : ''}"></td>
                 <td class="data-aggiornamento">-</td>
                 <td><input type="text" class="form-control note"></td>
-                <td class="d-flex gap-1 justify-content-center">
-                    <button class="btn btn-primary btn-sm saveRow" title="Salva"><i class="bi bi-check-circle"></i></button>
-                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
+                <td>
+                    <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
+                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
                 </td>
-            `;
+
+            ;
 
             table.insertBefore(newRow, table.firstChild);
             newRow.querySelector('.quantita').focus();
@@ -525,5 +469,54 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
     e.target.value = '';
 });
 </script>
+
+<script>
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.salvaSingola')) {
+        const btn = e.target.closest('.salvaSingola');
+        const row = btn.closest('tr');
+        const id = row.dataset.id || null;
+
+        const payload = {
+            isbn: row.querySelector(".isbn")?.value || '',
+            titolo: row.querySelector(".titolo")?.value || '',
+            quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
+            prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
+            note: row.querySelector(".note")?.value || '',
+            ...(categoria === "magazzino editore"
+                ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+                : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+            )
+        };
+
+        fetch(`/giacenze/${id ? 'singola/' + id : 'singola-create'}/${{{ $magazzino->id }}}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ giacenza: payload })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Salvato con successo!');
+                // aggiorna data aggiornamento
+                row.querySelector('.data-aggiornamento').innerText = new Date().toISOString().split('T')[0];
+                // aggiorna data-id e data-original
+                if (data.id) row.dataset.id = data.id;
+                row.dataset.original = JSON.stringify(payload);
+            } else {
+                alert('Errore nel salvataggio: ' + (data.message || ''));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Errore nella richiesta');
+        });
+    }
+});
+</script>
+
 
 @endsection
