@@ -320,7 +320,6 @@ $(function() {
         $(this).closest("tr").remove();
     });
 
-
 $("#addRow").on("click", function () {
     const newRow = $(`
         <tr>
@@ -338,6 +337,7 @@ $("#addRow").on("click", function () {
             </td>
             <td data-label="Prezzo Copertina">
                 <input type="text" class="form-control prezzo-field" readonly>
+                <input type="hidden" name="prezzo[]" class="prezzo-field">
             </td>
             <td data-label="Valore Lordo">
                 <input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" readonly>
