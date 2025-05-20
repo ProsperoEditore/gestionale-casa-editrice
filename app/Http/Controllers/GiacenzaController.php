@@ -136,7 +136,10 @@ class GiacenzaController extends Controller
 
 public function storeSingola(Request $request, $magazzino_id)
 {
-    $data = $request->input('giacenza');
+    $data = $request->expectsJson()
+    ? $request->json()->get('giacenza')
+    : $request->input('giacenza');
+
 
     if (empty($data['isbn']) || empty($data['titolo'])) {
         return response()->json(['success' => false, 'message' => 'Dati mancanti.']);
