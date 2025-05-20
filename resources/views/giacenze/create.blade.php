@@ -182,6 +182,55 @@ document.addEventListener("DOMContentLoaded", function() {
     let libri = @json($libri);
     const categoria = "{{ $magazzino->anagrafica->categoria }}";
 
+    document.getElementById("giacenzeTableBody").addEventListener("click", function(event) {
+    const button = event.target.closest(".saveRow");
+    if (!button) return;
+
+    const row = button.closest("tr");
+    const giacenzaId = row.getAttribute("data-id") || null;
+
+    const data = {
+        id: giacenzaId,
+        isbn: row.querySelector(".isbn")?.value || '',
+        titolo: row.querySelector(".titolo")?.value || '',
+        quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
+        prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
+        note: row.querySelector(".note")?.value || null,
+        ...(categoria === "magazzino editore"
+            ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+            : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+        )
+    };
+
+    fetch("{{ route('giacenze.store', ['magazzino' => $magazzino->id]) }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+        },
+        body: JSON.stringify({ giacenze: [data] })
+    })
+    .then(response => response.json())
+    .then(resp => {
+        if (resp.success) {
+            const saved = resp.saved_ids.find(r => r.isbn === data.isbn);
+            if (saved) {
+                row.setAttribute("data-id", saved.id);
+                row.querySelector(".data-aggiornamento").innerText = new Date().toISOString().split('T')[0];
+                row.dataset.original = JSON.stringify(data);
+                row.style.backgroundColor = "#d4edda"; // verde chiaro
+                setTimeout(() => row.style.backgroundColor = "", 1000);
+            }
+        } else {
+            alert("Errore nel salvataggio: " + resp.message);
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Errore nella richiesta.");
+    });
+});
+
     // 🔥 NUOVA FUNZIONE
     function coloraQuantitaInput(input) {
         let value = parseInt(input.value);
@@ -365,56 +414,6 @@ document.addEventListener("DOMContentLoaded", function() {
         alert("Errore nel salvataggio!");
     });
 });
-
-document.getElementById("giacenzeTableBody").addEventListener("click", function(event) {
-    const button = event.target.closest(".saveRow");
-    if (!button) return;
-
-    const row = button.closest("tr");
-    const giacenzaId = row.getAttribute("data-id") || null;
-
-    const data = {
-        id: giacenzaId,
-        isbn: row.querySelector(".isbn")?.value || '',
-        titolo: row.querySelector(".titolo")?.value || '',
-        quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
-        prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
-        note: row.querySelector(".note")?.value || null,
-        ...(categoria === "magazzino editore"
-            ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
-            : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
-        )
-    };
-
-    fetch("{{ route('giacenze.store', ['magazzino' => $magazzino->id]) }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-        },
-        body: JSON.stringify({ giacenze: [data] })
-    })
-    .then(response => response.json())
-    .then(resp => {
-        if (resp.success) {
-            const saved = resp.saved_ids.find(r => r.isbn === data.isbn);
-            if (saved) {
-                row.setAttribute("data-id", saved.id);
-                row.querySelector(".data-aggiornamento").innerText = new Date().toISOString().split('T')[0];
-                row.dataset.original = JSON.stringify(data);
-                row.style.backgroundColor = "#d4edda"; // verde chiaro
-                setTimeout(() => row.style.backgroundColor = "", 1000);
-            }
-        } else {
-            alert("Errore nel salvataggio: " + resp.message);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-        alert("Errore nella richiesta.");
-    });
-});
-
 </script>
 
 <script>
@@ -491,7 +490,6 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 
             // Altrimenti aggiunge nuova riga
             const table = document.getElementById("giacenzeTableBody");
-            const categoria = "{{ $magazzino->anagrafica->categoria }}";
             const newRow = document.createElement("tr");
 
             newRow.innerHTML = `
