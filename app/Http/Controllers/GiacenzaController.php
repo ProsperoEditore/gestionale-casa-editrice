@@ -151,11 +151,13 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
         ? Giacenza::find($id)
         : Giacenza::where('magazzino_id', $magazzino_id)->where('isbn', $data['isbn'])->first();
 
-    if (!$giacenza) {
-        $giacenza = new Giacenza();
-        $giacenza->magazzino_id = $magazzino_id;
-        $giacenza->isbn = $data['isbn'];
-    }
+        if (!$giacenza) {
+            $giacenza = new Giacenza();
+            $giacenza->magazzino_id = $magazzino_id;
+            $giacenza->isbn = $data['isbn'];
+        }
+
+        $giacenza->libro_id = $libro->id;
 
     $giacenza->titolo = $data['titolo'];
     $giacenza->quantita = $data['quantita'];

@@ -89,7 +89,9 @@
                 </td>
                 <td><input type="text" class="form-control note" value="{{ $giacenza->note }}"></td>
                 <td>
-                    <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
+                    <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
+                        <i class="bi bi-save"></i>
+                    </button>
                     <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
@@ -222,7 +224,9 @@ document.addEventListener("DOMContentLoaded", function() {
             <td class="data-aggiornamento">-</td>
             <td><input type="text" class="form-control note"></td>
             <td>
-                <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
+                <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
+                    <i class="bi bi-save"></i>
+                </button>
                 <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
             </td>
         `;
@@ -462,8 +466,13 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
                 <td class="data-aggiornamento">-</td>
                 <td><input type="text" class="form-control note"></td>
                 <td>
-                    <button class="btn btn-success btn-sm salvaSingola" title="Salva riga"><i class="bi bi-check-circle"></i></button>
+                    <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
+                        <i class="bi bi-save"></i>
+                    </button>
                     <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
+                        <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
+                            Salvato!
+                        </div>
                 </td>
 
             `;
@@ -537,11 +546,18 @@ document.addEventListener('click', function (e) {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert('Salvato con successo!');
                 row.querySelector('.data-aggiornamento').innerText = new Date().toISOString().split('T')[0];
                 if (data.id) row.dataset.id = data.id;
                 row.dataset.original = JSON.stringify(payload);
-            } else {
+
+                // Mostra popup "Salvato!"
+                const alertBox = row.querySelector('.alert-salvata');
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    setTimeout(() => alertBox.classList.add('d-none'), 2000);
+                }
+            }
+            else {
                 alert('Errore nel salvataggio: ' + (data.message || ''));
             }
         })
