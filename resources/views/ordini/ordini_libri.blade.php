@@ -133,9 +133,8 @@
                     <td data-label="Quantità">
                         <input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}">
                         <div class="stock-info text-muted" style="font-size: 0.8em; display: none; opacity: 0.6;"></div>
-                    </td>
                     <td data-label="Prezzo Copertina">
-                        <input type="text" name="prezzo[]" class="form-control prezzo-field" value="{{ $libro->prezzo }}" readonly>
+                        <input type="text" name="prezzo[]" class="form-control prezzo-field" readonly>
                     </td>
                     <td data-label="Valore Lordo">
                         <input type="text" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" value="{{ $libro->pivot->valore_vendita_lordo }}" readonly>
