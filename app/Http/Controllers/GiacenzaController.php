@@ -134,11 +134,11 @@ class GiacenzaController extends Controller
     }
     
 
-public function storeSingola(Request $request, $magazzino_id, $id = null)
+public function storeSingola(Request $request, $magazzino_id, $id = null){
 
 \Log::debug('Chiamata ricevuta in storeSingola', ['data' => $request->all(), 'id' => $id, 'magazzino_id' => $magazzino_id]);
 
-{
+
     $data = $request->input('giacenza');
 
     if (empty($data['isbn']) || empty($data['titolo'])) {
