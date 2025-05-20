@@ -134,8 +134,21 @@ class GiacenzaController extends Controller
     }
     
 
-public function storeSingola(Request $request, $magazzino_id, $id = null)
+public function storeSingola(Request $request, $id_or_magazzino, $maybe_magazzino = null)
 {
+    // Verifica se stai aggiornando o creando
+    if ($request->isMethod('put')) {
+        $id = $id_or_magazzino;
+        $magazzino_id = $maybe_magazzino;
+    } else {
+        $id = null;
+        $magazzino_id = $id_or_magazzino;
+    }
+
+    $magazzino = Magazzino::with('anagrafica')->find($magazzino_id);
+    if (!$magazzino) {
+        return response()->json(['success' => false, 'message' => 'Magazzino non trovato.']);
+    }
     try {
         $data = $request->input('giacenza');
 
