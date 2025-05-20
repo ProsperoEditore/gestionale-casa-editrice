@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 document.addEventListener("click", function(event) {
-    if (event.target.closest(".saveRow")) {
+    if (event.target.classList.contains("saveRow") || event.target.closest(".saveRow")) {
         const row = event.target.closest("tr");
         const giacenzaId = row.getAttribute("data-id") || null;
 
