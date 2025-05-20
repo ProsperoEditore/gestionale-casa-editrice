@@ -83,7 +83,10 @@
                     {{ $giacenza->data_ultimo_aggiornamento ? \Carbon\Carbon::parse($giacenza->data_ultimo_aggiornamento)->format('Y-m-d') : '-' }}
                 </td>
                 <td><input type="text" class="form-control note" value="{{ $giacenza->note }}"></td>
-                <td><button class="btn btn-danger btn-sm deleteRow"><i class="bi bi-trash"></i></button></td>
+                <td class="d-flex gap-1 justify-content-center">
+                    <button class="btn btn-primary btn-sm saveRow" title="Salva"><i class="bi bi-check-circle"></i></button>
+                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
+                </td>
             </tr>
         @endforeach
         </tbody>
@@ -214,7 +217,10 @@ document.addEventListener("DOMContentLoaded", function() {
             <td><input type="text" class="form-control costo_sconto"></td>
             <td class="data-aggiornamento">-</td>
             <td><input type="text" class="form-control note"></td>
-            <td><button class="btn btn-danger btn-sm deleteRow"><i class="bi bi-trash"></i></button></td>
+            <td class="d-flex gap-1 justify-content-center">
+                <button class="btn btn-primary btn-sm saveRow" title="Salva"><i class="bi bi-check-circle"></i></button>
+                <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
+            </td>
         `;
         table.insertBefore(row, table.firstChild);
 
@@ -360,6 +366,52 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+document.addEventListener("click", function(event) {
+    if (event.target.closest(".saveRow")) {
+        const row = event.target.closest("tr");
+        const giacenzaId = row.getAttribute("data-id") || null;
+
+        const data = {
+            id: giacenzaId,
+            isbn: row.querySelector(".isbn")?.value || '',
+            titolo: row.querySelector(".titolo")?.value || '',
+            quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
+            prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
+            note: row.querySelector(".note")?.value || null,
+            ...(categoria === "magazzino editore"
+                ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+                : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+            )
+        };
+
+        fetch("{{ route('giacenze.store', ['magazzino' => $magazzino->id]) }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({ giacenze: [data] })
+        })
+        .then(response => response.json())
+        .then(resp => {
+            if (resp.success) {
+                const saved = resp.saved_ids.find(r => r.isbn === data.isbn);
+                if (saved) {
+                    row.setAttribute("data-id", saved.id);
+                    row.querySelector(".data-aggiornamento").innerText = new Date().toISOString().split('T')[0];
+
+                    row.dataset.original = JSON.stringify(data);
+                    alert("Riga salvata.");
+                }
+            } else {
+                alert("Errore nel salvataggio: " + resp.message);
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            alert("Errore nella richiesta.");
+        });
+    }
 });
 </script>
 
@@ -449,7 +501,10 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
                 <td><input type="text" class="form-control costo_sconto" value="${categoria === 'magazzino editore' ? libro.costo_produzione : ''}"></td>
                 <td class="data-aggiornamento">-</td>
                 <td><input type="text" class="form-control note"></td>
-                <td><button class="btn btn-danger btn-sm deleteRow"><i class="bi bi-trash"></i></button></td>
+                <td class="d-flex gap-1 justify-content-center">
+                    <button class="btn btn-primary btn-sm saveRow" title="Salva"><i class="bi bi-check-circle"></i></button>
+                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
+                </td>
             `;
 
             table.insertBefore(newRow, table.firstChild);
