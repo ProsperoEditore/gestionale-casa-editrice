@@ -147,18 +147,22 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
         return response()->json(['success' => false, 'message' => 'Libro non trovato.']);
     }
 
-    $giacenza = $id
-        ? Giacenza::find($id)
-        : Giacenza::where('magazzino_id', $magazzino_id)->where('isbn', $data['isbn'])->first();
-
+    if ($request->isMethod('put') && $id) {
+        $giacenza = Giacenza::find($id);
+        if (!$giacenza) {
+            return response()->json(['success' => false, 'message' => 'Giacenza non trovata.']);
+        }
+    } else {
+        // POST: crea nuova oppure aggiorna se esiste già per isbn
+        $giacenza = Giacenza::where('magazzino_id', $magazzino_id)->where('isbn', $data['isbn'])->first();
         if (!$giacenza) {
             $giacenza = new Giacenza();
             $giacenza->magazzino_id = $magazzino_id;
             $giacenza->isbn = $data['isbn'];
         }
+    }
 
-        $giacenza->libro_id = $libro->id;
-
+    $giacenza->libro_id = $libro->id;
     $giacenza->titolo = $data['titolo'];
     $giacenza->quantita = $data['quantita'];
     $giacenza->prezzo = $data['prezzo'];
@@ -167,8 +171,10 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
 
     if ($giacenza->magazzino->anagrafica->categoria === 'magazzino editore') {
         $giacenza->costo_produzione = $data['costo_produzione'] ?? 0;
+        $giacenza->sconto = null;
     } else {
         $giacenza->sconto = $data['sconto'] ?? 0;
+        $giacenza->costo_produzione = null;
     }
 
     $giacenza->save();
