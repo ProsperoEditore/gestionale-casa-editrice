@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function() {
         row.innerHTML = `
             <td><input type="text" class="form-control marchio" readonly></td>
             <td><input type="text" class="form-control isbn" readonly></td>
-            <td><input type="text" class="form-control titolo autocomplete-titolo" placeholder="Cerca titolo..."></td>
+            <td><input type="text" class="form-control titolo autocomplete-titolo" placeholder="cerca/scansiona titolo..."></td>
             <td><input type="number" class="form-control quantita"></td>
             <td><input type="text" class="form-control prezzo" readonly></td>
             <td><input type="text" class="form-control costo_sconto"></td>

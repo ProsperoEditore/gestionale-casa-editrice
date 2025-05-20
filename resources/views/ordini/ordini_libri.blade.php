@@ -110,6 +110,10 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         <button type="submit" class="btn btn-primary">Salva</button>
     </div>
 
+    <div class="mb-3">
+        <label for="barcode-scan-ordini" class="form-label">Scansiona ISBN</label>
+        <input type="text" id="barcode-scan-ordini" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
+    </div>
 
     <h5 class="mt-5">Elenco Libri</h5>
     <table class="table table-bordered">
@@ -133,7 +137,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
                     <input type="text" name="isbn[]" class="form-control isbn-field" value="{{ $libro->isbn }}" readonly>
                 </td>
                 <td data-label="Titolo">
-                    <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="Cerca titolo..." value="{{ $libro->titolo }}">
+                    <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="cerca/scansiona titolo..." value="{{ $libro->titolo }}">
                     <input type="hidden" name="libro_id[]" class="libro-id" value="{{ $libro->id }}">
                     <input type="hidden" name="isbn[]" class="isbn-field" value="{{ $libro->isbn }}">
                     <input type="hidden" name="prezzo[]" class="prezzo-field" value="{{ $libro->prezzo }}">
@@ -357,18 +361,22 @@ $(function() {
 </script>
 
 <script>
-document.getElementById('barcode-scan-ordini').addEventListener('change', function(e) {
+document.getElementById('barcode-scan-ordini').addEventListener('input', function(e) {
     const codice = e.target.value.trim();
+
+    if (codice.length < 10) return; // evita trigger su input incompleti
 
     fetch('/api/libro-da-barcode?isbn=' + codice)
         .then(res => res.json())
         .then(libro => {
-            if (!libro) return alert('Libro non trovato.');
-
-            aggiungiRigaOrdine(libro); // questa funzione deve esistere
+            if (!libro) {
+                alert('Libro non trovato.');
+            } else {
+                aggiungiRigaOrdine(libro);
+            }
         });
 
-    e.target.value = '';
+    e.target.value = ''; // resetta per permettere una nuova scansione
 });
 </script>
 
@@ -387,7 +395,7 @@ function aggiungiRigaOrdine(libro) {
             <input type="text" name="isbn[]" class="form-control isbn-field" value="${libro.isbn}" readonly>
         </td>
         <td data-label="Titolo">
-            <input type="text" name="titolo[]" class="form-control titolo-autocomplete" value="${libro.titolo}" placeholder="Cerca titolo...">
+            <input type="text" name="titolo[]" class="form-control titolo-autocomplete" value="${libro.titolo}" placeholder="cerca/scansiona titolo...">
             <input type="hidden" name="libro_id[]" class="libro-id" value="${libro.id}">
             <input type="hidden" name="isbn[]" class="isbn-field" value="${libro.isbn}">
             <input type="hidden" name="prezzo[]" class="prezzo-field" value="${libro.prezzo}">
