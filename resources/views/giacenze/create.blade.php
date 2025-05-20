@@ -93,6 +93,9 @@
                         <i class="bi bi-save"></i>
                     </button>
                     <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
+                        <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
+                            Salvato!
+                        </div>
                 </td>
             </tr>
         @endforeach
@@ -228,6 +231,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     <i class="bi bi-save"></i>
                 </button>
                 <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
+                    <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
+                        Salvato!
+                    </div>
             </td>
         `;
         table.insertBefore(row, table.firstChild);
@@ -518,8 +524,8 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 
 <script>
 document.addEventListener('click', function (e) {
-    if (e.target.classList.contains('salvaSingola') || e.target.closest('.salvaSingola')) {
-        const btn = e.target.classList.contains('salvaSingola') ? e.target : e.target.closest('.salvaSingola');
+    const btn = e.target.closest('.salvaSingola');
+    if (btn) {
         const row = btn.closest('tr');
         const id = row.dataset.id || null;
 
