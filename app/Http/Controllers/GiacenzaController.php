@@ -65,9 +65,10 @@ class GiacenzaController extends Controller
         $savedIds = [];
     
         foreach ($data['giacenze'] as $giacenzaData) {
-            if (empty($giacenzaData['isbn']) || empty($giacenzaData['titolo']) || (int)$giacenzaData['quantita'] === 0) {
+            if (empty($giacenzaData['isbn']) || empty($giacenzaData['titolo'])) {
                 continue;
             }
+
     
             $libro = Libro::where('isbn', $giacenzaData['isbn'])->first();
             if (!$libro) {
