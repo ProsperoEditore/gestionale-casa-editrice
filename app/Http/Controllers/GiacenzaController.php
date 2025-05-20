@@ -134,6 +134,75 @@ class GiacenzaController extends Controller
     }
     
 
+public function storeSingola(Request $request, $magazzino_id)
+{
+    $data = $request->input('giacenza');
+
+    if (empty($data['isbn']) || empty($data['titolo'])) {
+        return response()->json(['success' => false, 'message' => 'Dati mancanti.']);
+    }
+
+    $categoria = Magazzino::with('anagrafica')->find($magazzino_id)?->anagrafica?->categoria;
+    $libro = Libro::where('isbn', $data['isbn'])->first();
+    if (!$libro) {
+        return response()->json(['success' => false, 'message' => 'Libro non trovato.']);
+    }
+
+    $giacenza = Giacenza::where('magazzino_id', $magazzino_id)
+                        ->where('isbn', $data['isbn'])
+                        ->first();
+
+    $isNuova = false;
+    if (!$giacenza) {
+        $giacenza = new Giacenza([
+            'magazzino_id' => $magazzino_id,
+            'isbn' => $data['isbn'],
+            'libro_id' => $libro->id,
+        ]);
+        $isNuova = true;
+    }
+
+    $modificata = false;
+
+    foreach (['titolo', 'quantita', 'prezzo', 'note'] as $campo) {
+        if ($giacenza->$campo != $data[$campo]) {
+            $giacenza->$campo = $data[$campo];
+            $modificata = true;
+        }
+    }
+
+    if ($categoria === 'magazzino editore') {
+        $costo = $data['costo_produzione'] ?? $data['costo_sconto'] ?? 0;
+        if ($giacenza->costo_produzione != $costo) {
+            $giacenza->costo_produzione = $costo;
+            $modificata = true;
+        }
+        if ($giacenza->sconto !== null) {
+            $giacenza->sconto = null;
+            $modificata = true;
+        }
+    } else {
+        $sconto = $data['sconto'] ?? $data['costo_sconto'] ?? 0;
+        if ($giacenza->sconto != $sconto) {
+            $giacenza->sconto = $sconto;
+            $modificata = true;
+        }
+        if ($giacenza->costo_produzione !== null) {
+            $giacenza->costo_produzione = null;
+            $modificata = true;
+        }
+    }
+
+    if ($modificata || $isNuova) {
+        $giacenza->data_ultimo_aggiornamento = now();
+        $giacenza->save();
+    }
+
+    return response()->json(['success' => true, 'saved_id' => $giacenza->id]);
+}
+
+
+
     public function importGiacenze(Request $request, $magazzino_id)
     {
         Excel::import(new GiacenzeImport($magazzino_id), $request->file('file'));
