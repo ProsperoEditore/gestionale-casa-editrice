@@ -84,7 +84,9 @@
                 </td>
                 <td><input type="text" class="form-control note" value="{{ $giacenza->note }}"></td>
                 <td class="d-flex gap-1 justify-content-center">
-                    <button class="btn btn-primary btn-sm saveRow" title="Salva"><i class="bi bi-check-circle"></i></button>
+                    <button type="button" class="btn btn-primary btn-sm saveRow" title="Salva">
+                        <i class="bi bi-check-circle pointer-events-none"></i>
+                    </button>
                     <button class="btn btn-danger btn-sm deleteRow" title="Elimina"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
@@ -166,7 +168,11 @@
 }
 </style>
 
-
+<style>
+.pointer-events-none {
+    pointer-events: none;
+}
+</style>
 
 
 
