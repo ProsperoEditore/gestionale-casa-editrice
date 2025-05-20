@@ -169,7 +169,9 @@ public function storeSingola(Request $request, $magazzino_id, $id = null)
         $giacenza->note = $data['note'] ?? null;
         $giacenza->data_ultimo_aggiornamento = now();
 
-        if ($giacenza->magazzino->anagrafica->categoria === 'magazzino editore') {
+        $giacenza->loadMissing('magazzino.anagrafica');
+
+        if ($giacenza->magazzino && $giacenza->magazzino->anagrafica && $giacenza->magazzino->anagrafica->categoria === 'magazzino editore') {
             $giacenza->costo_produzione = $data['costo_produzione'] ?? 0;
             $giacenza->sconto = null;
         } else {
