@@ -41,9 +41,10 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
 @endif
 
 
-@if(count(\$righeAmbigue) > 0)
-@include('ordini.partials.popup\_conflitti', \['righeAmbigue' => \$righeAmbigue])
+@if(count($righeAmbigue) > 0)
+    @include('ordini.partials.popup_conflitti', ['righeAmbigue' => $righeAmbigue])
 @endif
+
 
 ```
         <form action="{{ route('ordini.import.libri', $ordine->id) }}" method="POST" enctype="multipart/form-data">
