@@ -185,6 +185,7 @@
 
 <script>
     const routeSalvaSingola = @json(route('giacenze.store.singola', ['magazzino' => $magazzino->id]));
+    console.log("URL salvataggio singola:", routeSalvaSingola);
     const routeSalvaTutte = @json(route('giacenze.store', ['magazzino' => $magazzino->id]));
 </script>
 
