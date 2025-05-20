@@ -541,8 +541,13 @@ document.addEventListener('click', function (e) {
             )
         };
 
-        fetch(`/giacenze/singola/${id ?? ''}/{{ $magazzino->id }}`, {
-            method: "POST",
+        const url = id
+            ? `/giacenze/singola/${id}/{{ $magazzino->id }}`
+            : `/giacenze/singola/{{ $magazzino->id }}`;
+        const method = id ? "PUT" : "POST";
+
+        fetch(url, {
+            method: method,
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
@@ -562,8 +567,7 @@ document.addEventListener('click', function (e) {
                     alertBox.classList.remove('d-none');
                     setTimeout(() => alertBox.classList.add('d-none'), 2000);
                 }
-            }
-            else {
+            } else {
                 alert('Errore nel salvataggio: ' + (data.message || ''));
             }
         })
@@ -573,6 +577,7 @@ document.addEventListener('click', function (e) {
         });
     }
 });
+
 
 </script>
 

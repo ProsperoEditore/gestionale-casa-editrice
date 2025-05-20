@@ -89,7 +89,8 @@ Route::get('/magazzini/{magazzino}/giacenze/export', [GiacenzaController::class,
 Route::get('/giacenze/{giacenza}/edit', [GiacenzaController::class, 'edit'])->name('giacenze.edit');
 Route::put('/giacenze/{giacenza}', [GiacenzaController::class, 'update'])->name('giacenze.update');
 Route::delete('/giacenze/{id}', [GiacenzaController::class, 'destroy'])->name('giacenze.destroy');
-Route::post('/giacenze/singola/{id?}/{magazzino}', [GiacenzaController::class, 'storeSingola'])->name('giacenze.storeSingola');
+Route::post('/giacenze/singola/{magazzino}', [GiacenzaController::class, 'storeSingola'])->name('giacenze.storeSingola');
+Route::put('/giacenze/singola/{id}/{magazzino}', [GiacenzaController::class, 'storeSingola'])->name('giacenze.updateSingola');
 
 
 
