@@ -184,11 +184,16 @@
 
 
 <script>
+    const routeSalvaSingola = "{{ route('giacenze.store.singola', ['magazzino' => $magazzino->id]) }}";
+    const routeSalvaTutte = "{{ route('giacenze.store', ['magazzino' => $magazzino->id]) }}";
+</script>
+
+<script>
 document.addEventListener("DOMContentLoaded", function() {
     let libri = @json($libri);
     const categoria = "{{ $magazzino->anagrafica->categoria }}";
 
-    document.getElementById("giacenzeTableBody").addEventListener("click", function(event) {
+document.getElementById("giacenzeTableBody").addEventListener("click", function(event) {
     const button = event.target.closest(".saveRow");
     if (!button) return;
 
@@ -208,28 +213,24 @@ document.addEventListener("DOMContentLoaded", function() {
         )
     };
 
-fetch("{{ route('giacenze.store.singola', ['magazzino' => $magazzino->id]) }}", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-    },
-    body: JSON.stringify({ giacenza: data })
-})
-
+    fetch(routeSalvaSingola, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+        },
+        body: JSON.stringify({ giacenza: data })
+    })
     .then(response => response.json())
     .then(resp => {
         if (resp.success) {
-            const saved = resp.saved_ids.find(r => r.isbn === data.isbn);
-            if (saved) {
-                row.setAttribute("data-id", saved.id);
-                row.querySelector(".data-aggiornamento").innerText = new Date().toISOString().split('T')[0];
-                row.dataset.original = JSON.stringify(data);
-                row.style.backgroundColor = "#d4edda"; // verde chiaro
-                setTimeout(() => row.style.backgroundColor = "", 1000);
-            }
+            row.setAttribute("data-id", resp.saved_id);
+            row.querySelector(".data-aggiornamento").innerText = new Date().toISOString().split('T')[0];
+            row.dataset.original = JSON.stringify(data);
+            row.style.backgroundColor = "#d4edda";
+            setTimeout(() => row.style.backgroundColor = "", 1000);
         } else {
-            alert("Errore nel salvataggio: " + resp.message);
+            alert("Errore: " + resp.message);
         }
     })
     .catch(error => {
@@ -237,6 +238,7 @@ fetch("{{ route('giacenze.store.singola', ['magazzino' => $magazzino->id]) }}", 
         alert("Errore nella richiesta.");
     });
 });
+
 
     // 🔥 NUOVA FUNZIONE
     function coloraQuantitaInput(input) {
