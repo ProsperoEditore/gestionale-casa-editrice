@@ -208,14 +208,15 @@ document.addEventListener("DOMContentLoaded", function() {
         )
     };
 
-    fetch("{{ route('giacenze.store', ['magazzino' => $magazzino->id]) }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-        },
-        body: JSON.stringify({ giacenze: [data] })
-    })
+fetch("{{ route('giacenze.store.singola', ['magazzino' => $magazzino->id]) }}", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+    },
+    body: JSON.stringify({ giacenza: data })
+})
+
     .then(response => response.json())
     .then(resp => {
         if (resp.success) {
