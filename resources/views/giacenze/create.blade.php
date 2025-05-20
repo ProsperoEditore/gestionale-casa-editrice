@@ -466,6 +466,37 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 
             table.insertBefore(newRow, table.firstChild);
             newRow.querySelector('.quantita').focus();
+            $(newRow).find(".autocomplete-titolo").autocomplete({
+    minLength: 2,
+    source: function(request, response) {
+        const matches = libri.filter(libro =>
+            libro.titolo.toLowerCase().includes(request.term.toLowerCase())
+        );
+        response(matches.map(libro => ({
+            label: `${libro.titolo} [${libro.isbn}]`,
+            value: libro.titolo,
+            id: libro.id
+        })));
+    },
+    select: function(event, ui) {
+        const libroSelezionato = libri.find(libro =>
+            libro.titolo === ui.item.value && libro.id === ui.item.id
+        );
+        const parentRow = $(this).closest("tr");
+
+        if (libroSelezionato) {
+            parentRow.find(".isbn").val(libroSelezionato.isbn);
+            parentRow.find(".prezzo").val(libroSelezionato.prezzo);
+            parentRow.find(".marchio").val(libroSelezionato.marchio_editoriale ? libroSelezionato.marchio_editoriale.nome : "N/D");
+            if (categoria === "magazzino editore") {
+                parentRow.find(".costo_sconto").val(libroSelezionato.costo_produzione);
+            } else {
+                parentRow.find(".costo_sconto").val('');
+            }
+        }
+    }
+});
+
         });
 
     e.target.value = '';
