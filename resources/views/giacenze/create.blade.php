@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+
+<script>
+    const categoria = "{{ $magazzino->anagrafica->categoria }}";
+</script>
+
 <div class="container mt-5">
     <h2 class="text-center mb-4">Gestione Giacenze - {{ $magazzino->anagrafica->nome ?? 'Sconosciuto' }}</h2>
 
@@ -180,7 +185,6 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     let libri = @json($libri);
-    const categoria = "{{ $magazzino->anagrafica->categoria }}";
 
     // 🔥 NUOVA FUNZIONE
     function coloraQuantitaInput(input) {
@@ -505,8 +509,8 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 
 <script>
 document.addEventListener('click', function (e) {
-    if (e.target.closest('.salvaSingola')) {
-        const btn = e.target.closest('.salvaSingola');
+    if (e.target.classList.contains('salvaSingola') || e.target.closest('.salvaSingola')) {
+        const btn = e.target.classList.contains('salvaSingola') ? e.target : e.target.closest('.salvaSingola');
         const row = btn.closest('tr');
         const id = row.dataset.id || null;
 
@@ -522,7 +526,7 @@ document.addEventListener('click', function (e) {
             )
         };
 
-        fetch(`/giacenze/${id ? 'singola/' + id : 'singola-create'}/{{ $magazzino->id }}`, {
+        fetch(`/giacenze/singola/${id ?? ''}/{{ $magazzino->id }}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -534,9 +538,7 @@ document.addEventListener('click', function (e) {
         .then(data => {
             if (data.success) {
                 alert('Salvato con successo!');
-                // aggiorna data aggiornamento
                 row.querySelector('.data-aggiornamento').innerText = new Date().toISOString().split('T')[0];
-                // aggiorna data-id e data-original
                 if (data.id) row.dataset.id = data.id;
                 row.dataset.original = JSON.stringify(payload);
             } else {
@@ -549,6 +551,7 @@ document.addEventListener('click', function (e) {
         });
     }
 });
+
 </script>
 
 
