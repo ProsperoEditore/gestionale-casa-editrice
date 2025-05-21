@@ -78,7 +78,7 @@ public function collection(Collection $rows)
 
             $this->ordine->libri()->attach($libro->id, [
                 'quantita' => $quantita,
-                'prezzo' => $prezzo,
+                'prezzo_copertina' => $prezzo,
                 'sconto' => $sconto,
             ]);
         }
