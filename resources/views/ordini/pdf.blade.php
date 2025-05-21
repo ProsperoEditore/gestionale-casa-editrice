@@ -214,6 +214,18 @@
         @endif
     @endif
 
+    @php
+    $totale_quantita = 0;
+    $totale_lordo = 0;
+    $totale_netto = 0;
+
+    foreach($ordine->libri as $libro) {
+        $totale_quantita += $libro->pivot->quantita;
+        $totale_lordo += $libro->pivot->valore_vendita_lordo;
+        $totale_netto += $libro->pivot->netto_a_pagare;
+    }
+    @endphp
+
     <table>
         <thead>
             <tr>
@@ -254,6 +266,21 @@
                 <td>{{ $libro->pivot->info_spedizione }}</td>
                 </tr>
             @endforeach
+
+
+            <tr class="totale-row">
+                <td></td>
+                <td><strong>Totali</strong></td>
+                <td>{{ $totale_quantita }}</td>
+                <td></td>
+                <td>{{ number_format($totale_lordo, 2) }} €</td>
+                @if(!in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                    <td></td>
+                    <td>{{ number_format($totale_netto, 2) }} €</td>
+                @endif
+                <td></td>
+            </tr>
+
         </tbody>
     </table>
 
