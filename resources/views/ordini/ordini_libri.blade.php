@@ -7,7 +7,6 @@ controlla Ordini\_libri:
 <div class="container mt-5">
     <h3 class="text-center mb-4">Gestione ordine {{ $ordine->codice }}</h3>
 
-```
 @if($ordine->exists)
 <div class="alert alert-warning mt-3 text-center">
     ⚠️ Stai modificando un ordine esistente.<br>
@@ -22,7 +21,6 @@ controlla Ordini\_libri:
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Importa libri da Excel</h5>
-```
 
 @php
 $righeAmbigue = session()->pull('righe_ambigue_ordini', []);

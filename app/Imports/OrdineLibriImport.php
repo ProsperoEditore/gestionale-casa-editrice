@@ -69,8 +69,6 @@ class OrdineLibriImport implements ToCollection, WithHeadingRow
 
             if ($libro) {
                 $this->ordine->libri()->attach($libro->id, [
-                    'isbn' => $libro->isbn,
-                    'titolo' => $libro->titolo,
                     'quantita' => $quantita,
                     'prezzo_copertina' => $libro->prezzo_copertina,
                     'sconto' => $sconto,
