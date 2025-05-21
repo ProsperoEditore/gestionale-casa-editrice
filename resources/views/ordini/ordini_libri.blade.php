@@ -21,7 +21,6 @@ controlla Ordini\_libri:
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Importa libri da Excel</h5>
-
 @php
 $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
 @endphp

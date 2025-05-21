@@ -67,13 +67,22 @@ class OrdineLibriImport implements ToCollection, WithHeadingRow
                 }
             }
 
-            if ($libro) {
-                $this->ordine->libri()->attach($libro->id, [
-                    'quantita' => $quantita,
-                    'prezzo_copertina' => $libro->prezzo_copertina,
-                    'sconto' => $sconto,
-                ]);
+        if ($libro) {
+            $quantita = intval($quantita);
+            $prezzo = $libro->prezzo_copertina ?? 0.00;
+
+            if ($prezzo == 0.00) {
+                self::$errori[] = "Errore alla riga $rigaExcel: prezzo non impostato per ISBN '$isbn'.";
+                continue;
             }
+
+            $this->ordine->libri()->attach($libro->id, [
+                'quantita' => $quantita,
+                'prezzo_copertina' => $prezzo,
+                'sconto' => $sconto,
+            ]);
+        }
+
         }
 
         if (!empty($righeAmbigue)) {
