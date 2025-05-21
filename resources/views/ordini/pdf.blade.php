@@ -95,6 +95,7 @@
         font-family: 'Code128';
         font-size: 30px; /* Modifica la dimensione in base alle tue necessità */
         margin-right: 10px;
+        color: black
     }
 
     .barrato td {
@@ -104,13 +105,14 @@
 
     .verde td {
         color: green;
-        font-weight: bold;
+        font-weight: normal;
     }
 
     .rosso td {
         color: red;
-        font-weight: bold;
+        font-weight: normal;
     }
+
 
 
 </style>
