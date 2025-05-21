@@ -42,8 +42,6 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
     @include('ordini.partials.popup_conflitti', ['righeAmbigue' => $righeAmbigue])
 @endif
 
-
-```
         <form action="{{ route('ordini.import.libri', $ordine->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="file" name="file" accept=".xlsx" required class="form-control mb-2">
@@ -176,7 +174,6 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         </tbody>
     </table>
 </form>
-```
 
 </div>
 
