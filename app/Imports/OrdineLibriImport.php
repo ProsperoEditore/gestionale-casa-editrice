@@ -75,13 +75,17 @@ public function collection(Collection $rows)
 
             $prezzo = floatval($libro->prezzo);
 
+            $valoreLordo = $quantita * $prezzo;
+            $valoreScontato = $valoreLordo - ($valoreLordo * $sconto / 100);
 
             $this->ordine->libri()->attach($libro->id, [
                 'quantita' => $quantita,
                 'prezzo_copertina' => $prezzo,
                 'sconto' => $sconto,
-                'valore_vendita_lordo' => $quantita * $prezzo,
+                'valore_vendita_lordo' => $valoreLordo,
+                'netto_a_pagare' => $valoreScontato,
             ]);
+
         }
 
     if (!empty($righeAmbigue)) {
