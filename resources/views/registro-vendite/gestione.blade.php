@@ -104,6 +104,10 @@
 
     <div class="mt-4">
         <button type="button" id="addRow" class="btn btn-success mb-3">Aggiungi Riga</button>
+        <div class="mt-2 mb-3" style="max-width: 400px;">
+            <input type="text" id="barcode-scan-registro" class="form-control" placeholder="Scansiona codice a barre...">
+        </div>
+
 
         <form action="{{ route('registro-vendite.gestione', ['id' => $registroVendita->id]) }}" method="GET" class="d-flex flex-wrap gap-2 mb-3" style="max-width: 100%;">
             <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per titolo...">
@@ -401,5 +405,71 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
+
+<script>
+document.getElementById('barcode-scan-registro').addEventListener('input', function(e) {
+    const codice = e.target.value.trim();
+    if (codice.length < 10) return;
+
+    fetch('/api/libro-da-barcode?isbn=' + codice)
+        .then(res => res.json())
+        .then(libro => {
+            if (!libro) return alert('Libro non trovato.');
+
+            const today = new Date().toISOString().split('T')[0];
+            const righe = document.querySelectorAll('#registroVenditeBody tr');
+            let rigaStessaData = null;
+            let rigaDataDiversa = null;
+
+            righe.forEach(riga => {
+                const isbn = riga.querySelector('input[name="isbn[]"]')?.value;
+                const data = riga.querySelector('input[name="data[]"]')?.value;
+                if (isbn === libro.isbn) {
+                    if (data === today) rigaStessaData = riga;
+                    else rigaDataDiversa = riga;
+                }
+            });
+
+            if (rigaStessaData) {
+                rigaStessaData.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                rigaStessaData.querySelector('.quantita')?.focus();
+                rigaStessaData.style.backgroundColor = '#ffffcc';
+                setTimeout(() => rigaStessaData.style.backgroundColor = '', 2000);
+                return;
+            }
+
+            if (rigaDataDiversa) {
+                if (!confirm('Il libro esiste con una data diversa. Aggiungere nuova riga in data odierna?')) return;
+            }
+
+            // Crea nuova riga
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <input type="hidden" name="id[]" value="">
+                <td data-label="Data"><input type="date" name="data[]" value="${today}" class="form-control"></td>
+                <td data-label="Periodo"><input type="text" name="periodo[]" class="form-control" value="N/D"></td>
+                <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn" value="${libro.isbn}" readonly></td>
+                <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" value="${libro.titolo}" readonly></td>
+                <td data-label="Quantità"><input type="number" name="quantita[]" value="1" class="form-control quantita"></td>
+                <td data-label="Prezzo"><input type="number" name="prezzo[]" value="${libro.prezzo}" class="form-control prezzo" step="0.01" readonly></td>
+                <td data-label="Valore Vendita"><input type="number" name="valore_lordo[]" value="${parseFloat(libro.prezzo).toFixed(2)}" class="form-control valore-lordo" step="0.01" readonly></td>
+                <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+            `;
+
+            const body = document.getElementById("registroVenditeBody");
+            body.prepend(newRow);
+            newRow.querySelector('.quantita').focus();
+
+            newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
+                input.addEventListener("input", () => aggiornaValoreLordo(newRow));
+            });
+
+            aggiornaTotaleValoreVendita();
+        });
+
+    e.target.value = '';
+});
+</script>
+
 
 @endsection
