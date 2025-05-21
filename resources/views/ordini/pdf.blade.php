@@ -97,6 +97,22 @@
         margin-right: 10px;
     }
 
+    .barrato td {
+    text-decoration: line-through;
+    color: #888;
+    }
+
+    .verde td {
+        color: green;
+        font-weight: bold;
+    }
+
+    .rosso td {
+        color: red;
+        font-weight: bold;
+    }
+
+
 </style>
 
 
@@ -211,9 +227,14 @@
                 <th>Info</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach($ordine->libri as $libro)
-                <tr>
+            <tbody>
+                @foreach($ordine->libri as $libro)
+                    <tr class="
+                        @if($libro->pivot->info_spedizione === 'fuori catalogo') barrato
+                        @elseif(in_array($libro->pivot->info_spedizione, ['spedito da tipografia', 'consegna a mano', 'spedito da magazzino terzo'])) verde
+                        @elseif($libro->pivot->info_spedizione === 'momentaneamente non disponibile') rosso
+                        @endif
+                    ">
                 <td><span class="barcode">{{ $libro->isbn }}</span>
                 <br>
                 {{ $libro->isbn }}
