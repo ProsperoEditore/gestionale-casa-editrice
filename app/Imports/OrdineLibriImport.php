@@ -80,6 +80,7 @@ public function collection(Collection $rows)
                 'quantita' => $quantita,
                 'prezzo_copertina' => $prezzo,
                 'sconto' => $sconto,
+                'valore_vendita_lordo' => $quantita * $prezzo,
             ]);
         }
 
