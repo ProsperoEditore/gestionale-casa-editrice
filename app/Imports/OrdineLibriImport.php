@@ -68,12 +68,13 @@ public function collection(Collection $rows)
             }
         }
 
-        if ($libro) {
-            $prezzo = floatval($libro->prezzo_copertina);
-            if ($prezzo <= 0) {
+            if (!isset($libro->prezzo_copertina) || !is_numeric($libro->prezzo_copertina) || $libro->prezzo_copertina <= 0) {
                 self::$errori[] = "Errore alla riga $rigaExcel: prezzo non impostato per ISBN '{$libro->isbn}'.";
                 continue;
             }
+
+            $prezzo = floatval($libro->prezzo_copertina);
+
 
             $this->ordine->libri()->attach($libro->id, [
                 'quantita' => $quantita,
@@ -81,7 +82,6 @@ public function collection(Collection $rows)
                 'sconto' => $sconto,
             ]);
         }
-    }
 
     if (!empty($righeAmbigue)) {
         Session::put('righe_ambigue_ordini', $righeAmbigue);
