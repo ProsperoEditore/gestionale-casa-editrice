@@ -25,10 +25,10 @@ public function collection(Collection $rows)
     foreach ($rows as $index => $row) {
         $rigaExcel = $index + 2;
 
-        $isbn = trim((string) $row['isbn'] ?? '');
-        $titoloInput = trim((string) $row['titolo'] ?? '');
-        $quantita = intval($row['quantita'] ?? 0);
-        $sconto = floatval(str_replace(',', '.', $row['sconto'] ?? 0));
+        $isbn = isset($row['isbn']) ? trim((string) $row['isbn']) : '';
+        $titoloInput = isset($row['titolo']) ? trim((string) $row['titolo']) : '';
+        $quantita = isset($row['quantita']) ? intval($row['quantita']) : 0;
+        $sconto = isset($row['sconto']) ? floatval(str_replace(',', '.', $row['sconto'])) : 0.00;
 
         if (empty($quantita) || (empty($isbn) && empty($titoloInput))) {
             self::$errori[] = "Errore alla riga $rigaExcel: specificare almeno la quantità e un valore tra ISBN o titolo.";
