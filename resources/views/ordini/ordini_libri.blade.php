@@ -1,5 +1,3 @@
-controlla Ordini\_libri:
-
 @extends('layouts.app')
 
 @section('content')
