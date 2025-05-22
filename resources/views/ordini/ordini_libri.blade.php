@@ -365,10 +365,8 @@ $(function() {
 
         $("#ordiniBody").append(newRow);
     });
+    aggiornaTotaliOrdine();
 });
-
-aggiornaTotaliOrdine();
-
 </script>
 
 <script>
