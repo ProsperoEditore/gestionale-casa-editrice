@@ -284,13 +284,13 @@
         </tbody>
     </table>
 
-    {{-- Totale e metodi di pagamento solo per Acquisto --}}
-    @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+    @if($ordine->tipo_ordine === 'acquisto')
     <div style="margin: 20px 0; text-align: center;">
         <p style="font-size: 16px; font-weight: bold; margin: 10px 0;">
             Totale a pagare: {{ number_format($ordine->totale_netto_compilato, 2) }} €
         </p>
     </div>
+    @endif
 
     @if($ordine->pagato)
     <div style="margin: 10px 0; text-align: center;">
