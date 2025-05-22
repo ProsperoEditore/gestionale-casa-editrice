@@ -172,6 +172,20 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
             </tr>
             @endforeach
         </tbody>
+
+            <tfoot class="table-secondary">
+                <tr>
+                    <td></td>
+                    <td><strong>Totali</strong></td>
+                    <td><span id="totale_quantita">0</span></td>
+                    <td></td>
+                    <td><span id="totale_lordo">0.00</span> €</td>
+                    <td></td>
+                    <td><span id="totale_netto">0.00</span> €</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
     </table>
 </form>
 
@@ -285,6 +299,8 @@ $(function() {
         const sconto = parseFloat(row.find(".sconto-field").val()) || 0;
         const netto = valoreLordo - (valoreLordo * sconto / 100);
         row.find(".netto_a_pagare").val(netto.toFixed(2));
+
+        aggiornaTotaliOrdine();
     });
 
 
@@ -307,8 +323,6 @@ $(function() {
         const row = $(this).closest("tr");
         row.find(".stock-info").fadeOut();
     });
-
-
 
 
     $(document).on("click", ".removeRow", function() {
@@ -352,6 +366,9 @@ $(function() {
         $("#ordiniBody").append(newRow);
     });
 });
+
+aggiornaTotaliOrdine();
+
 </script>
 
 <script>
@@ -430,9 +447,31 @@ function aggiungiRigaOrdine(libro) {
 
     $('#ordiniBody').append(newRow);
     $('#ordiniBody tr:last-child input[name="quantita[]"]').focus();
+    aggiornaTotaliOrdine();
 
 }
-</script>
 
+function aggiornaTotaliOrdine() {
+    let totaleQuantita = 0;
+    let totaleLordo = 0;
+    let totaleNetto = 0;
+
+    $('#ordiniBody tr').each(function() {
+        const q = parseFloat($(this).find('.quantita-field').val()) || 0;
+        const l = parseFloat($(this).find('.valore_vendita_lordo').val()) || 0;
+        const n = parseFloat($(this).find('.netto_a_pagare').val()) || 0;
+
+        totaleQuantita += q;
+        totaleLordo += l;
+        totaleNetto += n;
+    });
+
+    $('#totale_quantita').text(totaleQuantita);
+    $('#totale_lordo').text(totaleLordo.toFixed(2));
+    $('#totale_netto').text(totaleNetto.toFixed(2));
+
+}
+
+</script>
 
 @endsection
