@@ -14,10 +14,10 @@ class Ordine extends Model
     use HasFactory;
 
     protected $table = 'ordines';
-    protected $guarded = ['data'];
 
     protected $fillable = [
         'codice',
+        'data',
         'tipo_ordine',
         'anagrafica_id',
         'canale',
