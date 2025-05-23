@@ -118,6 +118,8 @@ class OrdineController extends Controller
     
         $validatedData = $request->validate($rules);
 
+        $validatedData['data'] = $request->input('data');
+
         $validatedData['pagato'] = $request->input('pagato'); 
     
         // ✅ Se non è acquisto, metti un valore valido placeholder per evitare errori di constraint
