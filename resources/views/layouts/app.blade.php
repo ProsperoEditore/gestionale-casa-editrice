@@ -126,19 +126,14 @@
         <ul class="list-unstyled mt-3">
 
                     @auth         
-            @if (auth()->user()->access_anagrafiche)
-                <li class="mb-2">
-                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Anagrafiche</a>
-                </li>
-            @endif
             @if (auth()->user()->access_marchi)
                 <li class="mb-2">
                     <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Marchi editoriali</a>
                 </li>
             @endif
-            @if (auth()->user()->access_contratti)
+            @if (auth()->user()->access_anagrafiche)
                 <li class="mb-2">
-                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Contratti</a>
+                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Anagrafiche</a>
                 </li>
             @endif
             @if (auth()->user()->access_libri)
@@ -171,19 +166,24 @@
                     <a href="{{ route('scarichi.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Spedizioni</a>
                 </li>
             @endif
-            @if (auth()->user()->access_registro_tirature)
-                <li class="mb-2">
-                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro tirature</a>
-                </li>
-            @endif
             @if (auth()->user()->access_registro_vendite)
                 <li class="mb-2">
                     <a href="{{ route('registro-vendite.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro vendite</a>
                 </li>
             @endif
+            @if (auth()->user()->access_contratti)
+                <li class="mb-2">
+                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Contratti</a>
+                </li>
+            @endif
             @if (auth()->user()->access_report)
                 <li class="mb-2">
                     <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Report</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_registro_tirature)
+                <li class="mb-2">
+                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro tirature</a>
                 </li>
             @endif
             @if (auth()->user()->ruolo === 'admin')
@@ -221,15 +221,12 @@
             </a>
         </div>
         <div class="d-grid gap-2">
-            @auth         
-                @if (auth()->user()->access_anagrafiche)
-                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary">Anagrafiche</a>
-                @endif
+            @auth
                 @if (auth()->user()->access_marchi)
                     <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary">Marchi editoriali</a>
-                @endif
-                @if (auth()->user()->access_contratti)
-                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary">Contratti</a>
+                @endif         
+                @if (auth()->user()->access_anagrafiche)
+                    <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary">Anagrafiche</a>
                 @endif
                 @if (auth()->user()->access_libri)
                     <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary">Libri</a>
@@ -251,14 +248,17 @@
                 @if (auth()->user()->access_scarichi)
                     <a href="{{ route('scarichi.index') }}" class="btn btn-prospero-secondary">Spedizioni</a>
                 @endif
-                @if (auth()->user()->access_registro_tirature)
-                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary">Registro tirature</a>
-                @endif
                 @if (auth()->user()->access_registro_vendite)
                     <a href="{{ route('registro-vendite.index') }}" class="btn btn-prospero-secondary">Registro vendite</a>
                 @endif
+                @if (auth()->user()->access_contratti)
+                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary">Contratti</a>
+                @endif
                 @if (auth()->user()->access_report)
                     <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary">Report</a>
+                @endif
+                @if (auth()->user()->access_registro_tirature)
+                    <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary">Registro tirature</a>
                 @endif
                 @if (auth()->user()->ruolo === 'admin')
                     <a href="{{ route('utenti.index') }}" class="btn btn-prospero">Gestione Utenti</a>
