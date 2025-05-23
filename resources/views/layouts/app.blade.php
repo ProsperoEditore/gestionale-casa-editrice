@@ -131,14 +131,14 @@
                     <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Anagrafiche</a>
                 </li>
             @endif
-            @if (auth()->user()->access_contratti)
-                <li class="mb-2">
-                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Contratti</a>
-                </li>
-            @endif
             @if (auth()->user()->access_marchi)
                 <li class="mb-2">
                     <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Marchi editoriali</a>
+                </li>
+            @endif
+            @if (auth()->user()->access_contratti)
+                <li class="mb-2">
+                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Contratti</a>
                 </li>
             @endif
             @if (auth()->user()->access_libri)
@@ -225,11 +225,11 @@
                 @if (auth()->user()->access_anagrafiche)
                     <a href="{{ route('anagrafiche.index') }}" class="btn btn-prospero-secondary">Anagrafiche</a>
                 @endif
-                @if (auth()->user()->access_contratti)
-                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary">Contratti</a>
-                @endif
                 @if (auth()->user()->access_marchi)
                     <a href="{{ route('marchi-editoriali.index') }}" class="btn btn-prospero-secondary">Marchi editoriali</a>
+                @endif
+                @if (auth()->user()->access_contratti)
+                    <a href="{{ route('contratti.index') }}" class="btn btn-prospero-secondary">Contratti</a>
                 @endif
                 @if (auth()->user()->access_libri)
                     <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary">Libri</a>
