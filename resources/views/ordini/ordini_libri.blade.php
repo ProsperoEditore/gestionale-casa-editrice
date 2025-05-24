@@ -192,67 +192,70 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
 <style>
 @media (max-width: 767.98px) {
     table.table thead {
-        display: none;
+        display: none !important;
     }
 
     table.table tbody tr {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 0.75rem;
+        display: flex !important;
+        flex-direction: column !important;
+        margin-bottom: 1.2rem !important;
+        padding: 1rem !important;
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        border-radius: 0.75rem !important;
     }
 
     table.table tbody td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 0.5rem 0;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        padding: 0.4rem 0 !important;
         border: none !important;
     }
 
     table.table tbody td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        flex: 0 0 42%;
-        text-align: left;
-        color: #333;
+        content: attr(data-label) !important;
+        font-weight: bold !important;
+        color: #333 !important;
+        margin-bottom: 0.25rem;
     }
 
-    table.table tbody td input,
+    table.table tbody td input[type="text"],
+    table.table tbody td input[type="number"],
     table.table tbody td select,
     table.table tbody td button {
-        width: 56%;
-        max-width: 100%;
-        font-size: 0.95rem;
+        width: 100% !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 0.25rem !important;
     }
 
-    table.table tbody td .stock-info {
-        font-size: 0.75em;
-        margin-top: 0.3rem;
+    /* Nasconde gli input hidden nel campo Titolo */
+    table.table tbody td[data-label="Titolo"] input[type="hidden"] {
+        display: none !important;
     }
 
+    /* Azioni centrato */
     table.table tbody td[data-label="Azioni"]::before {
-        display: none;
+        display: none !important;
     }
 
     table.table tbody td[data-label="Azioni"] {
-        justify-content: center !important;
-        text-align: center;
+        align-items: center !important;
     }
 
     table.table tbody td[data-label="Azioni"] button {
-        margin: 0 auto;
+        margin-top: 0.5rem !important;
     }
 
+    /* Footer leggibile */
     table.table tfoot {
-        font-size: 0.9rem;
+        font-size: 0.9rem !important;
     }
 }
 </style>
+
+
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
