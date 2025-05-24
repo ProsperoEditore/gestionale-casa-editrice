@@ -109,6 +109,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
     </div>
 
     <h5 class="mt-5">Elenco libri</h5>
+    <div class="table-responsive">
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
@@ -185,77 +186,61 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
                 </tr>
             </tfoot>
     </table>
+    </div>
 </form>
 
 </div>
 
 <style>
-@media (max-width: 767.98px) {
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+
     table.table thead {
-        display: none !important;
+        display: none;
     }
 
     table.table tbody tr {
-        display: flex !important;
-        flex-direction: column !important;
-        margin-bottom: 1.2rem !important;
-        padding: 1rem !important;
-        background: #fff !important;
-        border: 1px solid #ccc !important;
-        border-radius: 0.75rem !important;
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 6px;
     }
 
-    table.table tbody td {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        width: 100% !important;
-        padding: 0.4rem 0 !important;
-        border: none !important;
+    table.table tbody tr td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 8px;
+        font-size: 14px;
+        border: none;
+        border-bottom: 1px solid #eee;
     }
 
-    table.table tbody td::before {
-        content: attr(data-label) !important;
-        font-weight: bold !important;
-        color: #333 !important;
-        margin-bottom: 0.25rem;
+    table.table tbody tr td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        flex-shrink: 0;
+        margin-right: 10px;
+        color: #555;
     }
 
-    table.table tbody td input[type="text"],
-    table.table tbody td input[type="number"],
-    table.table tbody td select,
-    table.table tbody td button {
-        width: 100% !important;
-        font-size: 0.95rem !important;
-        margin-bottom: 0.25rem !important;
+    .form-control,
+    .form-select {
+        font-size: 14px;
     }
 
-    /* Nasconde gli input hidden nel campo Titolo */
-    table.table tbody td[data-label="Titolo"] input[type="hidden"] {
-        display: none !important;
+    h3, h5 {
+        font-size: 18px;
     }
 
-    /* Azioni centrato */
-    table.table tbody td[data-label="Azioni"]::before {
-        display: none !important;
-    }
-
-    table.table tbody td[data-label="Azioni"] {
-        align-items: center !important;
-    }
-
-    table.table tbody td[data-label="Azioni"] button {
-        margin-top: 0.5rem !important;
-    }
-
-    /* Footer leggibile */
-    table.table tfoot {
-        font-size: 0.9rem !important;
+    .container {
+        padding: 10px;
     }
 }
 </style>
-
-
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
