@@ -129,6 +129,8 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
             <tr>
                 <td data-label="ISBN">
                     <input type="text" name="isbn[]" class="form-control isbn-field" value="{{ $libro->isbn }}" readonly>
+                </td>
+                <td hidden>
                     <input type="hidden" name="libro_id[]" class="libro-id" value="{{ $libro->id }}">
                 </td>
                 <td data-label="Titolo">
