@@ -186,6 +186,23 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
                 </tr>
             </tfoot>
     </table>
+
+        <!-- Totali visibili SOLO su mobile -->
+        <div class="d-md-none mt-3">
+            <div class="d-flex justify-content-between px-3 py-2 bg-light border-top border-bottom">
+                <strong>Totale Quantità:</strong>
+                <span id="totale_quantita_mobile">0</span>
+            </div>
+            <div class="d-flex justify-content-between px-3 py-2 bg-light border-bottom">
+                <strong>Totale Lordo:</strong>
+                <span id="totale_lordo_mobile">0.00 €</span>
+            </div>
+            <div class="d-flex justify-content-between px-3 py-2 bg-light border-bottom">
+                <strong>Totale Netto:</strong>
+                <span id="totale_netto_mobile">0.00 €</span>
+            </div>
+        </div>
+
     </div>
 </form>
 
@@ -197,7 +214,14 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         overflow-x: auto;
     }
 
-    table.table thead {
+    .card, .container, .table-responsive {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    table.table thead,
+    table.table tfoot {
         display: none;
     }
 
@@ -207,7 +231,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         border: 1px solid #ddd;
         padding: 10px;
         border-radius: 6px;
-        background-color: #fff; /* migliora contrasto */
+        background-color: #fff;
     }
 
     table.table tbody tr td {
@@ -218,7 +242,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         font-size: 14px;
         border: none;
         border-bottom: 1px solid #eee;
-        word-break: break-word; /* evita overflow dei campi lunghi */
+        word-break: break-word;
     }
 
     table.table tbody tr td::before {
@@ -227,12 +251,13 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         flex-shrink: 0;
         margin-right: 10px;
         color: #555;
-        min-width: 90px; /* migliora allineamento verticale */
+        min-width: 90px;
     }
 
-    .btn-sm {
-        padding: 4px 8px;
-        font-size: 13px;
+    table.table tbody tr td select.form-control,
+    table.table tbody tr td select.form-select {
+        min-width: 120px;
+        flex: 1;
     }
 
     .form-control,
@@ -463,6 +488,11 @@ function aggiornaTotaliOrdine() {
     $('#totale_quantita').text(totaleQuantita);
     $('#totale_lordo').text(totaleLordo.toFixed(2));
     $('#totale_netto').text(totaleNetto.toFixed(2));
+
+    document.getElementById('totale_quantita_mobile').innerText = totaleQuantita;
+    document.getElementById('totale_lordo_mobile').innerText = totaleLordo.toFixed(2) + " €";
+    document.getElementById('totale_netto_mobile').innerText = totaleNetto.toFixed(2) + " €";
+
 
 }
 
