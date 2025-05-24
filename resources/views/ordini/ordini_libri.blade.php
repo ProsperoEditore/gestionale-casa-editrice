@@ -129,12 +129,10 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
             <tr>
                 <td data-label="ISBN">
                     <input type="text" name="isbn[]" class="form-control isbn-field" value="{{ $libro->isbn }}" readonly>
+                    <input type="hidden" name="libro_id[]" class="libro-id" value="{{ $libro->id }}">
                 </td>
                 <td data-label="Titolo">
-                    <input type="text" name="titolo[]" class="form-control titolo-autocomplete" placeholder="cerca/scansiona titolo..." value="{{ $libro->titolo }}">
-                    <input type="hidden" name="libro_id[]" class="libro-id" value="{{ $libro->id }}">
-                    <input type="hidden" name="isbn[]" class="isbn-field" value="{{ $libro->isbn }}">
-                    <input type="hidden" name="prezzo[]" class="prezzo-field" value="{{ $libro->prezzo }}">
+                    <input type="text" name="titolo[]" class="form-control titolo-autocomplete" value="{{ $libro->titolo }}" placeholder="cerca/scansiona titolo...">
                 </td>
                 <td data-label="Quantità">
                     <input type="number" name="quantita[]" class="form-control quantita-field" value="{{ $libro->pivot->quantita }}">
@@ -207,6 +205,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         border: 1px solid #ddd;
         padding: 10px;
         border-radius: 6px;
+        background-color: #fff; /* migliora contrasto */
     }
 
     table.table tbody tr td {
@@ -217,6 +216,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         font-size: 14px;
         border: none;
         border-bottom: 1px solid #eee;
+        word-break: break-word; /* evita overflow dei campi lunghi */
     }
 
     table.table tbody tr td::before {
@@ -225,6 +225,12 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         flex-shrink: 0;
         margin-right: 10px;
         color: #555;
+        min-width: 90px; /* migliora allineamento verticale */
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 13px;
     }
 
     .form-control,
