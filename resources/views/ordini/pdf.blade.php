@@ -305,11 +305,11 @@
     @endif
 
     @if(!empty($ordine->costo_spedizione))
-        <p><strong>Costo Spedizione:</strong> {{ $ordine->costo_spedizione }}</p>
+        <p><strong>Costo spedizione:</strong> {{ $ordine->costo_spedizione }}</p>
     @endif
 
     @if(!empty($ordine->altre_specifiche_iva))
-        <p><strong>Altre Specifiche IVA:</strong> {{ $ordine->altre_specifiche_iva }}</p>
+        <p><strong>Altre specifiche:</strong> {{ $ordine->altre_specifiche_iva }}</p>
     @endif
 
     @if(!empty($ordine->tempi_pagamento))

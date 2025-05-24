@@ -81,11 +81,11 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         <input type="text" name="costo_spedizione" maxlength="255" class="form-control" value="{{ old('costo_spedizione', $ordine->costo_spedizione) }}">
     </div>
     <div class="mb-3">
-        <label for="altre_specifiche_iva" class="form-label"><strong>Altre specifiche IVA</strong></label>
-        <input type="text" name="altre_specifiche_iva" maxlength="255" class="form-control" value="{{ old('altre_specifiche_iva', $ordine->altre_specifiche_iva) }}">
+        <label for="altre_specifiche_iva" class="form-label"><strong>Altre specifiche</strong></label>
+        <input type="text" name="altre_specifiche_iva" maxlength="500" class="form-control" value="{{ old('altre_specifiche_iva', $ordine->altre_specifiche_iva) }}">
     </div>
     <div class="mb-3">
-        <label for="totale_netto_compilato" class="form-label"><strong>Totale Netto da Pagare (modificabile)</strong></label>
+        <label for="totale_netto_compilato" class="form-label"><strong>Totale netto da pagare (modificabile)</strong></label>
         <input type="number" step="0.01" name="totale_netto_compilato" id="totale_netto_compilato" class="form-control" value="{{ old('totale_netto_compilato', $ordine->totale_netto_compilato) }}">
     </div>
     <div class="mt-4 mb-3">
@@ -99,7 +99,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
     @endif
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <button type="button" class="btn btn-success" id="addRow">Aggiungi Riga</button>
+        <button type="button" class="btn btn-success" id="addRow">Aggiungi riga</button>
         <button type="submit" class="btn btn-primary">Salva</button>
     </div>
 
@@ -108,7 +108,7 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         <input type="text" id="barcode-scan-ordini" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
     </div>
 
-    <h5 class="mt-5">Elenco Libri</h5>
+    <h5 class="mt-5">Elenco libri</h5>
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
@@ -195,31 +195,29 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         display: none;
     }
 
-    table.table tbody td[data-label="Azioni"]::before {
-        display: none;
-    }
-
     table.table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-        padding: 0.8rem;
-        border-radius: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
         background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 0.75rem;
     }
 
     table.table tbody td {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.4rem 0;
-        border: none !important;
         width: 100%;
+        padding: 0.5rem 0;
+        border: none !important;
     }
 
     table.table tbody td::before {
         content: attr(data-label);
         font-weight: bold;
+        flex: 0 0 42%;
         text-align: left;
         color: #333;
     }
@@ -227,9 +225,9 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
     table.table tbody td input,
     table.table tbody td select,
     table.table tbody td button {
-        width: 60%;
+        width: 56%;
         max-width: 100%;
-        margin-left: 0.5rem;
+        font-size: 0.95rem;
     }
 
     table.table tbody td .stock-info {
@@ -237,21 +235,25 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         margin-top: 0.3rem;
     }
 
-    table.table tbody td:last-child {
-        justify-content: center;
+    table.table tbody td[data-label="Azioni"]::before {
+        display: none;
     }
 
     table.table tbody td[data-label="Azioni"] {
-    justify-content: center !important;
-    text-align: center;
-    }
-    
-    table.table tbody td[data-label="Azioni"] button {
-    margin: 0 auto;
+        justify-content: center !important;
+        text-align: center;
     }
 
+    table.table tbody td[data-label="Azioni"] button {
+        margin: 0 auto;
+    }
+
+    table.table tfoot {
+        font-size: 0.9rem;
+    }
 }
 </style>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
