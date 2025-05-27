@@ -32,7 +32,7 @@
                 <select name="canale_vendita" class="form-select form-select-sm me-1">
                   <option value="Vendite dirette" {{ $item->canale_vendita == 'Vendite dirette' ? 'selected' : '' }}>Vendite dirette</option>
                   <option value="Vendite indirette" {{ $item->canale_vendita == 'Vendite indirette' ? 'selected' : '' }}>Vendite indirette</option>
-                  <option value="Evento" {{ $item->canale_vendita == 'Evento' ? 'selected' : '' }}>Evento</option>
+                  <option value="Eventi" {{ $item->canale_vendita == 'Eventi' ? 'selected' : '' }}>Eventi</option>
                 </select>
                 <button type="submit" class="btn btn-sm btn-success" title="Salva"><i class="bi bi-check-lg"></i></button>
               </form>
@@ -70,7 +70,7 @@
             <select name="canale_vendita" class="form-select form-select-sm me-2">
               <option value="Vendite dirette" {{ $item->canale_vendita == 'Vendite dirette' ? 'selected' : '' }}>Vendite dirette</option>
               <option value="Vendite indirette" {{ $item->canale_vendita == 'Vendite indirette' ? 'selected' : '' }}>Vendite indirette</option>
-              <option value="Evento" {{ $item->canale_vendita == 'Evento' ? 'selected' : '' }}>Evento</option>
+              <option value="Eventi" {{ $item->canale_vendita == 'Eventi' ? 'selected' : '' }}>Eventi</option>
             </select>
             <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
           </form>
