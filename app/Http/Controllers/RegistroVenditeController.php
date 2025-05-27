@@ -307,9 +307,9 @@ class RegistroVenditeController extends Controller
     }
 
     public function updateCanale(Request $request, $id)
-{
+    {
     $request->validate([
-        'canale_vendita' => 'required|in:vendite dirette,vendite indirette,evento',
+        'canale_vendita' => 'required|in:Vendite dirette,Vendite indirette,Evento',
     ]);
 
     $registro = RegistroVendite::findOrFail($id);
@@ -317,7 +317,8 @@ class RegistroVenditeController extends Controller
     $registro->save();
 
     return redirect()->back()->with('success', 'Canale aggiornato con successo.');
-}
+    }
+
 
 
 }
