@@ -119,25 +119,36 @@
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
             <button type="submit" class="btn btn-primary mb-3">Salva</button>
 
-        <div class="mb-3 text-end">
-            <strong>Totale valore venduto (tutte le pagine):</strong>
-            <input type="text" id="totale-valore-vendita" class="form-control d-inline-block text-end fw-bold mb-2" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
-
-            <strong>Totale copie vendute (tutte le pagine):</strong>
-            <input type="text" id="totale-copie-vendute" class="form-control d-inline-block text-end fw-bold mb-2" style="max-width: 200px;" readonly>
-
-            <div class="d-flex flex-wrap align-items-center gap-2 mt-2 justify-content-end">
-                <label>Da <input type="date" id="filtro-da" class="form-control"></label>
-                <label>A <input type="date" id="filtro-a" class="form-control"></label>
-                <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
-            </div>
-
-            <strong class="d-block mt-2">Valore lordo (intervallo):</strong>
-            <input type="text" id="valore-lordo-parziale" class="form-control d-inline-block text-end fw-bold mb-2" style="max-width: 200px;" readonly>
-
-            <strong>Copie vendute (intervallo):</strong>
-            <input type="text" id="copie-vendute-parziale" class="form-control d-inline-block text-end fw-bold" style="max-width: 200px;" readonly>
+<div class="mb-3">
+    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2">
+        <div>
+            <strong>Totale valore venduto (tutte le pagine):</strong><br>
+            <input type="text" id="totale-valore-vendita" class="form-control text-end fw-bold" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
         </div>
+        <div>
+            <strong>Totale copie vendute (tutte le pagine):</strong><br>
+            <input type="text" id="totale-copie-vendute" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-end align-items-end gap-2 mt-3">
+        <label>Da <input type="date" id="filtro-da" class="form-control"></label>
+        <label>A <input type="date" id="filtro-a" class="form-control"></label>
+        <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mt-3">
+        <div>
+            <strong>Valore lordo (intervallo):</strong><br>
+            <input type="text" id="valore-lordo-parziale" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
+        </div>
+        <div>
+            <strong>Copie vendute (intervallo):</strong><br>
+            <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -335,6 +346,14 @@ function aggiornaTotaleValoreVendita() {
     aggiornaTotaleCopieVendute();
 }
 
+function aggiornaTotaleCopieVendute() {
+    let totaleCopie = 0;
+    document.querySelectorAll('.quantita').forEach(function (input) {
+        totaleCopie += parseInt(input.value) || 0;
+    });
+    document.getElementById('totale-copie-vendute').value = totaleCopie;
+}
+
     document.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
         input.addEventListener("input", () => {
             aggiornaTotaleValoreVendita();
@@ -482,15 +501,8 @@ document.getElementById('barcode-scan-registro').addEventListener('input', funct
 
             aggiornaTotaleValoreVendita();
     e.target.value = '';
-});
-
-function aggiornaTotaleCopieVendute() {
-    let totaleCopie = 0;
-    document.querySelectorAll('.quantita').forEach(function (input) {
-        totaleCopie += parseInt(input.value) || 0;
     });
-    document.getElementById('totale-copie-vendute').value = totaleCopie;
-}
+});
 
 function calcolaParziali() {
     const da = document.getElementById('filtro-da').value;
@@ -516,10 +528,8 @@ function calcolaParziali() {
         totaleValore += valore;
     });
     document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
-    document.getElementById('copie-vendute-parziale').value = totaleCopie;
+    document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
 }
-
-    document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
 </script>
 
 
