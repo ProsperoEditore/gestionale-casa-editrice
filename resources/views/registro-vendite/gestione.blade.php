@@ -121,7 +121,22 @@
 
         <div class="mb-3 text-end">
             <strong>Totale valore venduto (tutte le pagine):</strong>
-            <input type="text" id="totale-valore-vendita" class="form-control d-inline-block text-end fw-bold" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
+            <input type="text" id="totale-valore-vendita" class="form-control d-inline-block text-end fw-bold mb-2" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
+
+            <strong>Totale copie vendute (tutte le pagine):</strong>
+            <input type="text" id="totale-copie-vendute" class="form-control d-inline-block text-end fw-bold mb-2" style="max-width: 200px;" readonly>
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-2 justify-content-end">
+                <label>Da <input type="date" id="filtro-da" class="form-control"></label>
+                <label>A <input type="date" id="filtro-a" class="form-control"></label>
+                <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+            </div>
+
+            <strong class="d-block mt-2">Valore lordo (intervallo):</strong>
+            <input type="text" id="valore-lordo-parziale" class="form-control d-inline-block text-end fw-bold mb-2" style="max-width: 200px;" readonly>
+
+            <strong>Copie vendute (intervallo):</strong>
+            <input type="text" id="copie-vendute-parziale" class="form-control d-inline-block text-end fw-bold" style="max-width: 200px;" readonly>
         </div>
 
 
@@ -310,14 +325,15 @@ function aggiornaValoreLordo(row) {
         });
     }
 
-    function aggiornaTotaleValoreVendita() {
+function aggiornaTotaleValoreVendita() {
     let totale = 0;
     document.querySelectorAll('.valore-lordo').forEach(function (input) {
         let valore = parseFloat(input.value) || 0;
         totale += valore;
     });
     document.getElementById('totale-valore-vendita').value = totale.toFixed(2);
-    }
+    aggiornaTotaleCopieVendute();
+}
 
     document.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
         input.addEventListener("input", () => {
@@ -465,10 +481,45 @@ document.getElementById('barcode-scan-registro').addEventListener('input', funct
             });
 
             aggiornaTotaleValoreVendita();
-        });
-
     e.target.value = '';
 });
+
+function aggiornaTotaleCopieVendute() {
+    let totaleCopie = 0;
+    document.querySelectorAll('.quantita').forEach(function (input) {
+        totaleCopie += parseInt(input.value) || 0;
+    });
+    document.getElementById('totale-copie-vendute').value = totaleCopie;
+}
+
+function calcolaParziali() {
+    const da = document.getElementById('filtro-da').value;
+    const a = document.getElementById('filtro-a').value;
+
+    let totaleValore = 0;
+    let totaleCopie = 0;
+
+    document.querySelectorAll('#registroVenditeBody tr').forEach(row => {
+        const dataStr = row.querySelector('input[name="data[]"]').value;
+        const data = new Date(dataStr);
+        const dataDa = new Date(da);
+        const dataA = new Date(a);
+
+        if (!dataStr || isNaN(data.getTime())) return;
+        if (da && data < dataDa) return;
+        if (a && data > dataA) return;
+
+        const quantita = parseInt(row.querySelector('.quantita').value) || 0;
+        const valore = parseFloat(row.querySelector('.valore-lordo').value) || 0;
+
+        totaleCopie += quantita;
+        totaleValore += valore;
+    });
+    document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
+    document.getElementById('copie-vendute-parziale').value = totaleCopie;
+}
+
+    document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
 </script>
 
 
