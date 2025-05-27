@@ -165,6 +165,7 @@ Route::post('/registro-vendite/clear-errori-sessione', function () {
     session()->forget('import_errori_persistenti');
     return response()->json(['success' => true]);
 })->name('registro-vendite.clear-errori-sessione');
+Route::patch('/registro-vendite/{id}/update-canale', [App\Http\Controllers\RegistroVenditeController::class, 'updateCanale'])->name('registro-vendite.updateCanale');
 
 
 

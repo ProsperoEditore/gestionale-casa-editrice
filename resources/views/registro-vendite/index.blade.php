@@ -25,7 +25,19 @@
         @foreach($items as $item)
           <tr>
             <td>{{ $item->anagrafica->nome }}</td>
-            <td>{{ $item->canale_vendita }}</td>
+            <td>
+              <form action="{{ route('registro-vendite.updateCanale', $item->id) }}" method="POST" class="d-flex align-items-center">
+                @csrf
+                @method('PATCH')
+                <select name="canale_vendita" class="form-select form-select-sm me-1">
+                  <option value="Vendite dirette" {{ $item->canale_vendita == 'Vendite dirette' ? 'selected' : '' }}>Vendite dirette</option>
+                  <option value="Vendite indirette" {{ $item->canale_vendita == 'Vendite indirette' ? 'selected' : '' }}>Vendite indirette</option>
+                  <option value="Evento" {{ $item->canale_vendita == 'Evento' ? 'selected' : '' }}>Evento</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-success" title="Salva"><i class="bi bi-check-lg"></i></button>
+              </form>
+            </td>
+
             <td>
               <div class="d-flex justify-content-center gap-2 text-nowrap">
                 <form action="{{ route('registro-vendite.destroy', $item->id) }}" method="POST" class="d-inline">
@@ -52,7 +64,17 @@
       <div class="card mb-3">
         <div class="card-body">
           <h5 class="card-title">{{ $item->anagrafica->nome }}</h5>
-          <p class="mb-1"><strong>Canale:</strong> {{ $item->canale_vendita }}</p>
+          <form action="{{ route('registro-vendite.updateCanale', $item->id) }}" method="POST" class="d-flex align-items-center mb-2">
+            @csrf
+            @method('PATCH')
+            <select name="canale_vendita" class="form-select form-select-sm me-2">
+              <option value="Vendite dirette" {{ $item->canale_vendita == 'Vendite dirette' ? 'selected' : '' }}>Vendite dirette</option>
+              <option value="Vendite indirette" {{ $item->canale_vendita == 'Vendite indirette' ? 'selected' : '' }}>Vendite indirette</option>
+              <option value="Evento" {{ $item->canale_vendita == 'Evento' ? 'selected' : '' }}>Evento</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
+          </form>
+
           <div class="d-flex flex-wrap gap-3 mt-2">
             <form action="{{ route('registro-vendite.destroy', $item->id) }}" method="POST" class="d-inline">
               @csrf

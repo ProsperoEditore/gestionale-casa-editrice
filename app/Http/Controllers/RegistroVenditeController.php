@@ -306,5 +306,18 @@ class RegistroVenditeController extends Controller
     Paginator::useBootstrap();
     }
 
+    public function updateCanale(Request $request, $id)
+{
+    $request->validate([
+        'canale_vendita' => 'required|in:Vendite dirette,Vendite indirette,Evento',
+    ]);
+
+    $registro = RegistroVendite::findOrFail($id);
+    $registro->canale_vendita = $request->canale_vendita;
+    $registro->save();
+
+    return redirect()->back()->with('success', 'Canale aggiornato con successo.');
+}
+
 
 }
