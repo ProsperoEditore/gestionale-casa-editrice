@@ -119,37 +119,33 @@
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
             <button type="submit" class="btn btn-primary mb-3">Salva</button>
 
-<div class="mb-3">
-    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2">
-        <div>
-            <strong>Totale valore venduto (tutte le pagine):</strong><br>
-            <input type="text" id="totale-valore-vendita" class="form-control text-end fw-bold" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
-        </div>
-        <div>
-            <strong>Totale copie vendute (tutte le pagine):</strong><br>
-            <input type="text" id="totale-copie-vendute" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
-        </div>
-    </div>
+            <div class="mb-3">
+                <div class="mb-2 text-end">
+                    <strong>Totale valore venduto (tutte le pagine):</strong><br>
+                    <input type="text" id="totale-valore-vendita" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
+                </div>
 
-    <div class="d-flex flex-wrap justify-content-end align-items-end gap-2 mt-3">
-        <label>Da <input type="date" id="filtro-da" class="form-control"></label>
-        <label>A <input type="date" id="filtro-a" class="form-control"></label>
-        <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
-    </div>
+                <div class="mb-2 text-end">
+                    <strong>Totale copie vendute (tutte le pagine):</strong><br>
+                    <input type="text" id="totale-copie-vendute" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
+                </div>
 
-    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mt-3">
-        <div>
-            <strong>Valore lordo (intervallo):</strong><br>
-            <input type="text" id="valore-lordo-parziale" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
-        </div>
-        <div>
-            <strong>Copie vendute (intervallo):</strong><br>
-            <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
-        </div>
-    </div>
-</div>
+                <div class="mb-2 text-end d-flex justify-content-end align-items-end gap-2">
+                    <label>Da <input type="date" id="filtro-da" class="form-control"></label>
+                    <label>A <input type="date" id="filtro-a" class="form-control"></label>
+                    <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+                </div>
 
+                <div class="mb-2 text-end">
+                    <strong>Valore lordo (intervallo):</strong><br>
+                    <input type="text" id="valore-lordo-parziale" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
+                </div>
 
+                <div class="mb-2 text-end">
+                    <strong>Copie vendute (intervallo):</strong><br>
+                    <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
+                </div>
+            </div>
 
 
             <h5>Elenco Vendite</h5>
@@ -407,37 +403,9 @@ function aggiornaTotaleCopieVendute() {
             }
         });
     });
-});
-</script>
+    aggiornaTotaleValoreVendita();
+    document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const btnChiudi = document.getElementById("chiudiErroriImport");
-    const divErrori = document.getElementById("erroriImport");
-
-    if (btnChiudi && divErrori) {
-        btnChiudi.addEventListener("click", function () {
-            // Nascondi visivamente
-            divErrori.style.display = "none";
-
-            // Cancella dalla sessione via AJAX
-            fetch("{{ route('registro-vendite.clear-errori-sessione') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) {
-                    alert("Errore nella rimozione dell'elenco errori.");
-                }
-            })
-            .catch(() => alert("Errore nella richiesta."));
-
-        });
-    }
 });
 </script>
 
