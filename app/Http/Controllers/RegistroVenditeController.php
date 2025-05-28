@@ -330,8 +330,8 @@ public function stampa($id, Request $request)
     $dataDa = $request->input('data_da');
     $dataA = $request->input('data_a');
 
-    // carica solo i dettagli con filtro sulle date
-    $dettagli = RegistroVenditeDettaglio::where('registro_vendita_id', $id)
+    $dettagli = RegistroVenditeDettaglio::with('libro')
+        ->where('registro_vendite_id', $id)
         ->when($dataDa, fn($query) => $query->whereDate('data', '>=', $dataDa))
         ->when($dataA, fn($query) => $query->whereDate('data', '<=', $dataA))
         ->get();
@@ -350,6 +350,7 @@ public function stampa($id, Request $request)
         '.pdf'
     );
 }
+
 
 
 
