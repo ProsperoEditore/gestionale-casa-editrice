@@ -554,12 +554,19 @@ function calcolaParziali() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // ... tutto il tuo codice esistente ...
     document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
+
+    // 🔁 copia valori nei campi hidden al momento della stampa
+    const btnStampaForm = document.querySelector('form[action*="registro-vendite.stampa"]');
+    if (btnStampaForm) {
+        btnStampaForm.addEventListener('submit', function () {
+            document.getElementById('inputDataDa').value = document.getElementById('filtro-da').value;
+            document.getElementById('inputDataA').value = document.getElementById('filtro-a').value;
+        });
+    }
 });
-
-
 </script>
+
 
 
 
