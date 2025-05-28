@@ -331,7 +331,7 @@ public function stampa($id, Request $request)
     $dataA = $request->input('data_a');
 
     $dettagli = RegistroVenditeDettaglio::with('libro')
-        ->where('registro_vendite_id', $id)
+        ->where('registro_vendita_id', $id) 
         ->when($dataDa, fn($query) => $query->whereDate('data', '>=', $dataDa))
         ->when($dataA, fn($query) => $query->whereDate('data', '<=', $dataA))
         ->get();
