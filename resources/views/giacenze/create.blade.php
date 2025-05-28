@@ -553,7 +553,8 @@ document.addEventListener('click', function (e) {
 
         const url = id
             ? `/giacenze/singola/${id}/{{ $magazzino->id }}`
-            : `/giacenze/singola/{{ $magazzino->id }}`;
+            : `/giacenze/singola//{{ $magazzino->id }}`;
+
         const method = id ? "PUT" : "POST";
 
         fetch(url, {
