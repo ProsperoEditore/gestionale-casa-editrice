@@ -119,6 +119,19 @@
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
             <button type="submit" class="btn btn-primary mb-3">Salva</button>
 
+            <div class="text-end mb-3">
+                <div class="d-inline-block me-4">
+                    <label class="fw-bold">Totale valore venduto:</label><br>
+                    <input type="text" class="form-control text-end fw-bold" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
+                </div>
+
+                <div class="d-inline-block">
+                    <label class="fw-bold">Totale copie vendute:</label><br>
+                    <input type="text" class="form-control text-end fw-bold" style="max-width: 200px;" value="{{ $totaleQuantita }}" readonly>
+                </div>
+            </div>
+
+
         <div class="row justify-content-end align-items-end g-2 mt-4">
             <!-- Date + pulsanti -->
             <div class="col-auto">
@@ -513,20 +526,21 @@ function calcolaParziali() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const filtroDa = document.getElementById('filtro-da');
-    const filtroA = document.getElementById('filtro-a');
-    const inputDa = document.getElementById('inputDataDa');
-    const inputA = document.getElementById('inputDataA');
+    const inputDa = document.getElementById('filtro-da');
+    const inputA = document.getElementById('filtro-a');
+    const hiddenDa = document.getElementById('inputDataDa');
+    const hiddenA = document.getElementById('inputDataA');
 
     function aggiornaHidden() {
-        inputDa.value = filtroDa.value;
-        inputA.value = filtroA.value;
+        if (hiddenDa && inputDa) hiddenDa.value = inputDa.value;
+        if (hiddenA && inputA) hiddenA.value = inputA.value;
     }
 
-    filtroDa.addEventListener('change', aggiornaHidden);
-    filtroA.addEventListener('change', aggiornaHidden);
-    aggiornaHidden(); // aggiorna subito all’avvio
+    inputDa?.addEventListener('change', aggiornaHidden);
+    inputA?.addEventListener('change', aggiornaHidden);
+    aggiornaHidden(); // iniziale
 });
+
 </script>
 
 
