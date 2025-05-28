@@ -9,6 +9,12 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Gestione Registro Vendite - {{ $registroVendita->anagrafica->nome }}</h3>
 
+        <div class="text-center mb-3">
+            <p><strong>Totale valore venduto:</strong> {{ number_format($totaleValoreLordo, 2) }} €</p>
+            <p><strong>Totale copie vendute:</strong> {{ $totaleQuantita }}</p>
+        </div>
+
+
     <div class="mb-3">
         <a href="{{ route('registro-vendite.index') }}" class="btn btn-secondary">Torna ai Registri Vendite</a>
     </div>
@@ -131,8 +137,8 @@
                 </div>
 
                 <div class="mb-2 text-end d-flex justify-content-end align-items-end gap-2">
-                    <label>Da <input type="date" id="filtro-da" class="form-control"></label>
-                    <label>A <input type="date" id="filtro-a" class="form-control"></label>
+                    <input type="date" id="filtro-da" class="form-control" value="{{ request('data_da') }}">
+                    <input type="date" id="filtro-a" class="form-control" value="{{ request('data_a') }}">
                     <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
                 </div>
 
