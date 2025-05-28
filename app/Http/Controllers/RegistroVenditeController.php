@@ -343,7 +343,12 @@ public function stampa($id, Request $request)
             'da' => $dataDa,
             'a' => $dataA,
         ]
-    ])->download('registro_vendite_' . $registro->id . '.pdf');
+    ])->download('registro_vendite_' . $registro->id .
+    ($dataDa || $dataA ? '_dal_' . ($dataDa ? \Carbon\Carbon::parse($dataDa)->format('Ymd') : '') .
+    '_al_' . ($dataA ? \Carbon\Carbon::parse($dataA)->format('Ymd') : '') : '') .
+    '.pdf'
+);
+
 }
 
 

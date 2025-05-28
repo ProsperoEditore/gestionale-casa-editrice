@@ -559,10 +559,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // 🔁 copia valori nei campi hidden al momento della stampa
     const btnStampaForm = document.querySelector('form[action*="registro-vendite.stampa"]');
     if (btnStampaForm) {
-        btnStampaForm.addEventListener('submit', function () {
+        btnStampaForm.addEventListener('submit', function (e) {
+            e.preventDefault();
             document.getElementById('inputDataDa').value = document.getElementById('filtro-da').value;
             document.getElementById('inputDataA').value = document.getElementById('filtro-a').value;
+            this.submit();
         });
+
     }
 });
 </script>
