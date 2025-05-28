@@ -325,31 +325,32 @@ class RegistroVenditeController extends Controller
 
 public function stampa($id, Request $request)
 {
-    $registro = RegistroVendite::with(['anagrafica', 'dettagli.libro'])->findOrFail($id);
+    $registro = RegistroVendite::with('anagrafica')->findOrFail($id);
 
     $dataDa = $request->input('data_da');
     $dataA = $request->input('data_a');
 
-    $dettagliFiltrati = $registro->dettagli->filter(function ($d) use ($dataDa, $dataA) {
-        if ($dataDa && $d->data < $dataDa) return false;
-        if ($dataA && $d->data > $dataA) return false;
-        return true;
-    });
+    // carica solo i dettagli con filtro sulle date
+    $dettagli = RegistroVenditeDettaglio::where('registro_vendita_id', $id)
+        ->when($dataDa, fn($query) => $query->whereDate('data', '>=', $dataDa))
+        ->when($dataA, fn($query) => $query->whereDate('data', '<=', $dataA))
+        ->get();
 
     return Pdf::loadView('registro-vendite.pdf', [
         'registro' => $registro,
-        'dettagli' => $dettagliFiltrati,
+        'dettagli' => $dettagli,
         'filtro_date' => [
             'da' => $dataDa,
             'a' => $dataA,
         ]
-    ])->download('registro_vendite_' . $registro->id .
-    ($dataDa || $dataA ? '_dal_' . ($dataDa ? \Carbon\Carbon::parse($dataDa)->format('Ymd') : '') .
-    '_al_' . ($dataA ? \Carbon\Carbon::parse($dataA)->format('Ymd') : '') : '') .
-    '.pdf'
-);
-
+    ])->download(
+        'registro_vendite_' . $registro->id .
+        ($dataDa || $dataA ? '_dal_' . ($dataDa ? \Carbon\Carbon::parse($dataDa)->format('Ymd') : '') .
+        '_al_' . ($dataA ? \Carbon\Carbon::parse($dataA)->format('Ymd') : '') : '') .
+        '.pdf'
+    );
 }
+
 
 
 
