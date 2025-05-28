@@ -526,22 +526,30 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 <script>
 document.addEventListener('click', function (e) {
     const btn = e.target.closest('.salvaSingola');
-    if (btn) {
-        btn.disabled = true; // 🔒 disabilita il bottone
-        const row = btn.closest('tr');
-        const id = row.dataset.id || null;
+        if (btn) {
+            const row = btn.closest('tr');
+            const id = row.dataset.id || null;
 
-        const payload = {
-            isbn: row.querySelector(".isbn")?.value || '',
-            titolo: row.querySelector(".titolo")?.value || '',
-            quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
-            prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
-            note: row.querySelector(".note")?.value || '',
-            ...(categoria === "magazzino editore"
-                ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
-                : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
-            )
-        };
+            const isbn = row.querySelector(".isbn")?.value.trim();
+            const titolo = row.querySelector(".titolo")?.value.trim();
+
+            if (!isbn || !titolo) {
+                alert("Compila almeno il titolo e seleziona un libro valido.");
+                return;
+            }
+
+            const payload = {
+                isbn: isbn,
+                titolo: titolo,
+                quantita: parseInt(row.querySelector(".quantita")?.value) || 0,
+                prezzo: parseFloat(row.querySelector(".prezzo")?.value) || 0,
+                note: row.querySelector(".note")?.value || '',
+                ...(categoria === "magazzino editore"
+                    ? { costo_produzione: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+                    : { sconto: parseFloat(row.querySelector(".costo_sconto")?.value) || 0 }
+                )
+            };
+
 
         const url = id
             ? `/giacenze/singola/${id}/{{ $magazzino->id }}`
@@ -574,11 +582,13 @@ document.addEventListener('click', function (e) {
                 alert('Errore nel salvataggio: ' + (data.message || ''));
             }
         })
-        .catch(err => {
+        .catch(async err => {
             btn.disabled = false;
-            console.error(err);
-            alert('Errore nella richiesta');
+            const responseText = await err?.response?.text?.();
+            console.error("Errore nella richiesta:", err, responseText);
+            alert('Errore nella richiesta: ' + (responseText || err.message));
         });
+
     }
 });
 </script>
