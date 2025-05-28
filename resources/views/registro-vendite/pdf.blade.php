@@ -64,14 +64,17 @@
 
     {{-- INTESTAZIONE --}}
     <div class="intestazione">
-        <img src="{{ public_path('images/logo-prospero.png') }}" class="logo" alt="Logo">
         <h2>Registro Vendite</h2>
     </div>
 
     <div class="dati">
         <p><strong>Anagrafica:</strong> {{ $registro->anagrafica->nome }}</p>
-        <p><strong>Canale di Vendita:</strong> {{ $registro->canale_vendita }}</p>
-        <p><strong>Periodo:</strong> {{ $registro->created_at->format('d/m/Y') }}</p>
+        @if($dataDa || $dataA)
+    <p><strong>Periodo:</strong>
+        @if($dataDa) dal {{ $dataDa->format('d/m/Y') }} @endif
+        @if($dataA) al {{ $dataA->format('d/m/Y') }} @endif
+    </p>
+@endif
     </div>
 
     {{-- TABELLA DETTAGLI --}}
@@ -87,12 +90,12 @@
             </tr>
         </thead>
         <tbody>
-            @php
-                $totaleQuantita = 0;
-                $totaleValore = 0;
-            @endphp
-
-            @foreach($registro->dettagli as $riga)
+            @foreach($registro->dettagli->filter(function($riga) use ($dataDa, $dataA) {
+                $data = \Carbon\Carbon::parse($riga->data);
+                if ($dataDa && $data->lt($dataDa)) return false;
+                if ($dataA && $data->gt($dataA)) return false;
+                return true;
+            }) as $riga)
                 @php
                     $quantita = $riga->quantita ?? 0;
                     $valore = $quantita * ($riga->prezzo ?? 0);
@@ -109,6 +112,7 @@
                 </tr>
             @endforeach
 
+
             <tr class="totale">
                 <td colspan="3">Totale</td>
                 <td>{{ $totaleQuantita }}</td>
@@ -117,11 +121,6 @@
             </tr>
         </tbody>
     </table>
-
-    {{-- FOOTER --}}
-    <div class="footer">
-        Prospero Editore di Burgazzi Riccardo – Registro generato il {{ now()->format('d/m/Y') }}
-    </div>
 
 </body>
 </html>

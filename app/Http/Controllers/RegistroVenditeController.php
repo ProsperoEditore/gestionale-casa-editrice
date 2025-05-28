@@ -321,13 +321,29 @@ class RegistroVenditeController extends Controller
     }
 
 
-public function stampa($id)
+public function stampa($id, Request $request)
 {
     $registro = RegistroVendite::with(['anagrafica', 'dettagli.libro'])->findOrFail($id);
 
-    $pdf = Pdf::loadView('registro-vendite.pdf', compact('registro'));
-    return $pdf->download('registro_vendite_'.$registro->id.'.pdf');
+    $dataDa = $request->input('data_da');
+    $dataA = $request->input('data_a');
+
+    $dettagliFiltrati = $registro->dettagli->filter(function ($d) use ($dataDa, $dataA) {
+        if ($dataDa && $d->data < $dataDa) return false;
+        if ($dataA && $d->data > $dataA) return false;
+        return true;
+    });
+
+    return Pdf::loadView('registro-vendite.pdf', [
+        'registro' => $registro,
+        'dettagli' => $dettagliFiltrati,
+        'filtro_date' => [
+            'da' => $dataDa,
+            'a' => $dataA,
+        ]
+    ])->download('registro_vendite_' . $registro->id . '.pdf');
 }
+
 
 
 }

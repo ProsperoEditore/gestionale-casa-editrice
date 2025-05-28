@@ -145,6 +145,16 @@
                     <strong>Copie vendute (intervallo):</strong><br>
                     <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
                 </div>
+
+                <div class="col-md-2">
+                    <label>Stampa PDF</label>
+                    <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank">
+                        <input type="hidden" name="data_da" id="inputDataDa">
+                        <input type="hidden" name="data_a" id="inputDataA">
+                        <button type="submit" class="btn btn-danger w-100 mt-1">📄 Stampa PDF</button>
+                    </form>
+                </div>
+
             </div>
 
 
@@ -498,6 +508,24 @@ function calcolaParziali() {
     document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
     document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputDa = document.querySelector('input[name="data_da_filtro"]');
+    const inputA = document.querySelector('input[name="data_a_filtro"]');
+    const hiddenDa = document.getElementById('inputDataDa');
+    const hiddenA = document.getElementById('inputDataA');
+
+    function aggiornaHidden() {
+        if (hiddenDa && inputDa) hiddenDa.value = inputDa.value;
+        if (hiddenA && inputA) hiddenA.value = inputA.value;
+    }
+
+    inputDa?.addEventListener('change', aggiornaHidden);
+    inputA?.addEventListener('change', aggiornaHidden);
+    aggiornaHidden(); // iniziale
+});
 </script>
 
 

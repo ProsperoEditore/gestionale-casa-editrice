@@ -171,6 +171,7 @@ Route::get('/registro-vendite/{id}/stampa', [RegistroVenditeController::class, '
 
 
 
+
 // Autocomplete Libri
 Route::get('/libri/autocomplete', [LibroController::class, 'autocomplete'])->name('libri.autocomplete');
 
