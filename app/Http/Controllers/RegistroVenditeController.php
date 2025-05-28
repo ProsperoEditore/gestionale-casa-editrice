@@ -13,6 +13,8 @@ use App\Models\Libro;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Pagination\Paginator;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+
 
 class RegistroVenditeController extends Controller
 {
