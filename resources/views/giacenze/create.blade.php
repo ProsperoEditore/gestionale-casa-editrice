@@ -217,6 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("addRow").addEventListener("click", function() {
         let table = document.getElementById("giacenzeTableBody");
         let row = document.createElement("tr");
+        row.setAttribute("data-id", "");
         row.innerHTML = `
             <td><input type="text" class="form-control marchio" readonly></td>
             <td><input type="text" class="form-control isbn" readonly></td>
@@ -461,7 +462,7 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
             const table = document.getElementById("giacenzeTableBody");
             const categoria = "{{ $magazzino->anagrafica->categoria }}";
             const newRow = document.createElement("tr");
-
+            newRow.setAttribute("data-id", "");
             newRow.innerHTML = ` 
                 <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
                 <td><input type="text" class="form-control isbn" value="${libro.isbn}" readonly></td>
@@ -526,6 +527,7 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
 document.addEventListener('click', function (e) {
     const btn = e.target.closest('.salvaSingola');
     if (btn) {
+        btn.disabled = true; // 🔒 disabilita il bottone
         const row = btn.closest('tr');
         const id = row.dataset.id || null;
 
@@ -546,25 +548,23 @@ document.addEventListener('click', function (e) {
             : `/giacenze/singola/{{ $magazzino->id }}`;
         const method = id ? "PUT" : "POST";
 
-
-
-            fetch(url, {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ giacenza: payload })
-            })
-
+        fetch(url, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ giacenza: payload })
+        })
         .then(res => res.json())
         .then(data => {
+            btn.disabled = false; // 🔓 riabilita il bottone
+
             if (data.success) {
                 row.querySelector('.data-aggiornamento').innerText = new Date().toISOString().split('T')[0];
                 if (data.id) row.dataset.id = data.id;
                 row.dataset.original = JSON.stringify(payload);
 
-                // Mostra popup "Salvato!"
                 const alertBox = row.querySelector('.alert-salvata');
                 if (alertBox) {
                     alertBox.classList.remove('d-none');
@@ -575,13 +575,12 @@ document.addEventListener('click', function (e) {
             }
         })
         .catch(err => {
+            btn.disabled = false;
             console.error(err);
             alert('Errore nella richiesta');
         });
     }
 });
-
-
 </script>
 
 
