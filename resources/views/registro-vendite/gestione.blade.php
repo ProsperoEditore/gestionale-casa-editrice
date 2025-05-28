@@ -428,149 +428,62 @@ function aggiornaTotaleCopieVendute() {
         });
     });
     aggiornaTotaleValoreVendita();
-    document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
 
 });
 </script>
 
 <script>
-document.getElementById('barcode-scan-registro').addEventListener('input', function(e) {
-    const codice = e.target.value.trim();
-    if (codice.length < 10) return;
-
-    fetch('/api/libro-da-barcode?isbn=' + codice)
-        .then(res => res.json())
-        .then(libro => {
-            if (!libro) return alert('Libro non trovato.');
-
-            const today = new Date().toISOString().split('T')[0];
-            const righe = document.querySelectorAll('#registroVenditeBody tr');
-            let rigaStessaData = null;
-            let rigaDataDiversa = null;
-
-            righe.forEach(riga => {
-                const isbn = riga.querySelector('input[name="isbn[]"]')?.value;
-                const data = riga.querySelector('input[name="data[]"]')?.value;
-                if (isbn === libro.isbn) {
-                    if (data === today) rigaStessaData = riga;
-                    else rigaDataDiversa = riga;
-                }
-            });
-
-            if (rigaStessaData) {
-                rigaStessaData.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                rigaStessaData.querySelector('.quantita')?.focus();
-                rigaStessaData.style.backgroundColor = '#ffffcc';
-                setTimeout(() => rigaStessaData.style.backgroundColor = '', 2000);
-                return;
-            }
-
-            if (rigaDataDiversa) {
-                if (!confirm('Il libro esiste con una data diversa. Aggiungere nuova riga in data odierna?')) return;
-            }
-
-            // Crea nuova riga
-            const newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <input type="hidden" name="id[]" value="">
-                <td data-label="Data"><input type="date" name="data[]" value="${today}" class="form-control"></td>
-                <td data-label="Periodo"><input type="text" name="periodo[]" class="form-control" value="N/D"></td>
-                <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn" value="${libro.isbn}" readonly></td>
-                <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" value="${libro.titolo}" readonly></td>
-                <td data-label="Quantità"><input type="number" name="quantita[]" value="1" class="form-control quantita"></td>
-                <td data-label="Prezzo"><input type="number" name="prezzo[]" value="${libro.prezzo}" class="form-control prezzo" step="0.01" readonly></td>
-                <td data-label="Valore Vendita"><input type="number" name="valore_lordo[]" value="${parseFloat(libro.prezzo).toFixed(2)}" class="form-control valore-lordo" step="0.01" readonly></td>
-                <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
-            `;
-
-            const body = document.getElementById("registroVenditeBody");
-            body.prepend(newRow);
-            newRow.querySelector('.quantita').focus();
-
-            newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
-                input.addEventListener("input", () => aggiornaValoreLordo(newRow));
-            });
-
-            aggiornaTotaleValoreVendita();
-    e.target.value = '';
-    });
-});
-
-function calcolaParziali() {
-    const da = document.getElementById('filtro-da').value;
-    const a = document.getElementById('filtro-a').value;
-
-    let totaleValore = 0;
-    let totaleCopie = 0;
-
-    document.querySelectorAll('#registroVenditeBody tr').forEach(row => {
-        const dataStr = row.querySelector('input[name="data[]"]').value;
-        const data = new Date(dataStr);
-        const dataDa = new Date(da);
-        const dataA = new Date(a);
-
-        if (!dataStr || isNaN(data.getTime())) return;
-        if (da && data < dataDa) return;
-        if (a && data > dataA) return;
-
-        const quantita = parseInt(row.querySelector('.quantita').value) || 0;
-        const valore = parseFloat(row.querySelector('.valore-lordo').value) || 0;
-
-        totaleCopie += quantita;
-        totaleValore += valore;
-    });
-    document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
-    document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
-}
-</script>
-
-<script>
-function calcolaParziali() {
-    const da = document.getElementById('filtro-da').value;
-    const a = document.getElementById('filtro-a').value;
-
-    let totaleValore = 0;
-    let totaleCopie = 0;
-
-    document.querySelectorAll('#registroVenditeBody tr').forEach(row => {
-        const dataStr = row.querySelector('input[name="data[]"]').value;
-        const data = new Date(dataStr);
-        const dataDa = new Date(da);
-        const dataA = new Date(a);
-
-        if (!dataStr || isNaN(data.getTime())) return;
-        if (da && data < dataDa) return;
-        if (a && data > dataA) return;
-
-        const quantita = parseInt(row.querySelector('.quantita').value) || 0;
-        const valore = parseFloat(row.querySelector('.valore-lordo').value) || 0;
-
-        totaleCopie += quantita;
-        totaleValore += valore;
-    });
-
-    document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
-    document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
-}
-
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
 
-    // 🔁 copia valori nei campi hidden al momento della stampa
-    const btnStampaForm = document.querySelector('form[action*="registro-vendite.stampa"]');
-    if (btnStampaForm) {
-        btnStampaForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            document.getElementById('inputDataDa').value = document.getElementById('filtro-da').value;
-            document.getElementById('inputDataA').value = document.getElementById('filtro-a').value;
-            this.submit();
+    function calcolaParziali() {
+        const da = document.getElementById('filtro-da').value;
+        const a = document.getElementById('filtro-a').value;
+
+        let totaleValore = 0;
+        let totaleCopie = 0;
+
+        document.querySelectorAll('#registroVenditeBody tr').forEach(row => {
+            const dataStr = row.querySelector('input[name="data[]"]').value;
+            const data = new Date(dataStr);
+            const dataDa = new Date(da);
+            const dataA = new Date(a);
+
+            if (!dataStr || isNaN(data.getTime())) return;
+            if (da && data < dataDa) return;
+            if (a && data > dataA) return;
+
+            const quantita = parseInt(row.querySelector('.quantita')?.value) || 0;
+            const valore = parseFloat(row.querySelector('.valore-lordo')?.value) || 0;
+
+            totaleCopie += quantita;
+            totaleValore += valore;
         });
 
+        document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
+        document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
     }
+
+    // Calcolo parziali
+    document.getElementById('calcola-parziali')?.addEventListener('click', calcolaParziali);
+
+    // Gestione stampa con intervallo di date
+    const stampaForm = document.querySelector('form[action*="registro-vendite.stampa"]');
+    if (stampaForm) {
+        stampaForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const da = document.getElementById('filtro-da')?.value;
+            const a = document.getElementById('filtro-a')?.value;
+
+            document.getElementById('inputDataDa').value = da;
+            document.getElementById('inputDataA').value = a;
+
+            this.submit();
+        });
+    }
+
 });
 </script>
-
-
 
 
 @endsection
