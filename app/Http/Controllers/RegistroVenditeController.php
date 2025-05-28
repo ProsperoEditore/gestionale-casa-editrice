@@ -319,6 +319,15 @@ class RegistroVenditeController extends Controller
     return redirect()->back()->with('success', 'Canale aggiornato con successo.');
     }
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
+public function stampa($id)
+{
+    $registro = RegistroVendite::with(['anagrafica', 'dettagli.libro'])->findOrFail($id);
+
+    $pdf = Pdf::loadView('registro-vendite.pdf', compact('registro'));
+    return $pdf->download('registro_vendite_'.$registro->id.'.pdf');
+}
 
 
 }

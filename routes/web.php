@@ -166,6 +166,7 @@ Route::post('/registro-vendite/clear-errori-sessione', function () {
     return response()->json(['success' => true]);
 })->name('registro-vendite.clear-errori-sessione');
 Route::patch('/registro-vendite/{id}/update-canale', [App\Http\Controllers\RegistroVenditeController::class, 'updateCanale'])->name('registro-vendite.updateCanale');
+Route::get('/registro-vendite/{id}/stampa', [RegistroVenditeController::class, 'stampa'])->name('registro-vendite.stampa');
 
 
 

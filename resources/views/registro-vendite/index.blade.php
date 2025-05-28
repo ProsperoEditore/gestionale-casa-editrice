@@ -47,9 +47,12 @@
                     <i class="bi bi-trash fs-5"></i>
                   </button>
                 </form>
-                <a class="text-info" href="{{ route('registro-vendite.gestione', $item->id) }}" title="Gestione Registro">
-                  <i class="bi bi-journal-text fs-5"></i>
-                </a>
+                  <a class="text-info" href="{{ route('registro-vendite.gestione', $item->id) }}" title="Gestione Registro">
+                      <i class="bi bi-journal-text fs-5"></i>
+                  </a>
+                  <a class="text-dark" href="{{ route('registro-vendite.stampa', $item->id) }}" title="Stampa PDF">
+                      <i class="bi bi-printer fs-5"></i>
+                  </a>
               </div>
             </td>
           </tr>
@@ -85,6 +88,9 @@
             </form>
             <a class="btn btn-sm btn-info" href="{{ route('registro-vendite.gestione', $item->id) }}" title="Gestione Registro">
               <i class="bi bi-journal-text"></i>
+            </a>
+            <a class="btn btn-sm btn-dark" href="{{ route('registro-vendite.stampa', $item->id) }}" title="Stampa PDF">
+                <i class="bi bi-printer"></i>
             </a>
           </div>
         </div>
