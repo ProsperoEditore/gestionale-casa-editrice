@@ -165,21 +165,16 @@
         </form> {{-- chiusura registroVenditeForm --}}
 
         <div class="text-end mt-3">
-            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank" id="form-stampa">
+            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank">
                 <div class="row justify-content-end align-items-end g-2 mt-4">
-                    <!-- Date + pulsanti -->
                     <div class="col-auto">
-                        <label for="filtro-da" class="form-label mb-1">Da</label>
-                        <input type="date" id="filtro-da" name="data_da" class="form-control" value="{{ request('data_da') }}">
+                        <label for="data_da" class="form-label mb-1">Da</label>
+                        <input type="date" class="form-control" name="data_da" id="data_da" value="{{ request('data_da') }}">
                     </div>
 
                     <div class="col-auto">
-                        <label for="filtro-a" class="form-label mb-1">A</label>
-                        <input type="date" id="filtro-a" name="data_a" class="form-control" value="{{ request('data_a') }}">
-                    </div>
-
-                    <div class="col-auto d-flex align-items-end">
-                        <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+                        <label for="data_a" class="form-label mb-1">A</label>
+                        <input type="date" class="form-control" name="data_a" id="data_a" value="{{ request('data_a') }}">
                     </div>
 
                     <div class="col-auto d-flex align-items-end">
@@ -187,6 +182,7 @@
                     </div>
                 </div>
             </form>
+
         </div>
 
             <h5>Elenco Vendite</h5>
@@ -482,6 +478,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Calcolo parziali
     document.getElementById('calcola-parziali')?.addEventListener('click', calcolaParziali);
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const formStampa = document.getElementById('form-stampa');
+    if (formStampa) {
+        formStampa.addEventListener('submit', function (e) {
+            const dataDa = document.getElementById('filtro-da')?.value;
+            const dataA = document.getElementById('filtro-a')?.value;
+
+            document.getElementById('dataDaHidden').value = dataDa;
+            document.getElementById('dataAHidden').value = dataA;
+        });
+    }
 });
 </script>
 
