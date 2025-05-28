@@ -69,13 +69,16 @@
 
     <div class="dati">
         <p><strong>Anagrafica:</strong> {{ $registro->anagrafica->nome }}</p>
-            @if($filtro_date['da'] || $filtro_date['a'])
+        @php
+            $dataDa = $filtro_date['da'] ? \Carbon\Carbon::parse($filtro_date['da']) : null;
+            $dataA = $filtro_date['a'] ? \Carbon\Carbon::parse($filtro_date['a']) : null;
+        @endphp
+        @if($dataDa || $dataA)
             <p><strong>Periodo:</strong>
-                @if($filtro_date['da']) dal {{ \Carbon\Carbon::parse($filtro_date['da'])->format('d/m/Y') }} @endif
-                @if($filtro_date['a']) al {{ \Carbon\Carbon::parse($filtro_date['a'])->format('d/m/Y') }} @endif
+                @if($dataDa) dal {{ $dataDa->format('d/m/Y') }} @endif
+                @if($dataA) al {{ $dataA->format('d/m/Y') }} @endif
             </p>
-            @endif
-
+        @endif
     </div>
 
     {{-- TABELLA DETTAGLI --}}
@@ -91,12 +94,12 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($registro->dettagli->filter(function($riga) use ($dataDa, $dataA) {
-                $data = \Carbon\Carbon::parse($riga->data);
-                if ($dataDa && $data->lt($dataDa)) return false;
-                if ($dataA && $data->gt($dataA)) return false;
-                return true;
-            }) as $riga)
+            @php
+                $totaleQuantita = 0;
+                $totaleValore = 0;
+            @endphp
+
+            @foreach($dettagli as $riga)
                 @php
                     $quantita = $riga->quantita ?? 0;
                     $valore = $quantita * ($riga->prezzo ?? 0);
@@ -112,7 +115,6 @@
                     <td>{{ number_format($valore, 2, ',', '.') }} €</td>
                 </tr>
             @endforeach
-
 
             <tr class="totale">
                 <td colspan="3">Totale</td>
