@@ -69,12 +69,13 @@
 
     <div class="dati">
         <p><strong>Anagrafica:</strong> {{ $registro->anagrafica->nome }}</p>
-        @if($dataDa || $dataA)
-    <p><strong>Periodo:</strong>
-        @if($dataDa) dal {{ $dataDa->format('d/m/Y') }} @endif
-        @if($dataA) al {{ $dataA->format('d/m/Y') }} @endif
-    </p>
-@endif
+            @if($filtro_date['da'] || $filtro_date['a'])
+            <p><strong>Periodo:</strong>
+                @if($filtro_date['da']) dal {{ \Carbon\Carbon::parse($filtro_date['da'])->format('d/m/Y') }} @endif
+                @if($filtro_date['a']) al {{ \Carbon\Carbon::parse($filtro_date['a'])->format('d/m/Y') }} @endif
+            </p>
+            @endif
+
     </div>
 
     {{-- TABELLA DETTAGLI --}}
