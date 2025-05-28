@@ -9,12 +9,6 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Gestione Registro Vendite - {{ $registroVendita->anagrafica->nome }}</h3>
 
-        <div class="text-center mb-3">
-            <p><strong>Totale valore venduto:</strong> {{ number_format($totaleValoreLordo, 2) }} €</p>
-            <p><strong>Totale copie vendute:</strong> {{ $totaleQuantita }}</p>
-        </div>
-
-
     <div class="mb-3">
         <a href="{{ route('registro-vendite.index') }}" class="btn btn-secondary">Torna ai Registri Vendite</a>
     </div>
@@ -127,20 +121,24 @@
 
             <div class="mb-3">
                 <div class="mb-2 text-end">
-                    <strong>Totale valore venduto (tutte le pagine):</strong><br>
-                    <input type="text" id="totale-valore-vendita" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
+                    <strong>Totale valore venduto:</strong><br>
+                    <input type="text" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
                 </div>
-
                 <div class="mb-2 text-end">
-                    <strong>Totale copie vendute (tutte le pagine):</strong><br>
-                    <input type="text" id="totale-copie-vendute" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
+                    <strong>Totale copie vendute:</strong><br>
+                    <input type="text" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" value="{{ $totaleQuantita }}" readonly>
                 </div>
 
-                <div class="mb-2 text-end d-flex justify-content-end align-items-end gap-2">
-                    <input type="date" id="filtro-da" class="form-control" value="{{ request('data_da') }}">
-                    <input type="date" id="filtro-a" class="form-control" value="{{ request('data_a') }}">
-                    <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+                <div class="mb-3 text-end" style="max-width: 250px; float: right;">
+                    <label for="filtro-da" class="form-label">Da</label>
+                    <input type="date" id="filtro-da" class="form-control mb-2" value="{{ request('data_da') }}">
+
+                    <label for="filtro-a" class="form-label">A</label>
+                    <input type="date" id="filtro-a" class="form-control mb-2" value="{{ request('data_a') }}">
+
+                    <button type="button" class="btn btn-secondary w-100" id="calcola-parziali">Calcola parziali</button>
                 </div>
+
 
                 <div class="mb-2 text-end">
                     <strong>Valore lordo (intervallo):</strong><br>
@@ -523,21 +521,22 @@ function calcolaParziali() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const inputDa = document.querySelector('input[name="data_da_filtro"]');
-    const inputA = document.querySelector('input[name="data_a_filtro"]');
-    const hiddenDa = document.getElementById('inputDataDa');
-    const hiddenA = document.getElementById('inputDataA');
+    const filtroDa = document.getElementById('filtro-da');
+    const filtroA = document.getElementById('filtro-a');
+    const inputDa = document.getElementById('inputDataDa');
+    const inputA = document.getElementById('inputDataA');
 
     function aggiornaHidden() {
-        if (hiddenDa && inputDa) hiddenDa.value = inputDa.value;
-        if (hiddenA && inputA) hiddenA.value = inputA.value;
+        inputDa.value = filtroDa.value;
+        inputA.value = filtroA.value;
     }
 
-    inputDa?.addEventListener('change', aggiornaHidden);
-    inputA?.addEventListener('change', aggiornaHidden);
-    aggiornaHidden(); // iniziale
+    filtroDa.addEventListener('change', aggiornaHidden);
+    filtroA.addEventListener('change', aggiornaHidden);
+    aggiornaHidden(); // aggiorna subito all’avvio
 });
 </script>
+
 
 
 @endsection
