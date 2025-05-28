@@ -119,53 +119,45 @@
             <input type="hidden" name="registro_vendita_id" value="{{ $registroVendita->id }}">
             <button type="submit" class="btn btn-primary mb-3">Salva</button>
 
-            <div class="mb-3">
-                <div class="mb-2 text-end">
-                    <strong>Totale valore venduto:</strong><br>
-                    <input type="text" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" value="{{ number_format($totaleValoreLordo, 2, ',', '.') }}" readonly>
-                </div>
-                <div class="mb-2 text-end">
-                    <strong>Totale copie vendute:</strong><br>
-                    <input type="text" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" value="{{ $totaleQuantita }}" readonly>
-                </div>
-
-                <div class="mb-3 text-end" style="max-width: 250px; float: right;">
-                    <label for="filtro-da" class="form-label">Da</label>
-                    <input type="date" id="filtro-da" class="form-control mb-2" value="{{ request('data_da') }}">
-
-                    <label for="filtro-a" class="form-label">A</label>
-                    <input type="date" id="filtro-a" class="form-control mb-2" value="{{ request('data_a') }}">
-
-                    <button type="button" class="btn btn-secondary w-100" id="calcola-parziali">Calcola parziali</button>
-                </div>
-
-
-                <div class="mb-2 text-end">
-                    <strong>Valore lordo (intervallo):</strong><br>
-                    <input type="text" id="valore-lordo-parziale" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
-                </div>
-
-                <div class="mb-2 text-end">
-                    <strong>Copie vendute (intervallo):</strong><br>
-                    <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
-                </div>
-
-                </div> {{-- chiude la div con tutti i campi calcolo --}}
-                </form> {{-- chiusura del form principale --}}
-
-                <div class="text-end mt-3">
-                    <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank" class="d-inline-block">
-                        <input type="hidden" name="data_da" id="inputDataDa">
-                        <input type="hidden" name="data_a" id="inputDataA">
-                        <button type="submit" class="btn btn-danger">
-                            📄 Stampa PDF
-                        </button>
-                    </form>
-                </div>
-
-
+        <div class="row justify-content-end align-items-end g-2 mt-4">
+            <!-- Date + pulsanti -->
+            <div class="col-auto">
+                <label for="filtro-da" class="form-label mb-1">Da</label>
+                <input type="date" id="filtro-da" class="form-control" value="{{ request('data_da') }}">
             </div>
 
+            <div class="col-auto">
+                <label for="filtro-a" class="form-label mb-1">A</label>
+                <input type="date" id="filtro-a" class="form-control" value="{{ request('data_a') }}">
+            </div>
+
+            <div class="col-auto d-flex align-items-end">
+                <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+            </div>
+
+            <!-- Totali parziali -->
+            <div class="col-12 text-end mt-3">
+                <div class="d-inline-block me-4">
+                    <label class="fw-bold">Valore lordo (intervallo):</label><br>
+                    <input type="text" id="valore-lordo-parziale" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
+                </div>
+
+                <div class="d-inline-block">
+                    <label class="fw-bold">Copie vendute (intervallo):</label><br>
+                    <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold" style="max-width: 200px;" readonly>
+                </div>
+            </div>
+        </div>
+
+        </form> {{-- chiusura registroVenditeForm --}}
+
+        <div class="text-end mt-3">
+            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank">
+                <input type="hidden" name="data_da" id="inputDataDa">
+                <input type="hidden" name="data_a" id="inputDataA">
+                <button type="submit" class="btn btn-danger">📄 Stampa PDF</button>
+            </form>
+        </div>
 
             <h5>Elenco Vendite</h5>
 
