@@ -352,7 +352,4 @@ public function stampa($id, Request $request)
 }
 
 
-
-
-
 }
