@@ -525,21 +525,39 @@ function calcolaParziali() {
 </script>
 
 <script>
+function calcolaParziali() {
+    const da = document.getElementById('filtro-da').value;
+    const a = document.getElementById('filtro-a').value;
+
+    let totaleValore = 0;
+    let totaleCopie = 0;
+
+    document.querySelectorAll('#registroVenditeBody tr').forEach(row => {
+        const dataStr = row.querySelector('input[name="data[]"]').value;
+        const data = new Date(dataStr);
+        const dataDa = new Date(da);
+        const dataA = new Date(a);
+
+        if (!dataStr || isNaN(data.getTime())) return;
+        if (da && data < dataDa) return;
+        if (a && data > dataA) return;
+
+        const quantita = parseInt(row.querySelector('.quantita').value) || 0;
+        const valore = parseFloat(row.querySelector('.valore-lordo').value) || 0;
+
+        totaleCopie += quantita;
+        totaleValore += valore;
+    });
+
+    document.getElementById('valore-lordo-parziale').value = totaleValore.toFixed(2);
+    document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-    const inputDa = document.getElementById('filtro-da');
-    const inputA = document.getElementById('filtro-a');
-    const hiddenDa = document.getElementById('inputDataDa');
-    const hiddenA = document.getElementById('inputDataA');
-
-    function aggiornaHidden() {
-        if (hiddenDa && inputDa) hiddenDa.value = inputDa.value;
-        if (hiddenA && inputA) hiddenA.value = inputA.value;
-    }
-
-    inputDa?.addEventListener('change', aggiornaHidden);
-    inputA?.addEventListener('change', aggiornaHidden);
-    aggiornaHidden(); // iniziale
+    // ... tutto il tuo codice esistente ...
+    document.getElementById('calcola-parziali').addEventListener('click', calcolaParziali);
 });
+
 
 </script>
 
