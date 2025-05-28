@@ -146,13 +146,19 @@
                     <input type="text" id="copie-vendute-parziale" class="form-control text-end fw-bold d-inline-block" style="max-width: 200px;" readonly>
                 </div>
 
-                <div class="mb-3 text-end">
+                </div> {{-- chiude la div con tutti i campi calcolo --}}
+                </form> {{-- chiusura del form principale --}}
+
+                <div class="text-end mt-3">
                     <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank" class="d-inline-block">
                         <input type="hidden" name="data_da" id="inputDataDa">
                         <input type="hidden" name="data_a" id="inputDataA">
-                        <button type="submit" class="btn btn-danger mt-1">📄 Stampa PDF</button>
+                        <button type="submit" class="btn btn-danger">
+                            📄 Stampa PDF
+                        </button>
                     </form>
                 </div>
+
 
             </div>
 
