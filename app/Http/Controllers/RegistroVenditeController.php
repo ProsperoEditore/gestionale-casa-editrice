@@ -12,6 +12,7 @@ use App\Models\Anagrafica;
 use App\Models\Libro;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Pagination\Paginator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RegistroVenditeController extends Controller
 {
@@ -319,7 +320,6 @@ class RegistroVenditeController extends Controller
     return redirect()->back()->with('success', 'Canale aggiornato con successo.');
     }
 
-use Barryvdh\DomPDF\Facade\Pdf;
 
 public function stampa($id)
 {
