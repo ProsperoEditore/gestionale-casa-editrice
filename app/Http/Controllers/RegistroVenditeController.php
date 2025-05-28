@@ -330,25 +330,33 @@ public function stampa($id, Request $request)
     $dataDa = $request->input('data_da');
     $dataA = $request->input('data_a');
 
-    $dettagli = RegistroVenditeDettaglio::with('libro')
-        ->where('registro_vendita_id', $id) 
+    $dettagli_raw = RegistroVenditeDettaglio::with(['libro'])
+        ->where('registro_vendita_id', $id)
         ->when($dataDa, fn($query) => $query->whereDate('data', '>=', $dataDa))
         ->when($dataA, fn($query) => $query->whereDate('data', '<=', $dataA))
-        ->get();
+        ->get()
+        ->sortBy(fn($item) => $item->data)
+        ->values();
+
+    // Totali parziali
+    $totali = [
+        'quantita' => $dettagli_raw->sum('quantita'),
+        'valore_lordo' => $dettagli_raw->sum('valore_lordo'),
+    ];
+
+    // Nome file
+    $inizio = $dataDa ? Carbon::parse($dataDa)->format('d-m-Y') : 'inizio';
+    $fine = $dataA ? Carbon::parse($dataA)->format('d-m-Y') : 'oggi';
+    $nomeFile = "Registro_{$registro->anagrafica->nome}_da_{$inizio}_a_{$fine}.pdf";
 
     return Pdf::loadView('registro-vendite.pdf', [
         'registro' => $registro,
-        'dettagli' => $dettagli,
-        'filtro_date' => [
-            'da' => $dataDa,
-            'a' => $dataA,
-        ]
-    ])->download(
-        'registro_vendite_' . $registro->id .
-        ($dataDa || $dataA ? '_dal_' . ($dataDa ? \Carbon\Carbon::parse($dataDa)->format('Ymd') : '') .
-        '_al_' . ($dataA ? \Carbon\Carbon::parse($dataA)->format('Ymd') : '') : '') .
-        '.pdf'
-    );
+        'dettagli' => $dettagli_raw,
+        'totali' => $totali,
+        'filtro_date' => ['da' => $dataDa, 'a' => $dataA],
+    ])
+    ->setPaper('a4', 'landscape')
+    ->download($nomeFile);
 }
 
 

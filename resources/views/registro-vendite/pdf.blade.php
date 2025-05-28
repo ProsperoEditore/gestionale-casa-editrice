@@ -69,14 +69,11 @@
 
     <div class="dati">
         <p><strong>Anagrafica:</strong> {{ $registro->anagrafica->nome }}</p>
-        @php
-            $dataDa = $filtro_date['da'] ? \Carbon\Carbon::parse($filtro_date['da']) : null;
-            $dataA = $filtro_date['a'] ? \Carbon\Carbon::parse($filtro_date['a']) : null;
-        @endphp
-        @if($dataDa || $dataA)
+
+        @if($filtro_date['da'] || $filtro_date['a'])
             <p><strong>Periodo:</strong>
-                @if($dataDa) dal {{ $dataDa->format('d/m/Y') }} @endif
-                @if($dataA) al {{ $dataA->format('d/m/Y') }} @endif
+                @if($filtro_date['da']) dal {{ \Carbon\Carbon::parse($filtro_date['da'])->format('d/m/Y') }} @endif
+                @if($filtro_date['a']) al {{ \Carbon\Carbon::parse($filtro_date['a'])->format('d/m/Y') }} @endif
             </p>
         @endif
     </div>
@@ -102,7 +99,8 @@
             @foreach($dettagli as $riga)
                 @php
                     $quantita = $riga->quantita ?? 0;
-                    $valore = $quantita * ($riga->prezzo ?? 0);
+                    $prezzo = $riga->prezzo ?? 0;
+                    $valore = $quantita * $prezzo;
                     $totaleQuantita += $quantita;
                     $totaleValore += $valore;
                 @endphp
@@ -111,7 +109,7 @@
                     <td>{{ $riga->isbn }}</td>
                     <td style="text-align: left;">{{ $riga->titolo }}</td>
                     <td>{{ $quantita }}</td>
-                    <td>{{ number_format($riga->prezzo, 2, ',', '.') }} €</td>
+                    <td>{{ number_format($prezzo, 2, ',', '.') }} €</td>
                     <td>{{ number_format($valore, 2, ',', '.') }} €</td>
                 </tr>
             @endforeach
@@ -124,6 +122,20 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="footer">
+        Registro Vendite generato il {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+    </div>
+
+    {{-- NUMERAZIONE PAGINE --}}
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->getFont("DejaVu Sans", "normal");
+            $size = 10;
+            $pageText = "pag. {PAGE_NUM} di {PAGE_COUNT}";
+            $pdf->page_text(270, 570, $pageText, $font, $size);
+        }
+    </script>
 
 </body>
 </html>
