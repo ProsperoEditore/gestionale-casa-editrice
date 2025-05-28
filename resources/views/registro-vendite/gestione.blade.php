@@ -165,10 +165,27 @@
         </form> {{-- chiusura registroVenditeForm --}}
 
         <div class="text-end mt-3">
-            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank">
-                <input type="hidden" name="data_da" id="inputDataDa">
-                <input type="hidden" name="data_a" id="inputDataA">
-                <button type="submit" class="btn btn-danger">📄 Stampa PDF</button>
+            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank" id="form-stampa">
+                <div class="row justify-content-end align-items-end g-2 mt-4">
+                    <!-- Date + pulsanti -->
+                    <div class="col-auto">
+                        <label for="filtro-da" class="form-label mb-1">Da</label>
+                        <input type="date" id="filtro-da" name="data_da" class="form-control" value="{{ request('data_da') }}">
+                    </div>
+
+                    <div class="col-auto">
+                        <label for="filtro-a" class="form-label mb-1">A</label>
+                        <input type="date" id="filtro-a" name="data_a" class="form-control" value="{{ request('data_a') }}">
+                    </div>
+
+                    <div class="col-auto d-flex align-items-end">
+                        <button type="button" class="btn btn-secondary" id="calcola-parziali">Calcola parziali</button>
+                    </div>
+
+                    <div class="col-auto d-flex align-items-end">
+                        <button type="submit" class="btn btn-danger">📄 Stampa PDF</button>
+                    </div>
+                </div>
             </form>
         </div>
 
@@ -465,23 +482,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Calcolo parziali
     document.getElementById('calcola-parziali')?.addEventListener('click', calcolaParziali);
-
-    // Gestione stampa con intervallo di date
-    const stampaForm = document.querySelector('form[action*="registro-vendite.stampa"]');
-    if (stampaForm) {
-        stampaForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const da = document.getElementById('filtro-da')?.value;
-            const a = document.getElementById('filtro-a')?.value;
-
-            document.getElementById('inputDataDa').value = da;
-            document.getElementById('inputDataA').value = a;
-
-            this.submit();
-        });
-    }
-
 });
 </script>
 
