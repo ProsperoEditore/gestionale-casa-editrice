@@ -137,7 +137,7 @@
 
 
     .table-responsive {
-        overflow-x: auto;
+        overflow-x: visible;
         width: 100%;
     }
 
@@ -147,8 +147,8 @@
     }
 
     .container {
-        max-width: 1440px; 
-        width: 100%;
+        max-width: 100% !important;
+        width: 95%;
         margin: 0 auto;
         padding-left: 10px;
         padding-right: 10px;
