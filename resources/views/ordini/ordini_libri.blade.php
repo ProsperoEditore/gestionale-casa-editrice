@@ -17,9 +17,16 @@
 @endif
 
 
-<div class="mb-3">
+<div class="mb-3 d-flex gap-2">
     <a href="{{ route('ordini.index') }}" class="btn btn-secondary">Torna agli Ordini</a>
+
+    @if($ordine->exists)
+        <a href="{{ route('ordini.stampa', $ordine->id) }}" target="_blank" class="btn btn-danger">
+            📄 Stampa
+        </a>
+    @endif
 </div>
+
 
 <div class="card">
     <div class="card-body">
