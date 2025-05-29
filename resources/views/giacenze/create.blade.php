@@ -145,7 +145,7 @@
     }
 
     .container {
-        overflow-x: auto;
+        overflow-x: visible;
     }
 </style>
 
