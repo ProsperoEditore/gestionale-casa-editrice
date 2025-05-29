@@ -246,7 +246,7 @@ class OrdineController extends Controller
     
             $info = strtolower(trim($libro->pivot->info_spedizione ?? ''));
     
-            if ($info === 'spedito da magazzino editore' && $quantitaNuova > $quantitaPrecedente) {
+            if (in_array($info, ['spedito da magazzino editore', 'consegna a mano']) && $quantitaNuova > $quantitaPrecedente) {
                 $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
                     $query->where('categoria', 'magazzino editore');
                 })->first();
@@ -456,7 +456,7 @@ public function importLibri(Request $request, $id)
     
                     // 🔄 SOTTRAZIONE da magazzino editore solo se specificato
                     $info_normalized = strtolower(trim($info));
-                    if ($info_normalized === 'spedito da magazzino editore') {
+                    if (in_array($info_normalized, ['spedito da magazzino editore', 'consegna a mano'])) {
                         $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
                             $query->where('categoria', 'magazzino editore');
                         })->first();

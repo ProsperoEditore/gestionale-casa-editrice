@@ -311,6 +311,7 @@ input.valore-lordo {
 document.addEventListener('DOMContentLoaded', function () {
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
+    gestisciEventiElimina();
 
             document.querySelectorAll("#registroVenditeBody tr").forEach(function(row) {
             row.querySelectorAll(".quantita, .prezzo").forEach(function(input) {
@@ -417,30 +418,37 @@ function aggiornaTotaleCopieVendute() {
             });
 
         initAutocomplete(newRow.querySelector(".titolo"));
+        gestisciEventiElimina();
     });
 
-    document.querySelectorAll(".delete-row").forEach(btn => {
-        btn.addEventListener("click", function() {
-            let row = this.closest("tr");
-            let dettaglioId = row.dataset.id;
-            if (dettaglioId) {
-                if (confirm("Vuoi davvero eliminare questa riga?")) {
-                    fetch(`/registro-vendite/dettaglio/${dettaglioId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        }
-                    }).then(res => res.json()).then(data => {
-                        if (data.success) row.remove();
-                        else alert("Errore nell'eliminazione della riga.");
-                    }).catch(() => alert("Errore nella richiesta."));
-                }
-            } else {
-                row.remove();
-            }
+    function gestisciEventiElimina() {
+        document.querySelectorAll(".delete-row").forEach(btn => {
+            btn.removeEventListener("click", handleDeleteRiga); // evita doppio binding
+            btn.addEventListener("click", handleDeleteRiga);
         });
-    });
-    aggiornaTotaleValoreVendita();
+    }
+
+    function handleDeleteRiga(e) {
+        const row = e.target.closest("tr");
+        const dettaglioId = row.dataset.id;
+
+        if (dettaglioId) {
+            if (confirm("Vuoi davvero eliminare questa riga?")) {
+                fetch(`/registro-vendite/dettaglio/${dettaglioId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                }).then(res => res.json()).then(data => {
+                    if (data.success) row.remove();
+                    else alert("Errore nell'eliminazione della riga.");
+                }).catch(() => alert("Errore nella richiesta."));
+            }
+        } else {
+            row.remove();
+        }
+    }
+
 
 });
 </script>

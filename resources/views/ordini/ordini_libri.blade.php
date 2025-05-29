@@ -7,10 +7,15 @@
 
 @if($ordine->exists)
 <div class="alert alert-warning mt-3 text-center">
-    ⚠️ Stai modificando un ordine esistente.<br>
-    Ricorda di aggiornare manualmente le quantità in <strong>Magazzino</strong>.
+    <span class="text-danger">
+        ℹ️ Se selezioni <strong>“spedito da magazzino editore”</strong> o <strong>“consegna a mano”</strong> nella colonna <em>Info</em>,<br>
+        il sistema aggiorna automaticamente le giacenze del magazzino editore.
+    </span>
+    <br><br>
+    ⚠️ Se stai modificando un ordine esistente, ricorda di aggiornare manualmente le quantità in <strong>Magazzino</strong>.
 </div>
 @endif
+
 
 <div class="mb-3">
     <a href="{{ route('ordini.index') }}" class="btn btn-secondary">Torna agli Ordini</a>

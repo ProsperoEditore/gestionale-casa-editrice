@@ -269,8 +269,8 @@
 
 
             <tr class="totale-row">
-                <td></td>
                 <td><strong>Totali</strong></td>
+                <td>{{ $ordine->libri->count() }}</td>
                 <td>{{ $totale_quantita }}</td>
                 <td></td>
                 <td>{{ number_format($totale_lordo, 2) }} €</td>
