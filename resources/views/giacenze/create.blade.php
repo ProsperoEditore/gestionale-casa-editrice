@@ -125,15 +125,16 @@
 </div>
 
 <style>
-    #giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 140px; }
-    #giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 140px; }
-    #giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 280px; }
-    #giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 80px; }
-    #giacenzeTable th:nth-child(5), #giacenzeTable td:nth-child(5) { width: 90px; }
-    #giacenzeTable th:nth-child(6), #giacenzeTable td:nth-child(6) { width: 90px; }
-    #giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 110px; }
-    #giacenzeTable th:nth-child(8), #giacenzeTable td:nth-child(8) { width: 220px; }
-    #giacenzeTable th:nth-child(9), #giacenzeTable td:nth-child(9) { width: 100px; }
+    #giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 160px; } /* Marchio */
+    #giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 160px; } /* ISBN */
+    #giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 300px; } /* Titolo */
+    #giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 100px; } /* Q.tà */
+    #giacenzeTable th:nth-child(5), #giacenzeTable td:nth-child(5) { width: 100px; } /* Prezzo */
+    #giacenzeTable th:nth-child(6), #giacenzeTable td:nth-child(6) { width: 100px; } /* Costo/Sconto */
+    #giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 120px; } /* Data */
+    #giacenzeTable th:nth-child(8), #giacenzeTable td:nth-child(8) { width: 280px; } /* Note */
+    #giacenzeTable th:nth-child(9), #giacenzeTable td:nth-child(9) { width: 120px; } /* Azioni */
+
 
     .table-responsive {
         overflow-x: visible;
@@ -142,12 +143,18 @@
 
     #giacenzeTable {
         width: 100%;
-        table-layout: fixed;
+        table-layout: auto;
     }
 
     .container {
+        max-width: 100% !important;
+        width: 95%;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
         overflow-x: visible;
     }
+
 </style>
 
 
@@ -193,16 +200,13 @@
 
 <style>
 #riepilogo-totali {
-    display: inline-block;
-    width: auto;
-    background-color: #d9f7ff; /* colore azzurro chiaro */
-    padding: 10px 15px;
-    font-size: 14px;
-    margin-left: auto;
-    margin-right: 0;
     float: right;
-    border-radius: 8px;
+    margin-left: 20px;
     margin-bottom: 10px;
+    background-color: #d9f7ff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
 }
 
 #riepilogo-totali ul {
