@@ -242,6 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
         lengthChange: false,
         drawCallback: function () {
             aggiornaTotaliGiacenze();
+            document.querySelectorAll(".quantita").forEach(input => coloraQuantitaInput(input));
         }
     });
 
