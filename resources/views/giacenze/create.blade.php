@@ -143,16 +143,16 @@
 
     #giacenzeTable {
         width: 100%;
-        table-layout: auto;
+        table-layout: fixed;
     }
 
     .container {
-        max-width: 100% !important;
-        width: 95%;
+        max-width: 1440px; 
+        width: 100%;
         margin: 0 auto;
         padding-left: 10px;
         padding-right: 10px;
-        overflow-x: visible;
+        overflow-x: hidden; 
     }
 
 </style>
@@ -235,7 +235,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const table = $('#giacenzeTable').DataTable({
         paging: true,
-        pageLength: 40,
+        pageLength: 25,
         info: false,
         searching: false,
         ordering: false,
@@ -333,7 +333,6 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("input", function(event) {
         if (event.target.classList.contains("quantita")) {
             coloraQuantitaInput(event.target);
-            aggiornaTotaliGiacenze(); 
         }
     });
 
