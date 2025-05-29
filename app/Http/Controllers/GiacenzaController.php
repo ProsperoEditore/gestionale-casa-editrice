@@ -43,7 +43,7 @@ class GiacenzaController extends Controller
         ")
         ->orderBy('libri.titolo')
         ->select('giacenze.*')
-        ->paginate(50);
+        ->get();
     
 
     

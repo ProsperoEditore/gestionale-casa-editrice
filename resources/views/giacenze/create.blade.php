@@ -120,11 +120,6 @@
         </tbody>
     </table>
 
-    <div class="d-flex justify-content-center mt-3">
-    {{ $giacenze->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
-    </div>
-
-
     </div>
 </div>
 
