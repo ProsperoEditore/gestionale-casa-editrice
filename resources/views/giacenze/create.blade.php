@@ -408,40 +408,42 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function aggiornaTotaliGiacenze() {
-    let marchi = new Set();
-    let titoli = 0;
-    let quantitaTotale = 0;
-    let valoreTotale = 0;
-    let costoTotale = 0;
+    const table = $('#giacenzeTable').DataTable();
+    const righe = table.rows().nodes(); // tutte le righe di tutte le pagine
 
-    document.querySelectorAll('#giacenzeTableBody tr').forEach(row => {
-        const marchio = row.querySelector('.marchio')?.value?.trim();
-        const titolo = row.querySelector('.titolo')?.value?.trim();
-        const quantita = parseFloat(row.querySelector('.quantita')?.value) || 0;
-        const prezzo = parseFloat(row.querySelector('.prezzo')?.value) || 0;
-        const costo = parseFloat(row.querySelector('.costo_sconto')?.value) || 0;
+    const marchiSet = new Set();
+    const titoliSet = new Set();
+    let sommaQuantita = 0;
+    let sommaValoreLordo = 0;
+    let sommaCosto = 0;
 
-        if (marchio) marchi.add(marchio);
-        if (titolo) titoli++;
+    righe.forEach(riga => {
+        const marchio = riga.querySelector('.marchio')?.value?.trim();
+        const titolo = riga.querySelector('.titolo')?.value?.trim();
+        const quantita = parseInt(riga.querySelector('.quantita')?.value) || 0;
+        const prezzo = parseFloat(riga.querySelector('.prezzo')?.value) || 0;
+        const costo = parseFloat(riga.querySelector('.costo_sconto')?.value) || 0;
 
-        quantitaTotale += quantita;
-        valoreTotale += quantita * prezzo;
+        if (marchio) marchiSet.add(marchio);
+        if (titolo) titoliSet.add(titolo);
 
-        if (categoria === "magazzino editore") {
-            costoTotale += quantita * costo;
-        }
+        sommaQuantita += quantita;
+        sommaValoreLordo += quantita * prezzo;
+
+        @if($magazzino->anagrafica->categoria == 'magazzino editore')
+            sommaCosto += quantita * costo;
+        @endif
     });
 
-    document.getElementById('tot-marchi').innerText = marchi.size;
-    document.getElementById('tot-titoli').innerText = titoli;
-    document.getElementById('tot-quantita').innerText = quantitaTotale;
-    document.getElementById('tot-valore-lordo').innerText = valoreTotale.toFixed(2);
-
-    if (categoria === "magazzino editore") {
-        document.getElementById('tot-costo').innerText = costoTotale.toFixed(2);
+    document.getElementById("tot-marchi").innerText = marchiSet.size;
+    document.getElementById("tot-titoli").innerText = titoliSet.size;
+    document.getElementById("tot-quantita").innerText = sommaQuantita;
+    document.getElementById("tot-valore-lordo").innerText = sommaValoreLordo.toFixed(2);
+    const costoSpan = document.getElementById("tot-costo");
+    if (costoSpan) {
+        costoSpan.innerText = sommaCosto.toFixed(2);
     }
 }
-
 </script>
 
 <script>
