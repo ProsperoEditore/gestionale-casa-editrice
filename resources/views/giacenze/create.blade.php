@@ -235,7 +235,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const table = $('#giacenzeTable').DataTable({
         paging: true,
-        pageLength: 25,
+        pageLength: 20,
         info: false,
         searching: false,
         ordering: false,
