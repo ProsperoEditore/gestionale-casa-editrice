@@ -9,6 +9,12 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Gestione Giacenze - {{ $magazzino->anagrafica->nome ?? 'Sconosciuto' }}</h2>
 
+    <div class="alert alert-warning text-center" role="alert">
+    ⚠️ <strong>Attenzione:</strong> usa il pulsante <strong>Salva</strong> in alto per registrare le nuove righe aggiunte.<br>
+    Per modificare una riga esistente, utilizza invece l'icona <i class="bi bi-save"></i> nella colonna <strong>Azioni</strong>.
+</div>
+
+
     <a href="{{ route('magazzini.index') }}" class="btn btn-secondary">Torna ai Magazzini</a>
 
     <hr>
@@ -43,6 +49,18 @@
         <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
     </div>
 
+<div class="alert alert-info" id="riepilogo-totali" style="font-size: 15px;">
+    <strong>Riepilogo:</strong>
+    <ul class="mb-0">
+        <li>Marchi presenti: <span id="tot-marchi">0</span></li>
+        <li>Totale titoli a magazzino: <span id="tot-titoli">0</span></li>
+        <li>Quantità complessiva: <span id="tot-quantita">0</span></li>
+        <li>Valore lordo complessivo: <span id="tot-valore-lordo">0.00</span> €</li>
+        @if ($magazzino->anagrafica->categoria === 'magazzino editore')
+        <li>Totale prezzo di costo: <span id="tot-costo">0.00</span> €</li>
+        @endif
+    </ul>
+</div>
 
 <div class="table-responsive" style="overflow-x: auto;">
 <table id="giacenzeTable" class="table table-bordered mt-3">
@@ -189,6 +207,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    aggiornaTotaliGiacenze();
     let libri = @json($libri);
 
     // 🔥 NUOVA FUNZIONE
@@ -270,12 +289,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
-
+        aggiornaTotaliGiacenze();
     });
 
     document.addEventListener("input", function(event) {
         if (event.target.classList.contains("quantita")) {
             coloraQuantitaInput(event.target);
+            aggiornaTotaliGiacenze(); 
         }
     });
 
@@ -296,6 +316,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (data.success) {
                         row.remove();
                         alert("Giacenza eliminata con successo.");
+                        aggiornaTotaliGiacenze();
                     } else {
                         alert("Errore nell'eliminazione: " + data.message);
                     }
@@ -306,6 +327,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             } else {
                 row.remove();
+                aggiornaTotaliGiacenze();
             }
         }
     });
@@ -384,6 +406,42 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 });
+
+function aggiornaTotaliGiacenze() {
+    let marchi = new Set();
+    let titoli = 0;
+    let quantitaTotale = 0;
+    let valoreTotale = 0;
+    let costoTotale = 0;
+
+    document.querySelectorAll('#giacenzeTableBody tr').forEach(row => {
+        const marchio = row.querySelector('.marchio')?.value?.trim();
+        const titolo = row.querySelector('.titolo')?.value?.trim();
+        const quantita = parseFloat(row.querySelector('.quantita')?.value) || 0;
+        const prezzo = parseFloat(row.querySelector('.prezzo')?.value) || 0;
+        const costo = parseFloat(row.querySelector('.costo_sconto')?.value) || 0;
+
+        if (marchio) marchi.add(marchio);
+        if (titolo) titoli++;
+
+        quantitaTotale += quantita;
+        valoreTotale += quantita * prezzo;
+
+        if (categoria === "magazzino editore") {
+            costoTotale += quantita * costo;
+        }
+    });
+
+    document.getElementById('tot-marchi').innerText = marchi.size;
+    document.getElementById('tot-titoli').innerText = titoli;
+    document.getElementById('tot-quantita').innerText = quantitaTotale;
+    document.getElementById('tot-valore-lordo').innerText = valoreTotale.toFixed(2);
+
+    if (categoria === "magazzino editore") {
+        document.getElementById('tot-costo').innerText = costoTotale.toFixed(2);
+    }
+}
+
 </script>
 
 <script>
