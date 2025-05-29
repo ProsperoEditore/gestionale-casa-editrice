@@ -409,7 +409,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function aggiornaTotaliGiacenze() {
     const table = $('#giacenzeTable').DataTable();
-    const righe = table.rows().nodes(); // tutte le righe di tutte le pagine
+    const righe = table.rows().nodes(); // tutte le righe, non solo visibili
 
     const marchiSet = new Set();
     const titoliSet = new Set();
@@ -430,7 +430,7 @@ function aggiornaTotaliGiacenze() {
         sommaQuantita += quantita;
         sommaValoreLordo += quantita * prezzo;
 
-        @if($magazzino->anagrafica->categoria == 'magazzino editore')
+        @if ($magazzino->anagrafica->categoria === 'magazzino editore')
             sommaCosto += quantita * costo;
         @endif
     });
@@ -439,6 +439,7 @@ function aggiornaTotaliGiacenze() {
     document.getElementById("tot-titoli").innerText = titoliSet.size;
     document.getElementById("tot-quantita").innerText = sommaQuantita;
     document.getElementById("tot-valore-lordo").innerText = sommaValoreLordo.toFixed(2);
+
     const costoSpan = document.getElementById("tot-costo");
     if (costoSpan) {
         costoSpan.innerText = sommaCosto.toFixed(2);
