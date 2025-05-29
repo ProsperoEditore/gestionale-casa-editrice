@@ -126,17 +126,17 @@
 
 <style>
 /* Imposta larghezza specifica per ogni colonna */
-#giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 120px; } /* Marchio */
-#giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 150px; } /* ISBN */
-#giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 280px; } /* Titolo */
+#giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 100px; } /* Marchio */
+#giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 145px; } /* ISBN */
+#giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 250px; } /* Titolo */
 #giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 60px; }  /* Q.tà */
 #giacenzeTable th:nth-child(5), #giacenzeTable td:nth-child(5) { width: 70px; }  /* Prezzo */
 #giacenzeTable th:nth-child(6), #giacenzeTable td:nth-child(6) { width: 70px; }  /* Costo/Sconto */
-#giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 100px; } /* Data */
-#giacenzeTable th:nth-child(8), #giacenzeTable td:nth-child(8) { width: 280px; } /* Note */
+#giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 90px; } /* Data */
+#giacenzeTable th:nth-child(8), #giacenzeTable td:nth-child(8) { width: 230px; } /* Note */
 #giacenzeTable th:nth-child(9), #giacenzeTable td:nth-child(9) {
-    width: 100px;
-    min-width: 100px;
+    width: 90px;
+    min-width: 90px;
     white-space: nowrap;
 } /* Azioni */
 

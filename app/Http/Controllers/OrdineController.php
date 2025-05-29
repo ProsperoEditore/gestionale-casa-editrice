@@ -468,7 +468,7 @@ public function importLibri(Request $request, $id)
     
                             if ($giacenzaEditore) {
                                 $giacenzaEditore->quantita = max(0, $giacenzaEditore->quantita - $quantita);
-                                $giacenzaEditore->note = 'Sottratto con ordine ' . $ordine->codice;
+                                $giacenzaEditore->note = 'Ord. ' . $ordine->codice;
                                 $giacenzaEditore->data_ultimo_aggiornamento = now();
                                 $giacenzaEditore->save();
                             }
