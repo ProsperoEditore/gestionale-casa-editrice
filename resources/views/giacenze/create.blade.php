@@ -62,7 +62,7 @@
     </ul>
 </div>
 
-<div class="table-responsive" style="overflow-x: auto;">
+<div class="table-responsive" style="overflow-x: visible;">
 <table id="giacenzeTable" class="table table-bordered mt-3">
 
         <thead>
@@ -135,7 +135,7 @@
     #giacenzeTable th:nth-child(9), #giacenzeTable td:nth-child(9) { width: 100px; }
 
     .table-responsive {
-        overflow-x: auto;
+        overflow-x: visible;
         width: 100%;
     }
 
@@ -206,6 +206,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const table = $('#giacenzeTable').DataTable({
         paging: true,
+        pageLength: 40,
         info: false,
         searching: false,
         ordering: false,
@@ -416,7 +417,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function aggiornaTotaliGiacenze() {
-    const righe = document.querySelectorAll("#giacenzeTableBody tr");
+    const righe = Array.from($('#giacenzeTable').DataTable().rows().nodes());
 
     const marchiSet = new Set();
     const titoliSet = new Set();
