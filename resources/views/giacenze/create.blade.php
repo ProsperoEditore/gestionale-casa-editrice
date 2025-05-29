@@ -125,43 +125,66 @@
 </div>
 
 <style>
-    #giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 160px; } /* Marchio */
-    #giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 140px; } /* ISBN */
-    #giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 300px; } /* Titolo */
-    #giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 60px; } /* Q.tà */
-    #giacenzeTable th:nth-child(5), #giacenzeTable td:nth-child(5) { width: 60px; } /* Prezzo */
-    #giacenzeTable th:nth-child(6), #giacenzeTable td:nth-child(6) { width: 60px; } /* Costo/Sconto */
-    #giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 100px; } /* Data */
-    #giacenzeTable th:nth-child(8), #giacenzeTable td:nth-child(8) { width: 320px; } /* Note */
-    #giacenzeTable th:nth-child(9), #giacenzeTable td:nth-child(9) { width: 120px; min-width: 120px;} /* Azioni */
+/* Imposta larghezza specifica per ogni colonna */
+#giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 160px; } /* Marchio */
+#giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 140px; } /* ISBN */
+#giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 300px; } /* Titolo */
+#giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 60px; }  /* Q.tà */
+#giacenzeTable th:nth-child(5), #giacenzeTable td:nth-child(5) { width: 60px; }  /* Prezzo */
+#giacenzeTable th:nth-child(6), #giacenzeTable td:nth-child(6) { width: 60px; }  /* Costo/Sconto */
+#giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 100px; } /* Data */
+#giacenzeTable th:nth-child(8), #giacenzeTable td:nth-child(8) { width: 320px; } /* Note */
+#giacenzeTable th:nth-child(9), #giacenzeTable td:nth-child(9) {
+    width: 120px;
+    min-width: 120px;
+    white-space: nowrap;
+} /* Azioni */
 
+/* Rende la tabella scrollabile se eccede lo schermo */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
 
-    .table-responsive {
-        overflow-x: auto;
-        width: 100%;
-    }
+/* Tabella più flessibile e adattabile */
+#giacenzeTable {
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+}
 
-    #giacenzeTable {
-        width: 100%;
-        table-layout: fixed;
-    }
+/* Contenitore principale */
+.container {
+    max-width: 100% !important;
+    width: 95%;
+    margin: 0 auto;
+    padding: 0 10px;
+    overflow-x: auto;
+}
 
-    .container {
-        max-width: 100% !important;
-        width: 95%;
-        margin: 0 auto;
-        padding-left: 10px;
-        padding-right: 10px;
-        overflow-x: hidden; 
-    }
+/* Riepilogo grafico in alto */
+#riepilogo-totali {
+    float: right;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    background-color: #d9f7ff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+#riepilogo-totali ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#riepilogo-totali li {
+    margin-bottom: 2px;
+}
 
-</style>
-
-
-
-<style>
+/* Layout mobile ottimizzato */
 @media (max-width: 768px) {
-    #giacenzeTable th, #giacenzeTable td {
+    #giacenzeTable th,
+    #giacenzeTable td {
         font-size: 12px;
         padding: 4px;
     }
@@ -194,31 +217,15 @@
         width: 100%;
         margin-bottom: 8px;
     }
+
+    #riepilogo-totali {
+        float: none;
+        width: 100%;
+        margin: 10px 0;
+    }
 }
 </style>
 
-
-<style>
-#riepilogo-totali {
-    float: right;
-    margin-left: 20px;
-    margin-bottom: 10px;
-    background-color: #d9f7ff;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-#riepilogo-totali ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#riepilogo-totali li {
-    margin-bottom: 2px;
-}
-</style>
 
 
 
