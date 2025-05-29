@@ -106,7 +106,10 @@
                 <td class="data-aggiornamento">
                     {{ $giacenza->data_ultimo_aggiornamento ? \Carbon\Carbon::parse($giacenza->data_ultimo_aggiornamento)->format('Y-m-d') : '-' }}
                 </td>
-                <td><input type="text" class="form-control note" value="{{ $giacenza->note }}"></td>
+                @php
+                    $soloCodice = preg_replace('/^Sottratto con ordine\s*/i', '', $giacenza->note ?? '');
+                @endphp
+                <td><input type="text" class="form-control note" value="{{ $soloCodice }}"></td>
                 <td>
                     <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
                         <i class="bi bi-save"></i>
@@ -128,8 +131,8 @@
 /* Imposta larghezza specifica per ogni colonna */
 #giacenzeTable th:nth-child(1), #giacenzeTable td:nth-child(1) { width: 100px; } /* Marchio */
 #giacenzeTable th:nth-child(2), #giacenzeTable td:nth-child(2) { width: 145px; } /* ISBN */
-#giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 250px; } /* Titolo */
-#giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 60px; }  /* Q.tà */
+#giacenzeTable th:nth-child(3), #giacenzeTable td:nth-child(3) { width: 240px; } /* Titolo */
+#giacenzeTable th:nth-child(4), #giacenzeTable td:nth-child(4) { width: 70px; }  /* Q.tà */
 #giacenzeTable th:nth-child(5), #giacenzeTable td:nth-child(5) { width: 70px; }  /* Prezzo */
 #giacenzeTable th:nth-child(6), #giacenzeTable td:nth-child(6) { width: 70px; }  /* Costo/Sconto */
 #giacenzeTable th:nth-child(7), #giacenzeTable td:nth-child(7) { width: 90px; } /* Data */
