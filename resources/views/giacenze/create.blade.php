@@ -421,8 +421,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function aggiornaTotaliGiacenze() {
-    const table = $('#giacenzeTable').DataTable();
-    const righe = table.rows().nodes(); // tutte le righe, non solo visibili
+    const righe = document.querySelectorAll("#giacenzeTableBody tr");
 
     const marchiSet = new Set();
     const titoliSet = new Set();
@@ -454,10 +453,9 @@ function aggiornaTotaliGiacenze() {
     document.getElementById("tot-valore-lordo").innerText = sommaValoreLordo.toFixed(2);
 
     const costoSpan = document.getElementById("tot-costo");
-    if (costoSpan) {
-        costoSpan.innerText = sommaCosto.toFixed(2);
-    }
+    if (costoSpan) costoSpan.innerText = sommaCosto.toFixed(2);
 }
+
 </script>
 
 <script>
