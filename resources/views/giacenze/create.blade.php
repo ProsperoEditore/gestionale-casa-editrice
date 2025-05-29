@@ -49,7 +49,7 @@
         <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
     </div>
 
-<div class="alert alert-info" id="riepilogo-totali" style="font-size: 15px;">
+<div id="riepilogo-totali">
     <strong>Riepilogo:</strong>
     <ul class="mb-0">
         <li>Marchi presenti: <span id="tot-marchi">0</span></li>
@@ -61,6 +61,7 @@
         @endif
     </ul>
 </div>
+
 
 <div class="table-responsive" style="overflow-x: visible;">
 <table id="giacenzeTable" class="table table-bordered mt-3">
@@ -190,6 +191,30 @@
 </style>
 
 
+<style>
+#riepilogo-totali {
+    display: inline-block;
+    width: auto;
+    background-color: #d9f7ff; /* colore azzurro chiaro */
+    padding: 10px 15px;
+    font-size: 14px;
+    margin-left: auto;
+    margin-right: 0;
+    float: right;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+#riepilogo-totali ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#riepilogo-totali li {
+    margin-bottom: 2px;
+}
+</style>
 
 
 
