@@ -61,11 +61,6 @@ class GiacenzaController extends Controller
             ];
         }
 
-
-    
-        // Carica le informazioni per il magazzino
-        $magazzino = Magazzino::findOrFail($magazzino_id);
-
         return view('giacenze.create', compact('magazzino', 'giacenze', 'libri', 'totali'));
     }
 
