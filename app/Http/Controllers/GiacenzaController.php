@@ -45,12 +45,28 @@ class GiacenzaController extends Controller
         ->select('giacenze.*')
         ->get();
     
+                // Calcola i totali solo se la categoria NON è "magazzino editore" o "distributore"
+        $totali = null;
+        if (!in_array($magazzino->anagrafica->categoria, ['magazzino editore', 'distributore'])) {
+            $giacenzeConRelazioni = Giacenza::with('libro.marchio_editoriale')
+                ->where('magazzino_id', $magazzino_id)
+                ->get();
+
+            $totali = [
+                'marchi' => $giacenzeConRelazioni->pluck('libro.marchio_editoriale.nome')->filter()->unique()->count(),
+                'titoli' => $giacenzeConRelazioni->count(),
+                'quantita' => $giacenzeConRelazioni->sum('quantita'),
+                'valore_lordo' => $giacenzeConRelazioni->sum(fn($g) => $g->prezzo * $g->quantita),
+                'costo_totale' => $giacenzeConRelazioni->sum(fn($g) => $g->costo_produzione * $g->quantita),
+            ];
+        }
+
 
     
         // Carica le informazioni per il magazzino
         $magazzino = Magazzino::findOrFail($magazzino_id);
 
-        return view('giacenze.create', compact('magazzino', 'giacenze', 'libri'));
+        return view('giacenze.create', compact('magazzino', 'giacenze', 'libri', 'totali'));
     }
 
     public function store(Request $request, $magazzino_id)
