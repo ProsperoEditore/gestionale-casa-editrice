@@ -12,25 +12,25 @@ use App\Exports\GiacenzeExport;
 
 class GiacenzaController extends Controller
 {
-    public function create($magazzino_id, Request $request)
-    {
-        $magazzino = Magazzino::with('anagrafica')->findOrFail($magazzino_id);
-        $giacenze = Giacenza::where('magazzino_id', $magazzino_id)->get();
-        $libri = Libro::with('marchio_editoriale')->get();
+public function create($magazzino_id, Request $request)
+{
+    // Carica il magazzino con anagrafica
+    $magazzino = Magazzino::with('anagrafica')->findOrFail($magazzino_id);
+    $libri = Libro::with('marchio_editoriale')->get();
 
-        $query = Giacenza::query()->where('magazzino_id', $magazzino_id);
+    // Costruisci query base
+    $query = Giacenza::query()->where('magazzino_id', $magazzino_id);
 
-        // Filtro di ricerca per titolo
-        if ($request->filled('search')) {
-            $searchTerm = strtolower($request->input('search'));
-            $query->whereHas('libro', function ($q) use ($searchTerm) {
-                $q->whereRaw("LOWER(titolo) LIKE ?", ["%{$searchTerm}%"]);
-            });
-        }
-        
-    
-        // Carica i risultati filtrati
-        $giacenze = $query
+    // Applica filtro per titolo (ricerca)
+    if ($request->filled('search')) {
+        $searchTerm = strtolower($request->input('search'));
+        $query->whereHas('libro', function ($q) use ($searchTerm) {
+            $q->whereRaw("LOWER(titolo) LIKE ?", ["%{$searchTerm}%"]);
+        });
+    }
+
+    // Esegui query con join e ordinamento per marchio
+    $giacenze = $query
         ->join('libri', 'giacenze.libro_id', '=', 'libri.id')
         ->leftJoin('marchio_editoriales', 'libri.marchio_editoriale_id', '=', 'marchio_editoriales.id')
         ->orderByRaw("
@@ -44,25 +44,28 @@ class GiacenzaController extends Controller
         ->orderBy('libri.titolo')
         ->select('giacenze.*')
         ->get();
-    
-                // Calcola i totali solo se la categoria NON è "magazzino editore" o "distributore"
-        $totali = null;
-        if (!in_array($magazzino->anagrafica->categoria, ['magazzino editore', 'distributore'])) {
-            $giacenzeConRelazioni = Giacenza::with('libro.marchio_editoriale')
-                ->where('magazzino_id', $magazzino_id)
-                ->get();
 
-            $totali = [
-                'marchi' => $giacenzeConRelazioni->pluck('libro.marchio_editoriale.nome')->filter()->unique()->count(),
-                'titoli' => $giacenzeConRelazioni->count(),
-                'quantita' => $giacenzeConRelazioni->sum('quantita'),
-                'valore_lordo' => $giacenzeConRelazioni->sum(fn($g) => $g->prezzo * $g->quantita),
-                'costo_totale' => $giacenzeConRelazioni->sum(fn($g) => $g->costo_produzione * $g->quantita),
-            ];
-        }
+    // Calcolo dei totali SOLO se il magazzino non è troppo grande
+    $totali = null;
+    $categoria = strtolower($magazzino->anagrafica->categoria ?? '');
 
-        return view('giacenze.create', compact('magazzino', 'giacenze', 'libri', 'totali'));
+    if (!in_array($categoria, ['magazzino editore', 'distributore'])) {
+        $giacenzeConRelazioni = Giacenza::with('libro.marchio_editoriale')
+            ->where('magazzino_id', $magazzino_id)
+            ->get();
+
+        $totali = [
+            'marchi' => $giacenzeConRelazioni->pluck('libro.marchio_editoriale.nome')->filter()->unique()->count(),
+            'titoli' => $giacenzeConRelazioni->count(),
+            'quantita' => $giacenzeConRelazioni->sum('quantita'),
+            'valore_lordo' => $giacenzeConRelazioni->sum(fn($g) => $g->prezzo * $g->quantita),
+            'costo_totale' => $giacenzeConRelazioni->sum(fn($g) => $g->costo_produzione * $g->quantita),
+        ];
     }
+
+    return view('giacenze.create', compact('magazzino', 'giacenze', 'libri', 'totali'));
+}
+
 
     public function store(Request $request, $magazzino_id)
     {
