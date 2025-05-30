@@ -24,6 +24,7 @@
                             <option value="distributore">Distributore</option>
                             <option value="fiere">Fiere</option>
                             <option value="festival">Festival</option>
+                            <option value="azienda">Azienda</option>
                             <option value="altro">Altro</option>
                         </select>
                     </div>

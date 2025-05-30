@@ -26,6 +26,7 @@
                             <option value="distributore" {{ $item->categoria == 'distributore' ? 'selected' : '' }}>Distributore</option>
                             <option value="fiere" {{ $item->categoria == 'fiere' ? 'selected' : '' }}>Fiere</option>
                             <option value="festival" {{ $item->categoria == 'festival' ? 'selected' : '' }}>Festival</option>
+                            <option value="azienda" {{ $item->categoria == 'azienda' ? 'selected' : '' }}>Azienda</option>
                             <option value="altro" {{ $item->categoria == 'altro' ? 'selected' : '' }}>Altro</option>
                         </select>
                     </div>
