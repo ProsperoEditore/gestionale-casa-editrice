@@ -115,6 +115,17 @@ $(document).ready(function () {
             ordineSelect.disabled = false;
         }
     });
+
+        @if(isset($scarico) && $scarico->ordine)
+        const option = new Option(
+            '{{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}',
+            '{{ $scarico->ordine->id }}',
+            true,
+            true
+        );
+        $('#ordine_id').append(option).trigger('change');
+    @endif
+
 });
 </script>
 @endsection
