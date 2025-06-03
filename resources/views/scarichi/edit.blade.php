@@ -14,26 +14,21 @@
                 <!-- Ordine associato -->
                 <div class="mb-3">
                     <label class="form-label">Ordine Associato (facoltativo)</label>
-                    <select name="ordine_id" id="ordine_id" class="form-select">
-                        <option value="">-- Nessun ordine associato --</option>
-                        @foreach($ordini as $ordine)
-                            <option 
-                                value="{{ $ordine->id }}"
-                                data-destinatario="{{ $ordine->anagrafica->nome }}"
-                                data-anagrafica-id="{{ $ordine->anagrafica->id }}"
-                                @if($scarico->ordine_id == $ordine->id) selected @endif
-                            >
-                                {{ $ordine->codice }} - {{ $ordine->anagrafica->nome }}
-                            </option>
-                        @endforeach
-                    </select>
+                        <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%;">
+                            @if(isset($scarico) && $scarico->ordine)
+                                <option value="{{ $scarico->ordine->id }}" selected>
+                                    {{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}
+                                </option>
+                            @endif
+                        </select>
                 </div>
 
                 <!-- Altro ordine -->
                 <div class="mb-3">
                     <label class="form-label">Altro Ordine</label>
                     <input type="text" name="altro_ordine" id="altro_ordine" class="form-control" 
-                           value="{{ $scarico->altro_ordine }}" 
+                           value="{{ $scarico->altro_ordine }}"
+                           autocomplete="off"
                            @if($scarico->ordine_id) disabled @endif>
                 </div>
 
@@ -58,10 +53,11 @@
 
 <!-- Select2 CSS & JS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+$(document).ready(function () {
     console.log("EDIT SCRIPT ATTIVO ✅");
 
     const ordineSelect = document.getElementById('ordine_id');
@@ -70,33 +66,39 @@ document.addEventListener('DOMContentLoaded', function () {
     const anagraficaId = document.getElementById('anagrafica_id');
 
     $('#ordine_id').select2({
-        placeholder: 'Scrivi o seleziona un ordine...',
-        allowClear: true,
+        placeholder: '-- Cerca ordine esistente --',
+        ajax: {
+            url: '{{ route('scarichi.autocomplete-ordini') }}',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { query: params.term };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.codice + ' - ' + item.nome_cliente,
+                            anagrafica_id: item.anagrafica_id,
+                            nome_cliente: item.nome_cliente
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
         width: '100%'
-    }).on('select2:select', function () {
-        ordineSelect.dispatchEvent(new Event('change'));
-    });
+    }).on('select2:select', function (e) {
+        const data = e.params.data;
+        altroOrdineInput.value = '';
+        altroOrdineInput.disabled = true;
 
-    ordineSelect.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const nomeDestinatario = selectedOption.getAttribute('data-destinatario');
-        const idAnagrafica = selectedOption.getAttribute('data-anagrafica-id');
+        destinatarioNome.value = data.nome_cliente || '';
+        destinatarioNome.readOnly = true;
 
-        if (this.value) {
-            altroOrdineInput.value = '';
-            altroOrdineInput.disabled = true;
-
-            destinatarioNome.value = nomeDestinatario || '';
-            destinatarioNome.readOnly = true;
-
-            anagraficaId.value = idAnagrafica || '';
-        } else {
-            altroOrdineInput.disabled = false;
-            destinatarioNome.readOnly = false;
-
-            destinatarioNome.value = '';
-            anagraficaId.value = '';
-        }
+        anagraficaId.value = data.anagrafica_id || '';
     });
 
     altroOrdineInput.addEventListener('input', function () {

@@ -12,13 +12,15 @@
                 <!-- Ordine associato -->
                 <div class="mb-3">
                     <label class="form-label">Ordine Associato (facoltativo)</label>
-                    <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%"></select>
+                    <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%">
+                        <option value="" selected>-- Nessun ordine associato --</option>
+                    </select>
                 </div>
 
                 <!-- Altro ordine -->
                 <div class="mb-3">
                     <label class="form-label">Altro Ordine</label>
-                    <input type="text" name="altro_ordine" id="altro_ordine" class="form-control">
+                    <input type="text" name="altro_ordine" id="altro_ordine" class="form-control" autocomplete="off">
                 </div>
 
                 <!-- Destinatario -->
@@ -37,14 +39,14 @@
     </div>
 </div>
 
-
+<!-- Select2 & jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    console.log("SCRIPT ATTIVO ✅");
+$(document).ready(function () {
+    console.log("CREATE SCRIPT ATTIVO ✅");
 
     const ordineSelect = $('#ordine_id');
     const altroOrdineInput = document.getElementById('altro_ordine');
@@ -73,7 +75,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         };
                     })
                 };
-            }
+            },
+            cache: true
         }
     }).on('select2:select', function (e) {
         const data = e.params.data;
