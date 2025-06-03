@@ -116,14 +116,18 @@ $(document).ready(function () {
         }
     });
 
-        @if(isset($scarico) && $scarico->ordine)
+    @if(isset($scarico) && $scarico->ordine)
         const option = new Option(
             '{{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}',
             '{{ $scarico->ordine->id }}',
             true,
             true
         );
+        $(option).attr('data-anagrafica-id', '{{ $scarico->ordine->anagrafica->id }}');
+        $(option).attr('data-nome-cliente', '{{ $scarico->ordine->anagrafica->nome }}');
         $('#ordine_id').append(option).trigger('change');
+        $('#anagrafica_id').val('{{ $scarico->ordine->anagrafica->id }}');
+        $('#destinatario_nome').val('{{ $scarico->ordine->anagrafica->nome }}');
     @endif
 
 });
