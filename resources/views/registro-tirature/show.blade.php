@@ -8,16 +8,18 @@
     $righeAmbigue = session()->pull('righe_ambigue_tirature', []);
 @endphp
 
-@if(session('import_errori'))
+@php $erroriImport = session()->pull('import_errori'); @endphp
+@if($erroriImport)
     <div class="alert alert-danger mt-3">
         <strong>⚠️ Errori durante l'importazione:</strong>
         <ul>
-            @foreach(session('import_errori') as $err)
+            @foreach($erroriImport as $err)
                 <li>{{ $err }}</li>
             @endforeach
         </ul>
     </div>
 @endif
+
 
 @if(count($righeAmbigue) > 0)
 <!-- MODALE -->
