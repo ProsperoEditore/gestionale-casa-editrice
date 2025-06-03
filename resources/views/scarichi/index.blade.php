@@ -52,8 +52,14 @@
                     <td class="data-stato-info">
                         {{ $item->data_stato_info ? \Carbon\Carbon::parse($item->data_stato_info)->format('d/m/Y') : 'N.D.' }}
                     </td>
-                    <td class="d-flex justify-content-center gap-2">
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i></button>
+                        <td class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('scarichi.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-save"></i>
+                            </button>
                         </form>
 
                         <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline">
@@ -63,7 +69,7 @@
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
-                    </td>
+                        </td>
                 </tr>
             @endforeach
         </tbody>
@@ -111,6 +117,10 @@
                             </small>
 
                             <div class="d-flex gap-2">
+                                <a href="{{ route('scarichi.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <i class="bi bi-save"></i>
                                 </button>
