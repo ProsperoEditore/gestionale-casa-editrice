@@ -91,6 +91,7 @@ class ScaricoController extends Controller
 
     public function update(Request $request, $id)
     {
+        Log::debug('🚚 UPDATE SCARICO RICEVUTO:', $request->all());
         $request->validate([
             'ordine_id' => 'nullable|exists:ordines,id',
             'altro_ordine' => 'nullable|string|max:255',

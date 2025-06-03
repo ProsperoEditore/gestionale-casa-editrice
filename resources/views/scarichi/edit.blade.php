@@ -46,6 +46,16 @@
 
                 <div class="text-center mt-3">
                     <button type="submit" class="btn btn-success">Aggiorna</button>
+                    <script>
+                        $('form').on('submit', function (e) {
+                            console.log("🧪 Submit in corso con valori:");
+                            console.log("ordine_id:", $('#ordine_id').val());
+                            console.log("altro_ordine:", $('#altro_ordine').val());
+                            console.log("destinatario_nome:", $('#destinatario_nome').val());
+                            console.log("anagrafica_id:", $('#anagrafica_id').val());
+                        });
+                    </script>
+
                     <a href="{{ route('scarichi.index') }}" class="btn btn-secondary">Annulla</a>
                 </div>
             </form>
