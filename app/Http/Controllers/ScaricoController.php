@@ -99,15 +99,19 @@ class ScaricoController extends Controller
             'info_spedizione' => 'nullable|string|max:255',
         ]);
 
-        Scarico::findOrFail($id)->update([
-            'ordine_id' => $request->ordine_id,
-            'altro_ordine' => $request->altro_ordine,
-            'destinatario_nome' => $request->destinatario_nome,
-            'info_spedizione' => $request->info_spedizione,
-        ]);
+        $scarico = Scarico::findOrFail($id);
+
+        $scarico->ordine_id = $request->ordine_id;
+        $scarico->altro_ordine = $request->altro_ordine;
+        $scarico->anagrafica_id = $request->anagrafica_id;
+        $scarico->destinatario_nome = $request->destinatario_nome;
+        $scarico->info_spedizione = $request->info_spedizione;
+
+        $scarico->save();
 
         return redirect()->route('scarichi.index')->with('success', 'Scarico aggiornato con successo.');
     }
+
 
     public function destroy($id)
     {
