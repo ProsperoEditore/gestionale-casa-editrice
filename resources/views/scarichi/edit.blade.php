@@ -92,15 +92,27 @@ $(document).ready(function () {
         },
         minimumInputLength: 1,
         width: '100%'
-    }).on('select2:select', function (e) {
+    }) 
+    .on('select2:select', function (e) {
         const data = e.params.data;
+
         altroOrdineInput.value = '';
         altroOrdineInput.disabled = true;
 
-        destinatarioNome.value = data.nome_cliente || '';
+        // Popola destinatario e ID anagrafica
+        if (data.nome_cliente && data.anagrafica_id) {
+            destinatarioNome.value = data.nome_cliente;
+            anagraficaId.value = data.anagrafica_id;
+        } else {
+            // Se non presenti in JSON, cerca nei data-attribute dell'option selezionata
+            const selectedOption = $('#ordine_id').find('option:selected');
+            destinatarioNome.value = selectedOption.data('nome-cliente') || '';
+            anagraficaId.value = selectedOption.data('anagrafica-id') || '';
+        }
+
         destinatarioNome.readOnly = true;
 
-        anagraficaId.value = data.anagrafica_id || '';
+        console.log("✅ anagrafica_id aggiornato:", anagraficaId.value);
     });
 
     altroOrdineInput.addEventListener('input', function () {
@@ -132,4 +144,5 @@ $(document).ready(function () {
 
 });
 </script>
+
 @endsection
