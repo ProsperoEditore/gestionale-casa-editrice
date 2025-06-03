@@ -114,7 +114,9 @@
                     <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
                         <i class="bi bi-save"></i>
                     </button>
-                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm deleteRow" title="Elimina riga">
+                        <i class="bi bi-trash"></i>
+                    </button>
                         <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
                             Salvato!
                         </div>
@@ -299,7 +301,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
                     <i class="bi bi-save"></i>
                 </button>
-                <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
+                <button type="button" class="btn btn-danger btn-sm deleteRow" title="Elimina riga">
+                    <i class="bi bi-trash"></i>
+                </button>
+
                     <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
                         Salvato!
                     </div>
@@ -583,7 +588,10 @@ document.getElementById('barcode-scan-giacenze').addEventListener('input', funct
                     <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
                         <i class="bi bi-save"></i>
                     </button>
-                    <button class="btn btn-danger btn-sm deleteRow" title="Elimina riga"><i class="bi bi-trash"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm deleteRow" title="Elimina riga">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
                         <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
                             Salvato!
                         </div>
@@ -700,6 +708,44 @@ document.addEventListener('click', function (e) {
     }
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.deleteRow').forEach(button => {
+        button.addEventListener('click', function () {
+            if (!confirm('Vuoi davvero eliminare questa riga?')) return;
+
+            const row = this.closest('tr');
+            const id = row.dataset.id;
+
+            if (!id) {
+                row.remove(); // Rimuove righe non ancora salvate
+                return;
+            }
+
+            fetch(`/giacenze/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                } else {
+                    alert("Errore: " + (data.message || "Impossibile eliminare la giacenza."));
+                }
+            })
+            .catch(() => {
+                alert("Errore nella richiesta al server.");
+            });
+        });
+    });
+});
+</script>
+
 
 
 @endsection

@@ -70,7 +70,8 @@
     </table>
 </div>
 
-
+<!-- VISUALIZZAZIONE MOBILE -->
+<div class="d-block d-md-none">
     <div class="row">
         @foreach($scarichi as $item)
         <div class="col-12 mb-3">
@@ -103,7 +104,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <small class="text-muted">Data: 
+                            <small class="text-muted">Data:
                                 <span class="data-stato-info">
                                     {{ $item->data_stato_info ? \Carbon\Carbon::parse($item->data_stato_info)->format('d/m/Y') : 'N.D.' }}
                                 </span>
@@ -115,20 +116,22 @@
                                 </button>
                             </div>
                         </div>
-                        </form> <!-- CHIUDE SOLO PATCH -->
+                    </form>
 
-                        <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline mt-2 ms-auto text-end">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
+                    <form action="{{ route('scarichi.destroy', $item->id) }}" method="POST" class="d-inline mt-2 ms-auto text-end">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
         @endforeach
     </div>
+</div>
+
 
     <div class="d-flex justify-content-center mt-4">
         {{ $scarichi->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
