@@ -92,8 +92,11 @@ class ScaricoController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'ordine_id' => 'nullable|exists:ordines,id',
+            'altro_ordine' => 'nullable|string|max:255',
             'anagrafica_id' => 'required|exists:anagraficas,id',
-            'ordine_id' => 'required|exists:ordines,id',
+            'destinatario_nome' => 'required|string|max:255',
+            'info_spedizione' => 'nullable|string|max:255',
         ]);
 
         Scarico::findOrFail($id)->update([
