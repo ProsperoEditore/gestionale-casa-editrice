@@ -24,20 +24,26 @@
         </div>
     </div>
 
-    @if(session('import_errori') || session('import_errori_persistenti'))
+    @php
+        $erroriImport = session()->pull('import_errori', []);
+        $erroriPersistenti = session()->pull('import_errori_persistenti', []);
+    @endphp
+
+    @if($erroriImport || $erroriPersistenti)
         <div id="erroriImport" class="alert alert-danger mt-3 position-relative">
             <strong>⚠️ Alcune righe non sono state importate:</strong>
             <ul class="mb-0 mt-2">
-                @foreach(session('import_errori') ?? [] as $errore)
+                @foreach($erroriImport as $errore)
                     <li>{{ $errore }}</li>
                 @endforeach
-                @foreach(session('import_errori_persistenti') ?? [] as $errore)
+                @foreach($erroriPersistenti as $errore)
                     <li>{{ $errore }}</li>
                 @endforeach
             </ul>
             <button id="chiudiErroriImport" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2">❌ Chiudi elenco errori</button>
         </div>
     @endif
+
 
     @if(session('success'))
         <div class="alert alert-success mt-3">{{ session('success') }}</div>
