@@ -16,7 +16,9 @@
                     <label class="form-label">Ordine Associato (facoltativo)</label>
                         <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%;">
                             @if(isset($scarico) && $scarico->ordine)
-                                <option value="{{ $scarico->ordine->id }}" selected>
+                                <option value="{{ $scarico->ordine->id }}" selected
+                                    data-anagrafica-id="{{ $scarico->ordine->anagrafica->id }}"
+                                    data-nome-cliente="{{ $scarico->ordine->anagrafica->nome }}">
                                     {{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}
                                 </option>
                             @endif
