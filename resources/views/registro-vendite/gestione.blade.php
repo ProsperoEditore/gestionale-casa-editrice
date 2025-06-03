@@ -504,5 +504,18 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const btnChiudi = document.getElementById('chiudiErroriImport');
+    const boxErrori = document.getElementById('erroriImport');
+
+    if (btnChiudi && boxErrori) {
+        btnChiudi.addEventListener('click', function () {
+            boxErrori.style.display = 'none';
+        });
+    }
+});
+</script>
+
 
 @endsection
