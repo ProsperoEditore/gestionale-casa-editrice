@@ -80,11 +80,12 @@ class ScaricoController extends Controller
     
     
 
-    public function edit(Scarico $scarico)
-    {
-        $ordini = Ordine::with('anagrafica')->get();
-        return view('scarichi.edit', compact('scarico', 'ordini'));
-    }
+        public function edit(Scarico $scarichi)
+        {
+            $ordini = Ordine::with('anagrafica')->get();
+            return view('scarichi.edit', ['scarico' => $scarichi, 'ordini' => $ordini]);
+        }
+
     
     
 
