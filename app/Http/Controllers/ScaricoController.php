@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Scarico;
 use App\Models\Ordine;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class ScaricoController extends Controller
 {
