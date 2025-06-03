@@ -6,9 +6,7 @@
 
     <div class="card">
         <div class="card-body">
-        <form action="{{ route('scarichi.update', $scarico) }}" method="POST">
-
-
+        <form action="{{ route('scarichi.update', ['scarichi' => $scarico->id]) }}" method="POST">
 
                 @csrf
                 @method('PUT')
