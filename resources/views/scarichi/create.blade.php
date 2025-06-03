@@ -24,9 +24,12 @@
                 </div>
 
                 <!-- Destinatario -->
-                <div class="mb-3">
-                    <label class="form-label">Destinatario</label>
-                    <input type="text" name="destinatario_nome" id="destinatario_nome" class="form-control">
+                    <div class="mb-3">
+                        <label class="form-label">Destinatario</label>
+                        <input type="text" name="destinatario_nome" id="destinatario_nome" class="form-control">
+                    </div>
+
+                    <!-- Campo nascosto anagrafica_id -->
                     <input type="hidden" name="anagrafica_id" id="anagrafica_id">
                 </div>
 

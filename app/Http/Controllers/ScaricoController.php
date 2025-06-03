@@ -100,14 +100,20 @@ class ScaricoController extends Controller
 
     public function update(Request $request, $id)
     {
-        Log::debug('🚚 UPDATE SCARICO RICEVUTO:', $request->all());
         $request->validate([
             'ordine_id' => 'nullable|exists:ordines,id',
             'altro_ordine' => 'nullable|string|max:255',
-            'anagrafica_id' => 'required|exists:anagraficas,id',
             'destinatario_nome' => 'required|string|max:255',
             'info_spedizione' => 'nullable|string|max:255',
         ]);
+
+        // Se è presente ordine_id, allora anagrafica_id è obbligatoria
+        if ($request->filled('ordine_id')) {
+            $request->validate([
+                'anagrafica_id' => 'required|exists:anagraficas,id',
+            ]);
+        }
+
 
         $scarico = Scarico::findOrFail($id);
 

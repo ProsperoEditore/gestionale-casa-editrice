@@ -7,28 +7,27 @@
     <div class="card">
         <div class="card-body">
         <form action="{{ route('scarichi.update', ['scarichi' => $scarico->id]) }}" method="POST">
-
                 @csrf
                 @method('PUT')
 
                 <!-- Ordine associato -->
                 <div class="mb-3">
                     <label class="form-label">Ordine Associato (facoltativo)</label>
-                        <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%;">
-                            @if(isset($scarico) && $scarico->ordine)
-                                <option value="{{ $scarico->ordine->id }}" selected
-                                    data-anagrafica-id="{{ $scarico->ordine->anagrafica->id }}"
-                                    data-nome-cliente="{{ $scarico->ordine->anagrafica->nome }}">
-                                    {{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}
-                                </option>
-                            @endif
-                        </select>
+                    <select name="ordine_id" id="ordine_id" class="form-select" style="width: 100%;">
+                        @if($scarico->ordine)
+                            <option value="{{ $scarico->ordine->id }}" selected
+                                data-anagrafica-id="{{ $scarico->ordine->anagrafica->id }}"
+                                data-nome-cliente="{{ $scarico->ordine->anagrafica->nome }}">
+                                {{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}
+                            </option>
+                        @endif
+                    </select>
                 </div>
 
                 <!-- Altro ordine -->
                 <div class="mb-3">
                     <label class="form-label">Altro Ordine</label>
-                    <input type="text" name="altro_ordine" id="altro_ordine" class="form-control" 
+                    <input type="text" name="altro_ordine" id="altro_ordine" class="form-control"
                            value="{{ $scarico->altro_ordine }}"
                            autocomplete="off"
                            @if($scarico->ordine_id) disabled @endif>
@@ -37,25 +36,14 @@
                 <!-- Destinatario -->
                 <div class="mb-3">
                     <label class="form-label">Destinatario</label>
-                    <input type="text" name="destinatario_nome" id="destinatario_nome" class="form-control" 
-                           value="{{ $scarico->anagrafica->nome ?? $scarico->destinatario_nome }}" 
+                    <input type="text" name="destinatario_nome" id="destinatario_nome" class="form-control"
+                           value="{{ $scarico->anagrafica->nome ?? $scarico->destinatario_nome }}"
                            @if($scarico->ordine_id) readonly @endif>
-                    <input type="hidden" name="anagrafica_id" id="anagrafica_id" 
-                           value="{{ $scarico->anagrafica_id }}">
+                    <input type="hidden" name="anagrafica_id" id="anagrafica_id" value="{{ old('anagrafica_id', $scarico->anagrafica_id ?? '') }}">
                 </div>
 
                 <div class="text-center mt-3">
                     <button type="submit" class="btn btn-success">Aggiorna</button>
-                    <script>
-                        $('form').on('submit', function (e) {
-                            console.log("🧪 Submit in corso con valori:");
-                            console.log("ordine_id:", $('#ordine_id').val());
-                            console.log("altro_ordine:", $('#altro_ordine').val());
-                            console.log("destinatario_nome:", $('#destinatario_nome').val());
-                            console.log("anagrafica_id:", $('#anagrafica_id').val());
-                        });
-                    </script>
-
                     <a href="{{ route('scarichi.index') }}" class="btn btn-secondary">Annulla</a>
                 </div>
             </form>
@@ -63,7 +51,7 @@
     </div>
 </div>
 
-<!-- Select2 CSS & JS -->
+<!-- Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -102,25 +90,15 @@ $(document).ready(function () {
         },
         minimumInputLength: 1,
         width: '100%'
-    }) 
-    .on('select2:select', function (e) {
+    }).on('select2:select', function (e) {
         const data = e.params.data;
 
         altroOrdineInput.value = '';
         altroOrdineInput.disabled = true;
 
-        // Popola destinatario e ID anagrafica
-        if (data.nome_cliente && data.anagrafica_id) {
-            destinatarioNome.value = data.nome_cliente;
-            anagraficaId.value = data.anagrafica_id;
-        } else {
-            // Se non presenti in JSON, cerca nei data-attribute dell'option selezionata
-            const selectedOption = $('#ordine_id').find('option:selected');
-            destinatarioNome.value = selectedOption.data('nome-cliente') || '';
-            anagraficaId.value = selectedOption.data('anagrafica-id') || '';
-        }
-
+        destinatarioNome.value = data.nome_cliente || '';
         destinatarioNome.readOnly = true;
+        anagraficaId.value = data.anagrafica_id || '';
 
         console.log("✅ anagrafica_id aggiornato:", anagraficaId.value);
     });
@@ -138,7 +116,8 @@ $(document).ready(function () {
         }
     });
 
-    @if(isset($scarico) && $scarico->ordine)
+    // Per ricaricare select2 con dati salvati
+    @if($scarico->ordine)
         const option = new Option(
             '{{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}',
             '{{ $scarico->ordine->id }}',
@@ -148,11 +127,17 @@ $(document).ready(function () {
         $(option).attr('data-anagrafica-id', '{{ $scarico->ordine->anagrafica->id }}');
         $(option).attr('data-nome-cliente', '{{ $scarico->ordine->anagrafica->nome }}');
         $('#ordine_id').append(option).trigger('change');
-        $('#anagrafica_id').val('{{ $scarico->ordine->anagrafica->id }}');
-        $('#destinatario_nome').val('{{ $scarico->ordine->anagrafica->nome }}');
     @endif
+
+    // Debug submit
+    $('form').on('submit', function (e) {
+        console.log("🧪 Submit in corso con valori:");
+        console.log("ordine_id:", $('#ordine_id').val());
+        console.log("altro_ordine:", $('#altro_ordine').val());
+        console.log("destinatario_nome:", $('#destinatario_nome').val());
+        console.log("anagrafica_id:", $('#anagrafica_id').val());
+    });
 
 });
 </script>
-
 @endsection
