@@ -105,7 +105,6 @@ $(document).ready(function () {
             ordineSelect.prop('disabled', true);
 
             destinatarioNome.readOnly = false;
-            destinatarioNome.value = '';
             anagraficaId.value = '';
         } else {
             ordineSelect.prop('disabled', false);
