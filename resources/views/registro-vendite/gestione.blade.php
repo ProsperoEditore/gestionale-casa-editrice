@@ -167,7 +167,7 @@
                 </div>
             </div>
         </div>
-        
+
 </form> {{-- chiusura form registroVenditeForm --}}
 
 <div class="text-end mt-3">
@@ -525,6 +525,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-
 
 @endsection
