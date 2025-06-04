@@ -36,7 +36,9 @@ class ScaricoController extends Controller
     
         $scarico = Scarico::findOrFail($id);
     
-        $scarico->info_spedizione = $request->info_spedizione;
+        if ($request->filled('info_spedizione')) {
+            $scarico->info_spedizione = $request->info_spedizione;
+        }
     
         if ($request->filled('stato')) {
             $scarico->stato = $request->stato;
@@ -121,7 +123,10 @@ class ScaricoController extends Controller
         $scarico->altro_ordine = $request->altro_ordine;
         $scarico->anagrafica_id = $request->anagrafica_id;
         $scarico->destinatario_nome = $request->destinatario_nome;
-        $scarico->info_spedizione = $request->info_spedizione;
+        if ($request->filled('info_spedizione')) {
+    $scarico->info_spedizione = $request->info_spedizione;
+    }
+
 
         $scarico->save();
 

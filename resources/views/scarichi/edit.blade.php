@@ -103,18 +103,25 @@ $(document).ready(function () {
         console.log("✅ anagrafica_id aggiornato:", anagraficaId.value);
     });
 
-    altroOrdineInput.addEventListener('input', function () {
-        if (this.value.trim() !== '') {
-            $('#ordine_id').val(null).trigger('change');
-            ordineSelect.disabled = true;
+altroOrdineInput.addEventListener('input', function () {
+    if (this.value.trim() !== '') {
+        $('#ordine_id').val(null).trigger('change');
+        ordineSelect.disabled = true;
 
-            destinatarioNome.readOnly = false;
+        destinatarioNome.readOnly = false;
+
+        // Solo se destinatario è stato compilato automaticamente lo azzero
+        // (es. se readonly o è uguale al vecchio ordine)
+        if (destinatarioNome.readOnly || destinatarioNome.value === '{{ $scarico->ordine->anagrafica->nome ?? '' }}') {
             destinatarioNome.value = '';
-            anagraficaId.value = '';
-        } else {
-            ordineSelect.disabled = false;
         }
-    });
+
+        anagraficaId.value = '';
+    } else {
+        ordineSelect.disabled = false;
+    }
+});
+
 
     // Per ricaricare select2 con dati salvati
     @if($scarico->ordine)
