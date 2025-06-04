@@ -109,68 +109,74 @@ class RegistroVenditeController extends Controller
     
     
     
-    public function salvaDettagli(Request $request, $id)
-    {
-        $registroVendita = RegistroVendite::findOrFail($id);
-    
-        if ($request->has('data') && is_array($request->data)) {
-            foreach ($request->data as $index => $data) {
-                $periodo = !empty($request->periodo[$index]) ? $request->periodo[$index] : 'N/D';
-    
-                // Se il dettaglio ha ID, aggiorna, altrimenti crea
-                if (!empty($request->id[$index])) {
-                    $dettaglio = RegistroVenditeDettaglio::find($request->id[$index]);
-                    if ($dettaglio) {
-                        $dettaglio->update([
-                            'data' => $data,
-                            'periodo' => $periodo,
-                            'isbn' => $request->isbn[$index] ?? null,
-                            'titolo' => $request->titolo[$index] ?? null,
-                            'quantita' => $request->quantita[$index] ?? 0,
-                            'prezzo' => $request->prezzo[$index] ?? 0.00,
-                            'valore_lordo' => ($request->quantita[$index] ?? 0) * ($request->prezzo[$index] ?? 0.00),
-                        ]);
-                    }
-                } else {
-                    RegistroVenditeDettaglio::create([
-                        'registro_vendita_id' => $registroVendita->id,
-                        'data' => $data,
-                        'periodo' => $periodo,
-                        'isbn' => $request->isbn[$index] ?? null,
-                        'titolo' => $request->titolo[$index] ?? null,
-                        'quantita' => $request->quantita[$index] ?? 0,
-                        'prezzo' => $request->prezzo[$index] ?? 0.00,
-                        'valore_lordo' => ($request->quantita[$index] ?? 0) * ($request->prezzo[$index] ?? 0.00),
-                    ]);
-                }
+public function salvaDettagli(Request $request, $id)
+{
+    $registroVendita = RegistroVendite::findOrFail($id);
+    $righe = $request->input('righe', []);
 
-    
-                // ✅ AGGIORNA GIACENZA se esiste il magazzino per l'anagrafica
-                $magazzino = \App\Models\Magazzino::where('anagrafica_id', $registroVendita->anagrafica_id)->first();
-    
-                if ($magazzino) {
-                    $libro = \App\Models\Libro::where('isbn', trim($request->isbn[$index]))->first();
-                    if ($libro) {
-                        $giacenza = \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
-                            ->where('libro_id', $libro->id)
-                            ->first();
-    
-                        if ($giacenza) {
-                            $quantitaDaSottrarre = $request->quantita[$index] ?? 0;
-                            $giacenza->quantita = max(0, $giacenza->quantita - $quantitaDaSottrarre);
-                            $giacenza->note = 'Aggiornato con rendiconto del ' . now()->format('d.m.Y');
-                            $giacenza->data_ultimo_aggiornamento = now();
-                            $giacenza->save();
-                        }
-                    }
+    foreach ($righe as $riga) {
+        // Verifica che ci siano dati sufficienti
+        if (empty($riga['isbn']) || empty($riga['quantita'])) {
+            continue; // salta righe vuote o non valide
+        }
+
+        $periodo = !empty($riga['periodo']) ? $riga['periodo'] : 'N/D';
+        $quantita = (int) ($riga['quantita'] ?? 0);
+        $prezzo = (float) ($riga['prezzo'] ?? 0.00);
+        $valoreLordo = $quantita * $prezzo;
+
+        if (!empty($riga['id'])) {
+            // Update
+            $dettaglio = RegistroVenditeDettaglio::find($riga['id']);
+            if ($dettaglio) {
+                $dettaglio->update([
+                    'data' => $riga['data'] ?? null,
+                    'periodo' => $periodo,
+                    'isbn' => $riga['isbn'],
+                    'titolo' => $riga['titolo'] ?? null,
+                    'quantita' => $quantita,
+                    'prezzo' => $prezzo,
+                    'valore_lordo' => $valoreLordo,
+                ]);
+            }
+        } else {
+            // Create
+            RegistroVenditeDettaglio::create([
+                'registro_vendita_id' => $registroVendita->id,
+                'data' => $riga['data'] ?? null,
+                'periodo' => $periodo,
+                'isbn' => $riga['isbn'],
+                'titolo' => $riga['titolo'] ?? null,
+                'quantita' => $quantita,
+                'prezzo' => $prezzo,
+                'valore_lordo' => $valoreLordo,
+            ]);
+        }
+
+        // ✅ AGGIORNA GIACENZA se esiste il magazzino per l'anagrafica
+        $magazzino = \App\Models\Magazzino::where('anagrafica_id', $registroVendita->anagrafica_id)->first();
+
+        if ($magazzino && !empty($riga['isbn'])) {
+            $libro = \App\Models\Libro::where('isbn', trim($riga['isbn']))->first();
+
+            if ($libro) {
+                $giacenza = \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
+                    ->where('libro_id', $libro->id)
+                    ->first();
+
+                if ($giacenza) {
+                    $giacenza->quantita = max(0, $giacenza->quantita - $quantita);
+                    $giacenza->note = 'Aggiornato con rendiconto del ' . now()->format('d.m.Y');
+                    $giacenza->data_ultimo_aggiornamento = now();
+                    $giacenza->save();
                 }
             }
         }
-    
-        return redirect()->route('registro-vendite.gestione', ['id' => $id])
-            ->with('success', 'Dettagli aggiornati con successo!');
     }
-    
+
+    return redirect()->route('registro-vendite.gestione', ['id' => $id])
+        ->with('success', 'Dettagli aggiornati con successo!');
+}
 
      
 
