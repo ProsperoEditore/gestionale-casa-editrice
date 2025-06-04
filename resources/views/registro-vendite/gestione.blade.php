@@ -168,26 +168,6 @@
             </div>
         </div>
 
-        <div class="text-end mt-3">
-            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank">
-                <div class="row justify-content-end align-items-end g-2 mt-4">
-                    <div class="col-auto">
-                        <label for="data_da" class="form-label mb-1">Da</label>
-                        <input type="date" class="form-control" name="data_da" id="data_da" value="{{ request('data_da') }}">
-                    </div>
-
-                    <div class="col-auto">
-                        <label for="data_a" class="form-label mb-1">A</label>
-                        <input type="date" class="form-control" name="data_a" id="data_a" value="{{ request('data_a') }}">
-                    </div>
-
-                    <div class="col-auto d-flex align-items-end">
-                        <button type="submit" class="btn btn-danger">📄 Stampa PDF</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
             <h5>Elenco Vendite</h5>
 
             @if($dettagli->isEmpty())
@@ -245,7 +225,28 @@
                 {{ $dettagli->links() }}
             </div>
     </div>
+    
     </form> {{-- chiusura registroVenditeForm --}}
+
+            <div class="text-end mt-3">
+            <form action="{{ route('registro-vendite.stampa', $registroVendita->id) }}" method="GET" target="_blank">
+                <div class="row justify-content-end align-items-end g-2 mt-4">
+                    <div class="col-auto">
+                        <label for="data_da" class="form-label mb-1">Da</label>
+                        <input type="date" class="form-control" name="data_da" id="data_da" value="{{ request('data_da') }}">
+                    </div>
+
+                    <div class="col-auto">
+                        <label for="data_a" class="form-label mb-1">A</label>
+                        <input type="date" class="form-control" name="data_a" id="data_a" value="{{ request('data_a') }}">
+                    </div>
+
+                    <div class="col-auto d-flex align-items-end">
+                        <button type="submit" class="btn btn-danger">📄 Stampa PDF</button>
+                    </div>
+                </div>
+            </form>
+        </div>
 </div>
 
 <style>
