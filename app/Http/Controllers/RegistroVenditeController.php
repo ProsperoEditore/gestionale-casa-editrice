@@ -113,6 +113,7 @@ public function salvaDettagli(Request $request, $id)
 {
     $registroVendita = RegistroVendite::findOrFail($id);
     $righe = $request->input('righe', []);
+    dd($request->all());
 
     foreach ($righe as $riga) {
         // Verifica che ci siano dati sufficienti
