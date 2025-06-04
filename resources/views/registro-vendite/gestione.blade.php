@@ -214,19 +214,18 @@
                         </tr>
                     </thead>
                     <tbody id="registroVenditeBody">
-                        @foreach($dettagli as $dettaglio)
+                            @foreach($dettagli as $i => $dettaglio)
                             <tr data-id="{{ $dettaglio->id }}">
-                                <input type="hidden" name="id[]" value="{{ $dettaglio->id }}">
-                                    <td data-label="Data"><input type="date" name="data[]" value="{{ $dettaglio->data }}" class="form-control"></td>
-                                    <td data-label="Periodo"><input type="text" name="periodo[]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
-                                    <td data-label="ISBN"><input type="text" name="isbn[]" value="{{ $dettaglio->isbn }}" class="form-control isbn"></td>
-                                    <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" value="{{ $dettaglio->titolo }}" placeholder="Cerca titolo..."></td>
-                                    <td data-label="Quantità"><input type="number" name="quantita[]" value="{{ $dettaglio->quantita }}" class="form-control quantita"></td>
-                                    <td data-label="Prezzo"><input type="number" name="prezzo[]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01"></td>
-                                    <td data-label="Valore Lordo"><input type="number" name="valore_lordo[]" value="{{ $dettaglio->quantita * $dettaglio->prezzo }}" class="form-control valore-lordo" readonly></td>
-                                    <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+                                <input type="hidden" name="righe[{{ $i }}][id]" value="{{ $dettaglio->id }}">
+                                <td><input type="date" name="righe[{{ $i }}][data]" value="{{ $dettaglio->data }}" class="form-control"></td>
+                                <td><input type="text" name="righe[{{ $i }}][periodo]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
+                                <td><input type="text" name="righe[{{ $i }}][isbn]" value="{{ $dettaglio->isbn }}" class="form-control"></td>
+                                <td><input type="text" name="righe[{{ $i }}][titolo]" value="{{ $dettaglio->titolo }}" class="form-control"></td>
+                                <td><input type="number" name="righe[{{ $i }}][quantita]" value="{{ $dettaglio->quantita }}" class="form-control"></td>
+                                <td><input type="number" name="righe[{{ $i }}][prezzo]" value="{{ $dettaglio->prezzo }}" class="form-control"></td>
+                                <td><input type="number" name="righe[{{ $i }}][valore_lordo]" value="{{ $dettaglio->valore_lordo }}" class="form-control"></td>
                             </tr>
-                        @endforeach
+                            @endforeach
                     </tbody>
                 </table>
             </div>
@@ -400,32 +399,36 @@ function aggiornaTotaleCopieVendute() {
         });
     });
 
-    document.getElementById("addRow").addEventListener("click", function() {
+    let rigaIndex = document.querySelectorAll("#registroVenditeBody tr").length;
+
+    document.getElementById("addRow").addEventListener("click", function () {
         let newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <input type="hidden" name="id[]" value="">
-                <td data-label="Data"><input type="date" name="data[]" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Data"></td>
-                <td data-label="Periodo"><input type="text" name="periodo[]" class="form-control" placeholder="Periodo"></td>
-                <td data-label="ISBN"><input type="text" name="isbn[]" class="form-control isbn" placeholder="ISBN" readonly></td>
-                <td data-label="Titolo"><input type="text" name="titolo[]" class="form-control titolo" placeholder="Cerca titolo..."></td>
-                <td data-label="Quantità"><input type="number" name="quantita[]" value="0" class="form-control quantita" placeholder="Quantità"></td>
-                <td data-label="Prezzo"><input type="number" name="prezzo[]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo" readonly></td>
-                <td data-label="Valore Vendita"><input type="number" name="valore_lordo[]" value="0.00" class="form-control valore-lordo" step="0.01" placeholder="Valore vendita"></td>
-                <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
-            `;
+        newRow.innerHTML = `
+            <input type="hidden" name="righe[${rigaIndex}][id]" value="">
+            <td data-label="Data"><input type="date" name="righe[${rigaIndex}][data]" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Data"></td>
+            <td data-label="Periodo"><input type="text" name="righe[${rigaIndex}][periodo]" class="form-control" placeholder="Periodo"></td>
+            <td data-label="ISBN"><input type="text" name="righe[${rigaIndex}][isbn]" class="form-control isbn" placeholder="ISBN" readonly></td>
+            <td data-label="Titolo"><input type="text" name="righe[${rigaIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..."></td>
+            <td data-label="Quantità"><input type="number" name="righe[${rigaIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità"></td>
+            <td data-label="Prezzo"><input type="number" name="righe[${rigaIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo" readonly></td>
+            <td data-label="Valore Vendita"><input type="number" name="righe[${rigaIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" placeholder="Valore vendita"></td>
+            <td data-label="Azioni"><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+        `;
 
         document.getElementById("registroVenditeBody").prepend(newRow);
 
-        // Listener su campi modificabili per aggiornare il totale
-            newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
-                input.addEventListener("input", function () {
-                    aggiornaValoreLordo(newRow);
-                });
+        newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
+            input.addEventListener("input", function () {
+                aggiornaValoreLordo(newRow);
             });
+        });
 
         initAutocomplete(newRow.querySelector(".titolo"));
         gestisciEventiElimina();
+
+        rigaIndex++;
     });
+
 
     function gestisciEventiElimina() {
         document.querySelectorAll(".delete-row").forEach(btn => {
