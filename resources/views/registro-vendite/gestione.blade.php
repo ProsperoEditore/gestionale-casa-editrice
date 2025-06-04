@@ -221,19 +221,19 @@
                                 <input type="text" name="righe[{{ $i }}][periodo]" value="{{ $dettaglio->periodo }}" class="form-control">
                             </td>
                             <td>
-                                <input type="text" name="righe[{{ $i }}][isbn]" value="{{ $dettaglio->isbn }}" class="form-control">
+                                <input type="text" name="righe[{{ $i }}][isbn]" value="{{ $dettaglio->isbn }}" class="form-control isbn">
                             </td>
                             <td>
-                                <input type="text" name="righe[{{ $i }}][titolo]" value="{{ $dettaglio->titolo }}" class="form-control">
+                                <input type="text" name="righe[{{ $i }}][titolo]" value="{{ $dettaglio->titolo }}" class="form-control titolo">
                             </td>
                             <td>
-                                <input type="number" name="righe[{{ $i }}][quantita]" value="{{ $dettaglio->quantita }}" class="form-control">
+                                <input type="number" name="righe[{{ $i }}][quantita]" value="{{ $dettaglio->quantita }}" class="form-control quantita">
                             </td>
                             <td>
-                                <input type="number" name="righe[{{ $i }}][prezzo]" value="{{ $dettaglio->prezzo }}" class="form-control">
+                                <input type="number" name="righe[{{ $i }}][prezzo]" value="{{ $dettaglio->prezzo }}" class="form-control prezzo" step="0.01">
                             </td>
                             <td>
-                                <input type="number" name="righe[{{ $i }}][valore_lordo]" value="{{ $dettaglio->valore_lordo }}" class="form-control">
+                                <input type="number" name="righe[{{ $i }}][valore_lordo]" value="{{ $dettaglio->valore_lordo }}" class="form-control valore-lordo" step="0.01">
                             </td>
                         </tr>
                         @endforeach
