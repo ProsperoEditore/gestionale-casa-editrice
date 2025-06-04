@@ -214,18 +214,32 @@
                         </tr>
                     </thead>
                     <tbody id="registroVenditeBody">
-                            @foreach($dettagli as $i => $dettaglio)
-                            <tr data-id="{{ $dettaglio->id }}">
+                        @foreach($dettagli as $i => $dettaglio)
+                        <tr data-id="{{ $dettaglio->id }}">
+                            <td>
                                 <input type="hidden" name="righe[{{ $i }}][id]" value="{{ $dettaglio->id }}">
-                                <td><input type="date" name="righe[{{ $i }}][data]" value="{{ $dettaglio->data }}" class="form-control"></td>
-                                <td><input type="text" name="righe[{{ $i }}][periodo]" value="{{ $dettaglio->periodo }}" class="form-control"></td>
-                                <td><input type="text" name="righe[{{ $i }}][isbn]" value="{{ $dettaglio->isbn }}" class="form-control"></td>
-                                <td><input type="text" name="righe[{{ $i }}][titolo]" value="{{ $dettaglio->titolo }}" class="form-control"></td>
-                                <td><input type="number" name="righe[{{ $i }}][quantita]" value="{{ $dettaglio->quantita }}" class="form-control"></td>
-                                <td><input type="number" name="righe[{{ $i }}][prezzo]" value="{{ $dettaglio->prezzo }}" class="form-control"></td>
-                                <td><input type="number" name="righe[{{ $i }}][valore_lordo]" value="{{ $dettaglio->valore_lordo }}" class="form-control"></td>
-                            </tr>
-                            @endforeach
+                                <input type="date" name="righe[{{ $i }}][data]" value="{{ $dettaglio->data }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="text" name="righe[{{ $i }}][periodo]" value="{{ $dettaglio->periodo }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="text" name="righe[{{ $i }}][isbn]" value="{{ $dettaglio->isbn }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="text" name="righe[{{ $i }}][titolo]" value="{{ $dettaglio->titolo }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="number" name="righe[{{ $i }}][quantita]" value="{{ $dettaglio->quantita }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="number" name="righe[{{ $i }}][prezzo]" value="{{ $dettaglio->prezzo }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="number" name="righe[{{ $i }}][valore_lordo]" value="{{ $dettaglio->valore_lordo }}" class="form-control">
+                            </td>
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

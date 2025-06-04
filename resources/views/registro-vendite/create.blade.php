@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h3 class="text-center">Crea Registro Vendite</h3>
 
-    <form action="{{ route('registro-vendite.salvaDettagli', $registroVendita->id) }}" method="POST">
+    <form action="{{ route('registro-vendite.store') }}" method="POST">
         @csrf
 
         <div class="card mt-4">
