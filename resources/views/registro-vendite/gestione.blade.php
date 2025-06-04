@@ -215,6 +215,9 @@
                             <td>
                                 <input type="number" name="righe[{{ $i }}][valore_lordo]" value="{{ $dettaglio->valore_lordo }}" class="form-control valore-lordo" step="0.01">
                             </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
