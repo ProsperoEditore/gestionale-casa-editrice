@@ -78,7 +78,6 @@ Route::post('/magazzini/store', [MagazzinoController::class, 'store'])->name('ma
 Route::delete('/magazzini/{id}', [MagazzinoController::class, 'destroy'])->name('magazzini.destroy');
 Route::put('/magazzini/{id}/update-scadenza', [MagazzinoController::class, 'updateScadenza'])->name('magazzini.updateScadenza');
 
-
 // Giacenze collegate a un magazzino
 Route::get('/magazzini/{magazzino}/giacenze', [GiacenzaController::class, 'create'])->name('giacenze.create');
 Route::post('/magazzini/{magazzino}/giacenze', [GiacenzaController::class, 'store'])->name('giacenze.store');
@@ -92,14 +91,12 @@ Route::delete('/giacenze/{id}', [GiacenzaController::class, 'destroy'])->name('g
 Route::post('/giacenze/singola/{magazzino}', [GiacenzaController::class, 'storeSingola'])->name('giacenze.storeSingola.post');
 Route::put('/giacenze/singola/{id}/{magazzino}', [GiacenzaController::class, 'storeSingola'])->name('giacenze.storeSingola.put');
 
-
-
-
-
 // Rotta fallback per accesso diretto a giacenze.create senza magazzino
 Route::get('/giacenze/create', function () {
     return redirect()->route('magazzini.index')->with('error', '⚠ Devi selezionare prima un magazzino.');
 });
+
+
 
 
 // Ordini
