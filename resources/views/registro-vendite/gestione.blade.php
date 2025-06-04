@@ -225,7 +225,7 @@
                 {{ $dettagli->links() }}
             </div>
     </div>
-    
+
     </form> {{-- chiusura registroVenditeForm --}}
 
             <div class="text-end mt-3">
@@ -323,21 +323,20 @@ input.valore-lordo {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
     gestisciEventiElimina();
 
-            document.querySelectorAll("#registroVenditeBody tr").forEach(function(row) {
-            row.querySelectorAll(".quantita, .prezzo").forEach(function(input) {
-                input.addEventListener("input", function () {
-                    aggiornaValoreLordo(row);
-                });
+    // Mantieni inalterato questo pezzo, serve per aggiornare "valore lordo" sulle righe esistenti
+    document.querySelectorAll("#registroVenditeBody tr").forEach(function(row) {
+        row.querySelectorAll(".quantita, .prezzo").forEach(function(input) {
+            input.addEventListener("input", function () {
+                aggiornaValoreLordo(row);
             });
         });
-
+    });
 
     if (righeAmbigue.length > 0) {
         let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
@@ -353,23 +352,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
-    } 
-
-function aggiornaValoreLordo(row) {
-    let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
-    let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
-    const valore = (quantita * prezzo).toFixed(2);
-    const valoreInput = row.querySelector(".valore-lordo");
-
-    if (document.activeElement !== valoreInput) {
-        valoreInput.value = valore;
     }
 
-    aggiornaTotaleValoreVendita();
-}
+    function aggiornaValoreLordo(row) {
+        let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
+        let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
+        const valore = (quantita * prezzo).toFixed(2);
+        const valoreInput = row.querySelector(".valore-lordo");
+
+        if (document.activeElement !== valoreInput) {
+            valoreInput.value = valore;
+        }
+
+        aggiornaTotaleValoreVendita();
+    }
 
 
-
+    // ───────────  initAutocomplete  ───────────
     function initAutocomplete(input) {
         $(input).autocomplete({
             source: libri.map(libro => ({
@@ -382,28 +381,42 @@ function aggiornaValoreLordo(row) {
                 let parentRow = $(this).closest("tr");
                 parentRow.find(".isbn").val(ui.item.isbn);
                 parentRow.find(".prezzo").val(ui.item.prezzo);
+                // ──── ❶ Imposto FULL titolo nel campo e blocco il comportamento di default  ────
+                $(this).val(ui.item.value);
                 aggiornaValoreLordo(parentRow[0]);
+                return false;
             }
-        });
+        })
+        // Opzionale: mostro solo item.label nel dropdown senza duplicati
+        .autocomplete("instance")._renderItem = function(ul, item) {
+            return $("<li>")
+                .append("<div>" + item.label + "</div>")
+                .appendTo(ul);
+        };
     }
 
-function aggiornaTotaleValoreVendita() {
-    let totale = 0;
-    document.querySelectorAll('.valore-lordo').forEach(function (input) {
-        let valore = parseFloat(input.value) || 0;
-        totale += valore;
+    // ──── ❷ Applica l’autocomplete a TUTTI i campi “titolo” già esistenti in pagina ────
+    document.querySelectorAll(".titolo").forEach(function(input) {
+        initAutocomplete(input);
     });
-    document.getElementById('totale-valore-vendita').value = totale.toFixed(2);
-    aggiornaTotaleCopieVendute();
-}
 
-function aggiornaTotaleCopieVendute() {
-    let totaleCopie = 0;
-    document.querySelectorAll('.quantita').forEach(function (input) {
-        totaleCopie += parseInt(input.value) || 0;
-    });
-    document.getElementById('totale-copie-vendute').value = totaleCopie;
-}
+    function aggiornaTotaleValoreVendita() {
+        let totale = 0;
+        document.querySelectorAll('.valore-lordo').forEach(function (input) {
+            let valore = parseFloat(input.value) || 0;
+            totale += valore;
+        });
+        document.getElementById('totale-valore-vendita').value = totale.toFixed(2);
+        aggiornaTotaleCopieVendute();
+    }
+
+    function aggiornaTotaleCopieVendute() {
+        let totaleCopie = 0;
+        document.querySelectorAll('.quantita').forEach(function (input) {
+            totaleCopie += parseInt(input.value) || 0;
+        });
+        document.getElementById('totale-copie-vendute').value = totaleCopie;
+    }
 
     document.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
         input.addEventListener("input", () => {
@@ -435,12 +448,13 @@ function aggiornaTotaleCopieVendute() {
             });
         });
 
+        // ─── Applico l’autocomplete al nuovo campo <input class="titolo"> appena aggiunto ───
         initAutocomplete(newRow.querySelector(".titolo"));
+
         gestisciEventiElimina();
 
         rigaIndex++;
     });
-
 
     function gestisciEventiElimina() {
         document.querySelectorAll(".delete-row").forEach(btn => {
@@ -469,8 +483,6 @@ function aggiornaTotaleCopieVendute() {
             row.remove();
         }
     }
-
-
 });
 </script>
 
