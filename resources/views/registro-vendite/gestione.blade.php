@@ -408,6 +408,56 @@ $(document).ready(function () {
 
     gestisciEventiElimina();
 
+    $('#addRow').on('click', function () {
+    const newIndex = $('#registroVenditeBody tr').length;
+    const today = new Date().toISOString().slice(0, 10);
+
+    const $newRow = $(`
+        <tr>
+            <td>
+                <input type="hidden" name="righe[${newIndex}][id]" value="">
+                <input type="date" name="righe[${newIndex}][data]" value="${today}" class="form-control data-row">
+            </td>
+            <td>
+                <input type="text" name="righe[${newIndex}][periodo]" class="form-control periodo-row">
+            </td>
+            <td>
+                <input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn">
+            </td>
+            <td>
+                <input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo...">
+            </td>
+            <td>
+                <input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita">
+            </td>
+            <td>
+                <input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01">
+            </td>
+            <td>
+                <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01">
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+            </td>
+        </tr>
+    `);
+
+    $newRow.find('.data-row').on('change', function () {
+        const nuovaData = $(this).val();
+        $newRow.find('.periodo-row').val(calcolaPeriodo(nuovaData));
+    }).trigger('change');
+
+    initAutocomplete($newRow.find('.titolo'));
+    $newRow.find('.quantita, .prezzo').on('input', function () {
+        aggiornaValoreLordo($newRow);
+    });
+
+    $('#registroVenditeBody').prepend($newRow);
+    gestisciEventiElimina();
+    $newRow.find('.titolo').focus();
+});
+
+
     $(document).on('keydown', '#barcode-scan-registro', function(e) {
         if (e.key === 'Enter' || e.which === 13) {
             e.preventDefault();
@@ -548,49 +598,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-
-<script>
-function aggiungiRiga() {
-    const tbody = document.querySelector('#registroVenditeBody');
-    const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-        <td><input type="date" name="data[]" class="form-control data" required></td>
-        <td><input type="text" name="isbn[]" class="form-control isbn"></td>
-        <td><input type="text" name="titolo[]" class="form-control titolo autocomplete-titolo" placeholder="Cerca libro..."></td>
-        <td><input type="number" name="quantita[]" class="form-control quantita" value="1"></td>
-        <td><input type="number" name="prezzo[]" class="form-control prezzo" step="0.01" value="0.00"></td>
-        <td><input type="number" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" step="0.01" value="0.00" readonly></td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm delete-row" onclick="rimuoviRiga(this)">✖</button>
-        </td>
-    `;
-    tbody.appendChild(newRow);
-    aggiornaEventiRiga(newRow); // collega eventi a input quantità/prezzo
-    aggiornaValoreLordo(newRow); // calcola valore lordo iniziale
-}
-
-function aggiornaEventiRiga(row) {
-    const quantita = row.querySelector('.quantita');
-    const prezzo = row.querySelector('.prezzo');
-    if (quantita && prezzo) {
-        quantita.addEventListener('input', () => aggiornaValoreLordo(row));
-        prezzo.addEventListener('input', () => aggiornaValoreLordo(row));
-    }
-}
-
-function aggiornaValoreLordo(row) {
-    const quantita = parseFloat(row.querySelector('.quantita')?.value || 0);
-    const prezzo = parseFloat(row.querySelector('.prezzo')?.value || 0);
-    const valore = quantita * prezzo;
-    const valoreInput = row.querySelector('.valore_vendita_lordo');
-    if (valoreInput) valoreInput.value = valore.toFixed(2);
-}
-
-function rimuoviRiga(btn) {
-    const row = btn.closest('tr');
-    if (row) row.remove();
-}
-</script>
-
 
 @endsection
