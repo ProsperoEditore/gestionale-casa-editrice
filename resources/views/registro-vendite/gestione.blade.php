@@ -319,7 +319,6 @@ input.valore-lordo {
 
 </style>
 
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -537,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    $('#barcode-scan-registro').on('keydown', function(e) {
+    $(document).on('keydown', '#barcode-scan-registro', function(e) {
         if (e.key === 'Enter' || e.which === 13) {
             e.preventDefault();
 
