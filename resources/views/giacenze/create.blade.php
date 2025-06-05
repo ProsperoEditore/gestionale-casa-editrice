@@ -654,7 +654,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Focus automatico all’avvio
     campoScan.focus();
 
-    campoScan.addEventListener('blur', () => setTimeout(() => campoScan.focus(), 100));
+    let recentlyInteracted = false;
+
+        campoScan.addEventListener('blur', function () {
+            if (recentlyInteracted) return;
+            setTimeout(() => campoScan.focus(), 100);
+        });
+
+        document.addEventListener('click', function () {
+            recentlyInteracted = true;
+            setTimeout(() => {
+                recentlyInteracted = false;
+            }, 1000);
+        });
 
     campoScan.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
@@ -672,7 +684,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (rigaEsistente) {
             rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            rigaEsistente.querySelector('.quantita')?.focus();
+            setTimeout(() => {
+                rigaEsistente.querySelector('.quantita')?.focus();
+            }, 300);
             campoScan.value = '';
             return;
         }
