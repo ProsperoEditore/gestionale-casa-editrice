@@ -488,113 +488,111 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    $('#barcode-scan-registro').on('keydown', function(e) {
-        // Se è ENTER
-        if (e.key === 'Enter' || e.which === 13) {
-            e.preventDefault();
-            let scannedCode = $(this).val().trim();
-            if (!scannedCode) {
-                return;
-            }
+ $('#barcode-scan-registro').on('keydown', function(e) {
+    // Intercetto solo il tasto ENTER
+    if (e.key === 'Enter' || e.which === 13) {
+        e.preventDefault();
 
-            // Calcolo la data odierna in YYYY-MM-DD
-            let oggi = new Date();
-            let yyyy = oggi.getFullYear();
-            let mm   = String(oggi.getMonth() + 1).padStart(2, '0');
-            let dd   = String(oggi.getDate()).padStart(2, '0');
-            let todayStr = `${yyyy}-${mm}-${dd}`;
-
-            // Cerco tra le righe se esiste già (data = oggi, isbn = scannedCode)
-            let rigaTrovata = null;
-            $('#registroVenditeBody tr').each(function() {
-                let $tr = $(this);
-                let rowDate = $tr.find('input[name*="[data]"]').val();
-                let rowIsbn = $tr.find('.isbn').val().trim();
-                if (rowDate === todayStr && rowIsbn === scannedCode) {
-                    rigaTrovata = $tr;
-                    return false;
-                }
-            });
-
-            if (rigaTrovata) {
-                // Se la riga esiste, focus su .quantita
-                rigaTrovata.find('.quantita').focus();
-                $('#barcode-scan-registro').val('');
-                return;
-            }
-
-            // Se non esiste, chiedo conferma per aggiungere
-            let messaggio = 
-              "Non esiste ancora una riga con ISBN \"" + scannedCode + 
-              "\" per la data odierna (" + todayStr + ").\n" +
-              "Vuoi aggiungere una nuova riga ?";
-if (confirm(messaggio)) {
-    // Debug: verifico che entro correttamente
-    console.log('Ho premuto OK, vado a creare la nuova riga');
-
-    let newIndex = $('#registroVenditeBody tr').length;
-    console.log('newIndex =', newIndex);
-
-    let $newRow = $(`
-        <tr>
-          <td data-label="Data">
-            <input type="hidden" name="righe[${newIndex}][id]" value="">
-            <input type="date" name="righe[${newIndex}][data]" value="${todayStr}" class="form-control" />
-          </td>
-          <td data-label="Periodo">
-            <input type="text" name="righe[${newIndex}][periodo]" class="form-control" placeholder="Periodo" />
-          </td>
-          <td data-label="ISBN">
-            <input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn" value="${scannedCode}" readonly />
-          </td>
-          <td data-label="Titolo">
-            <input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..." />
-          </td>
-          <td data-label="Quantità">
-            <input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità" />
-          </td>
-          <td data-label="Prezzo">
-            <input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" readonly />
-          </td>
-          <td data-label="Valore Vendita">
-            <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" />
-          </td>
-          <td data-label="Azioni">
-            <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-          </td>
-        </tr>
-    `);
-
-    console.log('$newRow creato:', $newRow.prop('outerHTML'));
-
-    // Aggiungo la riga alla tabella
-    $('#registroVenditeBody').prepend($newRow);
-
-    console.log('Riga aggiunta, righe totali ora =', $('#registroVenditeBody tr').length);
-
-    // Ricollego eventi: autocomplete, ricalcolo valore e delete
-    initAutocomplete($newRow.find('.titolo'));
-    $newRow.find('.quantita, .prezzo').on('input', function() {
-        aggiornaValoreLordo($newRow[0]);
-    });
-    gestisciEventiElimina();
-
-    // Focus su "Quantità"
-    $newRow.find('.quantita').focus();
-
-    // Pulisco il campo barcode
-    $('#barcode-scan-registro').val('');
-
-    rigaIndex++;
-} 
-
-            } else {
-                // Se l'utente risponde "No", pulisco il campo barcode e non faccio altro
-                $('#barcode-scan-registro').val('');
-                return;
-            }
+        let scannedCode = $(this).val().trim();
+        if (!scannedCode) {
+            return;
         }
-    });
+
+        // Calcolo la data odierna in YYYY-MM-DD
+        let oggi = new Date();
+        let yyyy = oggi.getFullYear();
+        let mm   = String(oggi.getMonth() + 1).padStart(2, '0');
+        let dd   = String(oggi.getDate()).padStart(2, '0');
+        let todayStr = `${yyyy}-${mm}-${dd}`;
+
+        // Cerco se, nella tabella, esiste già una riga con data = oggi e isbn = scannedCode
+        let rigaTrovata = null;
+        $('#registroVenditeBody tr').each(function() {
+            let $tr = $(this);
+            let rowDate = $tr.find('input[name*="[data]"]').val();
+            let rowIsbn = $tr.find('.isbn').val().trim();
+            if (rowDate === todayStr && rowIsbn === scannedCode) {
+                rigaTrovata = $tr;
+                return false; // esco dal ciclo each
+            }
+        });
+
+        if (rigaTrovata) {
+            // Se la riga esiste, sposto il focus su .quantita di quella riga
+            rigaTrovata.find('.quantita').focus();
+            $('#barcode-scan-registro').val('');
+            return;
+        }
+
+        // Se non esiste, chiedo conferma all'utente
+        let messaggio = 
+          "Non esiste ancora una riga con ISBN \"" + scannedCode + 
+          "\" per la data odierna (" + todayStr + ").\n" +
+          "Vuoi aggiungere una nuova riga ?";
+        if (confirm(messaggio)) {
+            // Debug (puoi rimuoverlo dopo aver verificato che la riga si crea correttamente)
+            console.log('Ho premuto OK, creo la nuova riga');
+            console.log('Numero righe prima di aggiungere:', $('#registroVenditeBody tr').length);
+
+            let newIndex = $('#registroVenditeBody tr').length;
+            let $newRow = $(`
+                <tr>
+                  <td data-label="Data">
+                    <input type="hidden" name="righe[${newIndex}][id]" value="">
+                    <input type="date" name="righe[${newIndex}][data]" value="${todayStr}" class="form-control" />
+                  </td>
+                  <td data-label="Periodo">
+                    <input type="text" name="righe[${newIndex}][periodo]" class="form-control" placeholder="Periodo" />
+                  </td>
+                  <td data-label="ISBN">
+                    <input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn" value="${scannedCode}" readonly />
+                  </td>
+                  <td data-label="Titolo">
+                    <input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..." />
+                  </td>
+                  <td data-label="Quantità">
+                    <input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità" />
+                  </td>
+                  <td data-label="Prezzo">
+                    <input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" readonly />
+                  </td>
+                  <td data-label="Valore Vendita">
+                    <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" />
+                  </td>
+                  <td data-label="Azioni">
+                    <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+                  </td>
+                </tr>
+            `);
+
+            console.log('$newRow creato:', $newRow.prop('outerHTML'));
+
+            // Aggiungo la riga appena creata in testa alla tabella
+            $('#registroVenditeBody').prepend($newRow);
+
+            console.log('Righe totali dopo l\'inserimento:', $('#registroVenditeBody tr').length);
+
+            // Ricollego eventi: autocomplete, ricalcolo valore e delete
+            initAutocomplete($newRow.find('.titolo'));
+            $newRow.find('.quantita, .prezzo').on('input', function() {
+                aggiornaValoreLordo($newRow[0]);
+            });
+            gestisciEventiElimina();
+
+            // Metto il focus sulla nuova cella “quantita”
+            $newRow.find('.quantita').focus();
+
+            // Pulisco il campo barcode per la prossima scansione
+            $('#barcode-scan-registro').val('');
+
+            // Incremento l’indice per la prossima riga
+            rigaIndex++;
+        } else {
+            // Se l’utente ha scelto “No” alla conferma
+            $('#barcode-scan-registro').val('');
+        }
+    }
+});
 
 });
 </script>
