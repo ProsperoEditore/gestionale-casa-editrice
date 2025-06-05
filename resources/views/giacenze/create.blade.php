@@ -651,22 +651,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const campoScan = document.getElementById('barcode-scan-giacenze');
     if (!campoScan) return;
 
-    // Focus automatico all’avvio
-    campoScan.focus();
+    campoScan.focus({ preventScroll: true });
 
     let recentlyInteracted = false;
 
-        campoScan.addEventListener('blur', function () {
-            if (recentlyInteracted) return;
-            setTimeout(() => campoScan.focus(), 100);
-        });
+    campoScan.addEventListener('blur', function () {
+        if (recentlyInteracted) return;
+        setTimeout(() => campoScan.focus({ preventScroll: true }), 100);
+    });
 
-        document.addEventListener('click', function () {
-            recentlyInteracted = true;
-            setTimeout(() => {
-                recentlyInteracted = false;
-            }, 1000);
-        });
+    document.addEventListener('click', function () {
+        recentlyInteracted = true;
+        setTimeout(() => {
+            recentlyInteracted = false;
+        }, 1000);
+    });
 
     campoScan.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
@@ -675,31 +674,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const codice = campoScan.value.trim();
         if (!codice) return;
 
-        // Cerca riga già esistente
+        const categoria = "{{ $magazzino->anagrafica->categoria }}";
+        const tbody = document.querySelector('#giacenzeTable tbody');
+
+        // Cerca riga esistente
+        const rows = tbody.querySelectorAll('tr');
         let rigaEsistente = null;
-        document.querySelectorAll('#giacenzeTable tbody tr').forEach(row => {
+        rows.forEach(row => {
             const isbn = row.querySelector('.isbn')?.value.trim();
             if (isbn === codice) rigaEsistente = row;
         });
 
         if (rigaEsistente) {
             const inputQuantita = rigaEsistente.querySelector('.quantita');
-
-            // Scroll prima
-            inputQuantita?.blur(); // evita scroll automatici indesiderati
-            rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            // Focus dopo un piccolo ritardo
-            setTimeout(() => {
-                inputQuantita?.focus({ preventScroll: true });
-            }, 400);
-
+            if (inputQuantita) {
+                setTimeout(() => {
+                    rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    inputQuantita.focus({ preventScroll: true });
+                }, 100);
+            }
             campoScan.value = '';
             return;
         }
 
-
-        // Cerca il libro nell'array libri (disponibile globalmente)
+        // Nuovo libro
         const libro = libri.find(l => l.isbn === codice);
         if (!libro) {
             alert("ISBN non trovato tra i libri esistenti.");
@@ -707,8 +705,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const categoria = "{{ $magazzino->anagrafica->categoria }}";
-        const tbody = document.querySelector('#giacenzeTable tbody');
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
             <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
@@ -726,25 +722,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button type="button" class="btn btn-danger btn-sm deleteRow" title="Elimina riga">
                     <i class="bi bi-trash"></i>
                 </button>
-                <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
-                    Salvato!
-                </div>
+                <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">Salvato!</div>
             </td>
         `;
 
         tbody.insertBefore(newRow, tbody.firstChild);
+
         const quantitaInput = newRow.querySelector('.quantita');
-
-        quantitaInput?.blur(); // previene auto-scroll
-        newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
         setTimeout(() => {
+            newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
             quantitaInput?.focus({ preventScroll: true });
-        }, 400);
+        }, 100);
 
-
-
-        // Autocomplete sul nuovo titolo
+        // Attiva autocomplete
         $(newRow).find(".autocomplete-titolo").autocomplete({
             minLength: 2,
             source: function(request, response) {
@@ -762,11 +752,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     libro.titolo === ui.item.value && libro.id === ui.item.id
                 );
                 const parentRow = $(this).closest("tr");
-
                 if (libroSelezionato) {
                     parentRow.find(".isbn").val(libroSelezionato.isbn);
                     parentRow.find(".prezzo").val(libroSelezionato.prezzo);
-                    parentRow.find(".marchio").val(libroSelezionato.marchio_editoriale ? libroSelezionato.marchio_editoriale.nome : "N/D");
+                    parentRow.find(".marchio").val(libroSelezionato.marchio_editoriale?.nome || "N/D");
                     if (categoria === "magazzino editore") {
                         parentRow.find(".costo_sconto").val(libroSelezionato.costo_produzione);
                     } else {
@@ -780,6 +769,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
 
 
 @endsection
