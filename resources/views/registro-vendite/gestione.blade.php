@@ -336,21 +336,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
 
+    // ──────────────────────────────────────────────────────────────────────────────────
+    // 1) Funzione per restituire “meseAnno” da una data in formato YYYY-MM-DD
     function calcolaPeriodo(dateStr) {
-    if (!dateStr) return '';
-    const mesi = [
-        "gennaio","febbraio","marzo","aprile","maggio","giugno",
-        "luglio","agosto","settembre","ottobre","novembre","dicembre"
-    ];
-    // dateStr = "YYYY-MM-DD"
-    const parti = dateStr.split('-');
-    if (parti.length !== 3) return '';
-    const anno = parti[0];
-    const meseIdx = parseInt(parti[1], 10) - 1;
-    const meseNome = mesi[meseIdx] || '';
-    const anno2 = anno.substr(2, 2); // ultime due cifre dell’anno
-    return meseNome + anno2;
+        if (!dateStr) return '';
+        const mesi = [
+            "gennaio","febbraio","marzo","aprile","maggio","giugno",
+            "luglio","agosto","settembre","ottobre","novembre","dicembre"
+        ];
+        const parti = dateStr.split('-');
+        if (parti.length !== 3) return '';
+        const anno = parti[0];
+        const meseIdx = parseInt(parti[1], 10) - 1;
+        const meseNome = mesi[meseIdx] || '';
+        const anno2 = anno.substr(2, 2); // ultime due cifre
+        return meseNome + anno2;
     }
+    // ──────────────────────────────────────────────────────────────────────────────────
 
     gestisciEventiElimina();
     $('#barcode-scan-registro').focus();
@@ -454,42 +456,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById("addRow").addEventListener("click", function () {
         let newRow = document.createElement("tr");
-        newRow.innerHTML = 
+        newRow.innerHTML = `
             <input type="hidden" name="righe[${rigaIndex}][id]" value="">
             <td data-label="Data">
-            <input type="date" name="righe[${rigaIndex}][data]" value="{{ date('Y-m-d') }}" class="form-control data-row" placeholder="Data">
+              <input type="date" name="righe[${rigaIndex}][data]" value="{{ date('Y-m-d') }}" class="form-control data-row" placeholder="Data">
             </td>
             <td data-label="Periodo">
-            <input type="text" name="righe[${rigaIndex}][periodo]" class="form-control periodo-row" placeholder="Periodo">
+              <input type="text" name="righe[${rigaIndex}][periodo]" class="form-control periodo-row" placeholder="Periodo">
             </td>
             <td data-label="ISBN">
-            <input type="text" name="righe[${rigaIndex}][isbn]" class="form-control isbn" placeholder="ISBN" readonly>
+              <input type="text" name="righe[${rigaIndex}][isbn]" class="form-control isbn" placeholder="ISBN" readonly>
             </td>
             <td data-label="Titolo">
-            <input type="text" name="righe[${rigaIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo...">
+              <input type="text" name="righe[${rigaIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo...">
             </td>
             <td data-label="Quantità">
-            <input type="number" name="righe[${rigaIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità">
+              <input type="number" name="righe[${rigaIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità">
             </td>
             <td data-label="Prezzo">
-            <input type="number" name="righe[${rigaIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo" readonly>
+              <input type="number" name="righe[${rigaIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo" readonly>
             </td>
             <td data-label="Valore Vendita">
-            <input type="number" name="righe[${rigaIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" placeholder="Valore vendita">
+              <input type="number" name="righe[${rigaIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" placeholder="Valore vendita">
             </td>
             <td data-label="Azioni">
-            <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+              <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
             </td>
-        ;
+        `;
 
+        // Inserisco la riga in testa alla tabella
         document.getElementById("registroVenditeBody").prepend(newRow);
 
-        //  ─── Pre‐riempio il campo “Periodo” basandosi sulla data odierna ───
-        let $dataInput = $(newRow).find('.data-row');   // <input type="date">
-        let $periodoInput = $(newRow).find('.periodo-row'); // <input type="text">
-        let dataVal = $dataInput.val(); // es. "2025-05-07"
-        let periodoDefault = calcolaPeriodo(dataVal);
+        // ─── Pre‐riempio “Periodo” con calcolaPeriodo(data) ───
+        let $dataInput = $(newRow).find('.data-row');
+        let $periodoInput = $(newRow).find('.periodo-row');
+        let dataVal = $dataInput.val();                        // es. "2025-05-07"
+        let periodoDefault = calcolaPeriodo(dataVal);         // “maggio25”
         $periodoInput.val(periodoDefault);
+
+        // Se l’utente cambia data, ricalcolo Periodo
+        $dataInput.on('change', function() {
+            let nuovaData = $(this).val();
+            let nuovoPeriodo = calcolaPeriodo(nuovaData);
+            $periodoInput.val(nuovoPeriodo);
+        });
+        // ────────────────────────────────────────────────────────
 
         newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
             input.addEventListener("input", function () {
@@ -497,9 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Applico l’autocomplete al nuovo “titolo”
         initAutocomplete(newRow.querySelector(".titolo"));
-
         gestisciEventiElimina();
 
         rigaIndex++;
@@ -534,100 +543,97 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
- $('#barcode-scan-registro').on('keydown', function(e) {
-    // Intercetto solo il tasto ENTER
-    if (e.key === 'Enter' || e.which === 13) {
-        e.preventDefault();
+    $('#barcode-scan-registro').on('keydown', function(e) {
+        if (e.key === 'Enter' || e.which === 13) {
+            e.preventDefault();
 
-        let scannedCode = $(this).val().trim();
-        if (!scannedCode) {
-            return;
-        }
-
-        // Calcolo la data odierna in YYYY-MM-DD
-        let oggi = new Date();
-        let yyyy = oggi.getFullYear();
-        let mm   = String(oggi.getMonth() + 1).padStart(2, '0');
-        let dd   = String(oggi.getDate()).padStart(2, '0');
-        let todayStr = ${yyyy}-${mm}-${dd};
-
-        // Cerco se, nella tabella, esiste già una riga con data = oggi e isbn = scannedCode
-        let rigaTrovata = null;
-        $('#registroVenditeBody tr').each(function() {
-            let $tr = $(this);
-            let rowDate = $tr.find('input[name*="[data]"]').val();
-            let rowIsbn = $tr.find('.isbn').val().trim();
-            if (rowDate === todayStr && rowIsbn === scannedCode) {
-                rigaTrovata = $tr;
-                return false; // esco dal ciclo each
+            let scannedCode = $(this).val().trim();
+            if (!scannedCode) {
+                return;
             }
-        });
 
-        if (rigaTrovata) {
-            // Se la riga esiste, sposto il focus su .quantita di quella riga
-            rigaTrovata.find('.quantita').focus();
-            $('#barcode-scan-registro').val('');
-            return;
-        }
+            // Calcolo data odierna
+            let oggi = new Date();
+            let yyyy = oggi.getFullYear();
+            let mm   = String(oggi.getMonth() + 1).padStart(2, '0');
+            let dd   = String(oggi.getDate()).padStart(2, '0');
+            let todayStr = `${yyyy}-${mm}-${dd}`;
 
-        // Se non esiste, chiedo conferma all'utente
-        let messaggio = 
-          "Non esiste ancora una riga con ISBN \"" + scannedCode + 
-          "\" per la data odierna (" + todayStr + ").\n" +
-          "Vuoi aggiungere una nuova riga ?";
+            // Cerco riga esistente
+            let rigaTrovata = null;
+            $('#registroVenditeBody tr').each(function() {
+                let $tr = $(this);
+                let rowDate = $tr.find('input[name*="[data]"]').val();
+                let rowIsbn = $tr.find('.isbn').val().trim();
+                if (rowDate === todayStr && rowIsbn === scannedCode) {
+                    rigaTrovata = $tr;
+                    return false;
+                }
+            });
+
+            if (rigaTrovata) {
+                // Se c’è già, focus su quantita
+                rigaTrovata.find('.quantita').focus();
+                $('#barcode-scan-registro').val('');
+                return;
+            }
+
+            // Altrimenti chiedo conferma
+            let messaggio = 
+              "Non esiste ancora una riga con ISBN \"" + scannedCode + 
+              "\" per la data odierna (" + todayStr + ").\n" +
+              "Vuoi aggiungere una nuova riga ?";
             if (confirm(messaggio)) {
                 console.log('Ho premuto OK, creo la nuova riga');
 
                 let newIndex = $('#registroVenditeBody tr').length;
-                let $newRow = $(
+                let $newRow = $(`
                     <tr>
-                    <td data-label="Data">
+                      <td data-label="Data">
                         <input type="hidden" name="righe[${newIndex}][id]" value="">
                         <input type="date" name="righe[${newIndex}][data]" value="${todayStr}" class="form-control data-row" />
-                    </td>
-                    <td data-label="Periodo">
+                      </td>
+                      <td data-label="Periodo">
                         <input type="text" name="righe[${newIndex}][periodo]" class="form-control periodo-row" placeholder="Periodo" />
-                    </td>
-                    <td data-label="ISBN">
+                      </td>
+                      <td data-label="ISBN">
                         <input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn" value="${scannedCode}" readonly />
-                    </td>
-                    <td data-label="Titolo">
+                      </td>
+                      <td data-label="Titolo">
                         <input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..." />
-                    </td>
-                    <td data-label="Quantità">
+                      </td>
+                      <td data-label="Quantità">
                         <input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità" />
-                    </td>
-                    <td data-label="Prezzo">
+                      </td>
+                      <td data-label="Prezzo">
                         <input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" readonly />
-                    </td>
-                    <td data-label="Valore Vendita">
+                      </td>
+                      <td data-label="Valore Vendita">
                         <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" />
-                    </td>
-                    <td data-label="Azioni">
+                      </td>
+                      <td data-label="Azioni">
                         <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-                    </td>
+                      </td>
                     </tr>
-                );
+                `);
 
                 console.log('$newRow creato:', $newRow.prop('outerHTML'));
 
-                //  ─── Pre‐riempio il campo “Periodo” basandosi su todayStr ───
+                // Pre‐riempio “Periodo” su todayStr
                 let $dataInput = $newRow.find('.data-row');
                 let $periodoInput = $newRow.find('.periodo-row');
-                $periodoInput.val( calcolaPeriodo(todayStr) );
-                // Se l’utente cambia la data nella riga creata, aggiorno Periodo
+                $periodoInput.val(calcolaPeriodo(todayStr));
                 $dataInput.on('change', function() {
                     let d = $(this).val();
-                    $(this).closest('tr').find('.periodo-row').val( calcolaPeriodo(d) );
+                    $(this).closest('tr').find('.periodo-row').val(calcolaPeriodo(d));
                 });
-                // ─────────────────────────────────────────────────────────────────
 
-                // Inserisco la riga in testa alla tabella
+                // Inserisco la riga
                 $('#registroVenditeBody').prepend($newRow);
 
                 console.log('Righe totali dopo l\'inserimento:', $('#registroVenditeBody tr').length);
 
-                // Ricollego eventi: autocomplete, ricalcolo valore e delete
+                // Ricollego eventi
                 initAutocomplete($newRow.find('.titolo'));
                 $newRow.find('.quantita, .prezzo').on('input', function() {
                     aggiornaValoreLordo($newRow[0]);
@@ -644,8 +650,8 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 $('#barcode-scan-registro').val('');
             }
-    }
-});
+        }
+    });
 
 });
 </script>
