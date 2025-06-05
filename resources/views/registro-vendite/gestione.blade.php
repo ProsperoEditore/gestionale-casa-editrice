@@ -488,8 +488,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
- $('#barcode-scan-registro').on('keypress', function(e) {
-        if (e.which === 13) {
+    $('#barcode-scan-registro').on('keydown', function(e) {
+        // Se è ENTER
+        if (e.key === 'Enter' || e.which === 13) {
             e.preventDefault();
             let scannedCode = $(this).val().trim();
             if (!scannedCode) {
