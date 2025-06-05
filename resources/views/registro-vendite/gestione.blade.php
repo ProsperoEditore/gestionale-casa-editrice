@@ -511,9 +511,14 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('copie-vendute-parziale').value = totaleCopie.toString();
     }
 
+    // Focus automatico all’apertura
+    $('#barcode-scan-registro').val('').focus();
+
     // Calcolo parziali
     document.getElementById('calcola-parziali')?.addEventListener('click', calcolaParziali);
 });
+
+
 </script>
 
 <script>
