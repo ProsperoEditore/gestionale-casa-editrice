@@ -683,15 +683,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (rigaEsistente) {
+            const inputQuantita = rigaEsistente.querySelector('.quantita');
+
+            // Scroll prima
+            inputQuantita?.blur(); // evita scroll automatici indesiderati
             rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+            // Focus dopo un piccolo ritardo
             setTimeout(() => {
-                rigaEsistente.querySelector('.quantita')?.focus({ preventScroll: true });
-            }, 300);
+                inputQuantita?.focus({ preventScroll: true });
+            }, 400);
 
             campoScan.value = '';
             return;
         }
+
 
         // Cerca il libro nell'array libri (disponibile globalmente)
         const libro = libri.find(l => l.isbn === codice);
@@ -728,10 +734,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         tbody.insertBefore(newRow, tbody.firstChild);
         const quantitaInput = newRow.querySelector('.quantita');
+
+        quantitaInput?.blur(); // previene auto-scroll
+        newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        setTimeout(() => {
             quantitaInput?.focus({ preventScroll: true });
-            setTimeout(() => {
-                quantitaInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+        }, 400);
+
 
 
         // Autocomplete sul nuovo titolo
