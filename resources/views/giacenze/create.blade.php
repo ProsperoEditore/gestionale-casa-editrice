@@ -746,6 +746,65 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+    <script>
+        // === SCANSIONE BARCODE ===
+        document.addEventListener('DOMContentLoaded', function () {
+            const campoScan = document.getElementById('barcode-scan-giacenze');
+            if (!campoScan) return;
 
+            campoScan.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter') return;
+
+                e.preventDefault();
+                const codice = campoScan.value.trim();
+                if (!codice) return;
+
+                let rigaTrovata = null;
+
+                document.querySelectorAll('#giacenzeTable tbody tr').forEach(row => {
+                    const isbn = row.querySelector('.isbn')?.value.trim();
+                    if (isbn === codice) rigaTrovata = row;
+                });
+
+                if (rigaTrovata) {
+                    rigaTrovata.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    rigaTrovata.querySelector('.quantita')?.focus();
+                    campoScan.value = '';
+                    return;
+                }
+
+                const libro = libri.find(l => l.isbn === codice);
+                if (!libro) {
+                    alert("ISBN non trovato tra i libri esistenti.");
+                    campoScan.value = '';
+                    return;
+                }
+
+                const tbody = document.querySelector('#giacenzeTable tbody');
+                const index = tbody.querySelectorAll('tr').length;
+
+                const riga = document.createElement('tr');
+                riga.innerHTML = `
+                    <td>${libro.marchio || ''}</td>
+                    <td><input type="text" name="righe[${index}][isbn]" class="form-control isbn" value="${libro.isbn}" readonly></td>
+                    <td><input type="text" name="righe[${index}][titolo]" class="form-control titolo" value="${libro.titolo}" readonly></td>
+                    <td><input type="number" name="righe[${index}][quantita]" class="form-control quantita" value="0"></td>
+                    <td><input type="number" name="righe[${index}][prezzo]" class="form-control prezzo" value="${parseFloat(libro.prezzo).toFixed(2)}"></td>
+                    <td><input type="number" name="righe[${index}][sconto]" class="form-control sconto" value="0"></td>
+                    <td><input type="number" name="righe[${index}][costo]" class="form-control costo" value="${parseFloat(libro.costo_produzione).toFixed(2)}"></td>
+                    <td><input type="text" name="righe[${index}][note]" class="form-control note"></td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-success salva-singola">✔</button>
+                    </td>
+                `;
+
+                tbody.appendChild(riga);
+                riga.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                riga.querySelector('.quantita').focus();
+
+                campoScan.value = '';
+            });
+        });
+    </script>
 
 @endsection
