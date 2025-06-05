@@ -491,14 +491,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let periodoDefault = calcolaPeriodo(dataVal);
         $periodoInput.val(periodoDefault);
 
-        // Opzionale: se l’utente modifica la data manualmente, ricalcola Periodo
-        $dataInput.on('change', function() {
-            let nuovaData = $(this).val();
-            let nuovoPeriodo = calcolaPeriodo(nuovaData);
-            $periodoInput.val(nuovoPeriodo);
-        });
-        // ─────────────────────────────────────────────────────────────────
-
         newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
             input.addEventListener("input", function () {
                 aggiornaValoreLordo(newRow);
