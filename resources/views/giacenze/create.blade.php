@@ -727,7 +727,12 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         tbody.insertBefore(newRow, tbody.firstChild);
-        newRow.querySelector('.quantita')?.focus({ preventScroll: true });
+        const quantitaInput = newRow.querySelector('.quantita');
+            quantitaInput?.focus({ preventScroll: true });
+            setTimeout(() => {
+                quantitaInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+
 
         // Autocomplete sul nuovo titolo
         $(newRow).find(".autocomplete-titolo").autocomplete({
