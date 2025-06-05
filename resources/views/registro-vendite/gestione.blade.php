@@ -325,330 +325,160 @@ input.valore-lordo {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+$(document).ready(function () {
     const righeAmbigue = {!! json_encode($righe ?? []) !!};
     const libri = @json($libri);
 
-    // ──────────────────────────────────────────────────────────────────────────────────
-    // 1) Funzione per restituire “meseAnno” da una data in formato YYYY-MM-DD
     function calcolaPeriodo(dateStr) {
         if (!dateStr) return '';
-        const mesi = [
-            "gennaio","febbraio","marzo","aprile","maggio","giugno",
-            "luglio","agosto","settembre","ottobre","novembre","dicembre"
-        ];
+        const mesi = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
         const parti = dateStr.split('-');
         if (parti.length !== 3) return '';
-        const anno = parti[0];
-        const meseIdx = parseInt(parti[1], 10) - 1;
-        const meseNome = mesi[meseIdx] || '';
-        const anno2 = anno.substr(2, 2); // ultime due cifre
-        return meseNome + anno2;
-    }
-    // ──────────────────────────────────────────────────────────────────────────────────
-
-    gestisciEventiElimina();
-    $('#barcode-scan-registro').focus();
-
-    // Mantieni inalterato questo pezzo, serve per aggiornare "valore lordo" sulle righe esistenti
-    document.querySelectorAll("#registroVenditeBody tr").forEach(function(row) {
-        row.querySelectorAll(".quantita, .prezzo").forEach(function(input) {
-            input.addEventListener("input", function () {
-                aggiornaValoreLordo(row);
-            });
-        });
-    });
-
-    if (righeAmbigue.length > 0) {
-        let modal = new bootstrap.Modal(document.getElementById('popupConflitti'));
-        modal.show();
-
-        document.querySelectorAll('.libro-select').forEach(function(select) {
-            select.addEventListener('change', function() {
-                let index = this.dataset.index;
-                let selected = this.options[this.selectedIndex];
-                let titolo = selected.getAttribute('data-titolo') || '';
-                document.getElementById('titolo-hidden-' + index).value = titolo;
-            });
-        });
-
-        fetch("{{ route('registro-vendite.clear-conflitti-sessione') }}");
+        return mesi[parseInt(parti[1], 10) - 1] + dateStr.slice(2, 4);
     }
 
     function aggiornaValoreLordo(row) {
-        let quantita = parseFloat(row.querySelector(".quantita")?.value || 0);
-        let prezzo = parseFloat(row.querySelector(".prezzo")?.value || 0);
-        const valore = (quantita * prezzo).toFixed(2);
-        const valoreInput = row.querySelector(".valore-lordo");
-
-        if (document.activeElement !== valoreInput) {
-            valoreInput.value = valore;
-        }
-
+        let quantita = parseFloat($(row).find(".quantita").val() || 0);
+        let prezzo = parseFloat($(row).find(".prezzo").val() || 0);
+        $(row).find(".valore-lordo").val((quantita * prezzo).toFixed(2));
         aggiornaTotaleValoreVendita();
     }
 
+    function aggiornaTotaleValoreVendita() {
+        let totale = 0;
+        $('.valore-lordo').each(function () {
+            totale += parseFloat($(this).val()) || 0;
+        });
+        $('#totale-valore-vendita').val(totale.toFixed(2));
+        aggiornaTotaleCopieVendute();
+    }
 
-    // ───────────  initAutocomplete  ───────────
+    function aggiornaTotaleCopieVendute() {
+        let totale = 0;
+        $('.quantita').each(function () {
+            totale += parseInt($(this).val()) || 0;
+        });
+        $('#totale-copie-vendute').val(totale);
+    }
+
     function initAutocomplete(input) {
         $(input).autocomplete({
             source: libri.map(libro => ({
-                label: libro.titolo + " (" + libro.isbn + ")",
+                label: `${libro.titolo} (${libro.isbn})`,
                 value: libro.titolo,
                 isbn: libro.isbn,
                 prezzo: libro.prezzo
             })),
             select: function(event, ui) {
-                let parentRow = $(this).closest("tr");
-                parentRow.find(".isbn").val(ui.item.isbn);
-                parentRow.find(".prezzo").val(ui.item.prezzo);
-                // ──── ❶ Imposto FULL titolo nel campo e blocco il comportamento di default  ────
+                let row = $(this).closest("tr");
+                row.find(".isbn").val(ui.item.isbn);
+                row.find(".prezzo").val(ui.item.prezzo);
                 $(this).val(ui.item.value);
-                aggiornaValoreLordo(parentRow[0]);
+                aggiornaValoreLordo(row);
                 return false;
             }
-        })
-        // Opzionale: mostro solo item.label nel dropdown senza duplicati
-        .autocomplete("instance")._renderItem = function(ul, item) {
-            return $("<li>")
-                .append("<div>" + item.label + "</div>")
-                .appendTo(ul);
+        }).autocomplete("instance")._renderItem = function(ul, item) {
+            return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
         };
     }
 
-    // ──── ❷ Applica l’autocomplete a TUTTI i campi “titolo” già esistenti in pagina ────
-    document.querySelectorAll(".titolo").forEach(function(input) {
-        initAutocomplete(input);
+    $('.titolo').each(function () {
+        initAutocomplete(this);
     });
-
-    function aggiornaTotaleValoreVendita() {
-        let totale = 0;
-        document.querySelectorAll('.valore-lordo').forEach(function (input) {
-            let valore = parseFloat(input.value) || 0;
-            totale += valore;
-        });
-        document.getElementById('totale-valore-vendita').value = totale.toFixed(2);
-        aggiornaTotaleCopieVendute();
-    }
-
-    function aggiornaTotaleCopieVendute() {
-        let totaleCopie = 0;
-        document.querySelectorAll('.quantita').forEach(function (input) {
-            totaleCopie += parseInt(input.value) || 0;
-        });
-        document.getElementById('totale-copie-vendute').value = totaleCopie;
-    }
-
-    document.querySelectorAll(".quantita, .prezzo, .valore-lordo").forEach(input => {
-        input.addEventListener("input", () => {
-            aggiornaTotaleValoreVendita();
-        });
-    });
-
-    let rigaIndex = document.querySelectorAll("#registroVenditeBody tr").length;
-
-    document.getElementById("addRow").addEventListener("click", function () {
-        let newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <input type="hidden" name="righe[${rigaIndex}][id]" value="">
-            <td data-label="Data">
-              <input type="date" name="righe[${rigaIndex}][data]" value="{{ date('Y-m-d') }}" class="form-control data-row" placeholder="Data">
-            </td>
-            <td data-label="Periodo">
-              <input type="text" name="righe[${rigaIndex}][periodo]" class="form-control periodo-row" placeholder="Periodo">
-            </td>
-            <td data-label="ISBN">
-              <input type="text" name="righe[${rigaIndex}][isbn]" class="form-control isbn" placeholder="ISBN" readonly>
-            </td>
-            <td data-label="Titolo">
-              <input type="text" name="righe[${rigaIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo...">
-            </td>
-            <td data-label="Quantità">
-              <input type="number" name="righe[${rigaIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità">
-            </td>
-            <td data-label="Prezzo">
-              <input type="number" name="righe[${rigaIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" placeholder="Prezzo" readonly>
-            </td>
-            <td data-label="Valore Vendita">
-              <input type="number" name="righe[${rigaIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" placeholder="Valore vendita">
-            </td>
-            <td data-label="Azioni">
-              <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-            </td>
-        `;
-
-        // Inserisco la riga in testa alla tabella
-        document.getElementById("registroVenditeBody").prepend(newRow);
-
-        // ─── Pre‐riempio “Periodo” con calcolaPeriodo(data) ───
-        let $dataInput = $(newRow).find('.data-row');
-        let $periodoInput = $(newRow).find('.periodo-row');
-        let dataVal = $dataInput.val();                        // es. "2025-05-07"
-        let periodoDefault = calcolaPeriodo(dataVal);         // “maggio25”
-        $periodoInput.val(periodoDefault);
-
-        // Se l’utente cambia data, ricalcolo Periodo
-        $dataInput.on('change', function() {
-            let nuovaData = $(this).val();
-            let nuovoPeriodo = calcolaPeriodo(nuovaData);
-            $periodoInput.val(nuovoPeriodo);
-        });
-        // ────────────────────────────────────────────────────────
-
-        newRow.querySelectorAll(".quantita, .prezzo").forEach(input => {
-            input.addEventListener("input", function () {
-                aggiornaValoreLordo(newRow);
-            });
-        });
-
-        initAutocomplete(newRow.querySelector(".titolo"));
-        gestisciEventiElimina();
-
-        rigaIndex++;
-    });
-
 
     function gestisciEventiElimina() {
-        document.querySelectorAll(".delete-row").forEach(btn => {
-            btn.removeEventListener("click", handleDeleteRiga); // evita doppio binding
-            btn.addEventListener("click", handleDeleteRiga);
+        $(".delete-row").off("click").on("click", function () {
+            const row = $(this).closest("tr");
+            const dettaglioId = row.data("id");
+            if (dettaglioId) {
+                if (confirm("Vuoi davvero eliminare questa riga?")) {
+                    fetch(`/registro-vendite/dettaglio/${dettaglioId}`, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) row.remove();
+                        else alert("Errore nell'eliminazione.");
+                    }).catch(() => alert("Errore nella richiesta."));
+                }
+            } else {
+                row.remove();
+            }
         });
     }
 
-    function handleDeleteRiga(e) {
-        const row = e.target.closest("tr");
-        const dettaglioId = row.dataset.id;
-
-        if (dettaglioId) {
-            if (confirm("Vuoi davvero eliminare questa riga?")) {
-                fetch(/registro-vendite/dettaglio/${dettaglioId}, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                }).then(res => res.json()).then(data => {
-                    if (data.success) row.remove();
-                    else alert("Errore nell'eliminazione della riga.");
-                }).catch(() => alert("Errore nella richiesta."));
-            }
-        } else {
-            row.remove();
-        }
-    }
+    gestisciEventiElimina();
 
     $(document).on('keydown', '#barcode-scan-registro', function(e) {
-            console.log("🟡 Evento keydown rilevato!", e.key);
         if (e.key === 'Enter' || e.which === 13) {
             e.preventDefault();
+            const scannedCode = $(this).val().trim();
+            if (!scannedCode) return;
 
-            let scannedCode = $(this).val().trim();
-            if (!scannedCode) {
-                return;
-            }
-
-            // Calcolo data odierna
-            let oggi = new Date();
-            let yyyy = oggi.getFullYear();
-            let mm   = String(oggi.getMonth() + 1).padStart(2, '0');
-            let dd   = String(oggi.getDate()).padStart(2, '0');
-            let todayStr = `${yyyy}-${mm}-${dd}`;
-
-            // Cerco riga esistente
+            const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
             let rigaTrovata = null;
-            $('#registroVenditeBody tr').each(function() {
-                let $tr = $(this);
-                let rowDate = $tr.find('input[name*="[data]"]').val();
-                let rowIsbn = $tr.find('.isbn').val().trim();
-                if (rowDate === todayStr && rowIsbn === scannedCode) {
-                    rigaTrovata = $tr;
+
+            $('#registroVenditeBody tr').each(function () {
+                const data = $(this).find('input[name*="[data]"]').val();
+                const isbn = $(this).find('.isbn').val().trim();
+                if (data === today && isbn === scannedCode) {
+                    rigaTrovata = $(this);
                     return false;
                 }
             });
 
             if (rigaTrovata) {
-                // Se c’è già, focus su quantita
                 rigaTrovata.find('.quantita').focus();
                 $('#barcode-scan-registro').val('');
                 return;
             }
 
-            // Altrimenti chiedo conferma
-            let messaggio = 
-              "Non esiste ancora una riga con ISBN \"" + scannedCode + 
-              "\" per la data odierna (" + todayStr + ").\n" +
-              "Vuoi aggiungere una nuova riga ?";
-            if (confirm(messaggio)) {
-                console.log('Ho premuto OK, creo la nuova riga');
-
-                let newIndex = $('#registroVenditeBody tr').length;
-                let $newRow = $(`
-                    <tr>
-                      <td data-label="Data">
-                        <input type="hidden" name="righe[${newIndex}][id]" value="">
-                        <input type="date" name="righe[${newIndex}][data]" value="${todayStr}" class="form-control data-row" />
-                      </td>
-                      <td data-label="Periodo">
-                        <input type="text" name="righe[${newIndex}][periodo]" class="form-control periodo-row" placeholder="Periodo" />
-                      </td>
-                      <td data-label="ISBN">
-                        <input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn" value="${scannedCode}" readonly />
-                      </td>
-                      <td data-label="Titolo">
-                        <input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..." />
-                      </td>
-                      <td data-label="Quantità">
-                        <input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità" />
-                      </td>
-                      <td data-label="Prezzo">
-                        <input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" readonly />
-                      </td>
-                      <td data-label="Valore Vendita">
-                        <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" />
-                      </td>
-                      <td data-label="Azioni">
-                        <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-                      </td>
-                    </tr>
-                `);
-
-                console.log('$newRow creato:', $newRow.prop('outerHTML'));
-
-                // Pre‐riempio “Periodo” su todayStr
-                let $dataInput = $newRow.find('.data-row');
-                let $periodoInput = $newRow.find('.periodo-row');
-                $periodoInput.val(calcolaPeriodo(todayStr));
-                $dataInput.on('change', function() {
-                    let d = $(this).val();
-                    $(this).closest('tr').find('.periodo-row').val(calcolaPeriodo(d));
-                });
-
-                // Inserisco la riga
-                $('#registroVenditeBody').prepend($newRow);
-
-                console.log('Righe totali dopo l\'inserimento:', $('#registroVenditeBody tr').length);
-
-                // Ricollego eventi
-                initAutocomplete($newRow.find('.titolo'));
-                $newRow.find('.quantita, .prezzo').on('input', function() {
-                    aggiornaValoreLordo($newRow[0]);
-                });
-                gestisciEventiElimina();
-
-                // Focus su “Quantità”
-                $newRow.find('.quantita').focus();
-
-                // Pulisco il campo barcode
+            if (!confirm(`Non esiste ancora una riga con ISBN "${scannedCode}" per la data odierna (${today}).\nVuoi aggiungerla?`)) {
                 $('#barcode-scan-registro').val('');
-
-                rigaIndex++;
-            } else {
-                $('#barcode-scan-registro').val('');
+                return;
             }
+
+            const newIndex = $('#registroVenditeBody tr').length;
+            const $newRow = $(`
+                <tr>
+                  <td><input type="hidden" name="righe[${newIndex}][id]" value="">
+                      <input type="date" name="righe[${newIndex}][data]" value="${today}" class="form-control data-row"></td>
+                  <td><input type="text" name="righe[${newIndex}][periodo]" class="form-control periodo-row"></td>
+                  <td><input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn" value="${scannedCode}" readonly></td>
+                  <td><input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..."></td>
+                  <td><input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita"></td>
+                  <td><input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" readonly></td>
+                  <td><input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01"></td>
+                  <td><button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button></td>
+                </tr>
+            `);
+
+            const libro = libri.find(l => l.isbn === scannedCode);
+            if (libro) {
+                $newRow.find('.titolo').val(libro.titolo);
+                $newRow.find('.prezzo').val(parseFloat(libro.prezzo).toFixed(2));
+                aggiornaValoreLordo($newRow);
+            }
+
+            $newRow.find('.data-row').on('change', function () {
+                const nuovaData = $(this).val();
+                $newRow.find('.periodo-row').val(calcolaPeriodo(nuovaData));
+            }).trigger('change');
+
+            initAutocomplete($newRow.find('.titolo'));
+            $newRow.find('.quantita, .prezzo').on('input', function () {
+                aggiornaValoreLordo($newRow);
+            });
+
+            $('#registroVenditeBody').prepend($newRow);
+            gestisciEventiElimina();
+            $newRow.find('.quantita').focus();
+            $('#barcode-scan-registro').val('');
         }
     });
 
 });
 </script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
