@@ -537,6 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     $(document).on('keydown', '#barcode-scan-registro', function(e) {
+            console.log("🟡 Evento keydown rilevato!", e.key);
         if (e.key === 'Enter' || e.which === 13) {
             e.preventDefault();
 
