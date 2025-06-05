@@ -44,10 +44,11 @@
 
         <hr>
 
-    <h4>Aggiungi con penna ottica</h4>
-    <div class="mt-3 mb-3" style="max-width: 400px;">
-       <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona ISBN...">
-    </div>
+        <h4>Aggiungi con penna ottica</h4>
+        <div class="mt-3 mb-3" style="max-width: 400px;">
+            <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
+        </div>
+
 
 <div id="riepilogo-totali">
     <strong>Riepilogo:</strong>
@@ -538,107 +539,6 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
-document.getElementById('barcode-scan-giacenze').addEventListener('input', function(e) {
-    const codice = e.target.value.trim();
-
-    if (codice.length < 10) return;
-
-    fetch('/api/libro-da-barcode?isbn=' + codice)
-        .then(res => res.json())
-        .then(libro => {
-            if (!libro) {
-                alert('Libro non trovato.');
-                return;
-            }
-
-            // Cerca riga già esistente
-            const righe = document.querySelectorAll('#giacenzeTableBody tr');
-            let rigaEsistente = null;
-
-            righe.forEach(riga => {
-                const isbnCell = riga.querySelector('.isbn');
-                if (isbnCell && isbnCell.value === libro.isbn) {
-                    rigaEsistente = riga;
-                }
-            });
-
-            if (rigaEsistente) {
-                rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                rigaEsistente.querySelector('.quantita')?.focus();
-                rigaEsistente.style.backgroundColor = '#ffffcc'; // giallo chiaro
-                setTimeout(() => rigaEsistente.style.backgroundColor = '', 2000);
-                return;
-            }
-
-            // Altrimenti aggiunge nuova riga
-            const table = document.getElementById("giacenzeTableBody");
-            const categoria = "{{ $magazzino->anagrafica->categoria }}";
-            const newRow = document.createElement("tr");
-            newRow.setAttribute("data-id", "");
-            newRow.innerHTML = ` 
-                <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
-                <td><input type="text" class="form-control isbn" value="${libro.isbn}" readonly></td>
-                <td><input type="text" class="form-control titolo autocomplete-titolo" value="${libro.titolo}" placeholder="cerca/scansiona titolo..."></td>
-                <td><input type="number" class="form-control quantita" value="1"></td>
-                <td><input type="text" class="form-control prezzo" value="${libro.prezzo}" readonly></td>
-                <td><input type="text" class="form-control costo_sconto" value="${categoria === 'magazzino editore' ? libro.costo_produzione : ''}"></td>
-                <td class="data-aggiornamento">-</td>
-                <td><input type="text" class="form-control note"></td>
-                <td>
-                    <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
-                        <i class="bi bi-save"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm deleteRow" title="Elimina riga">
-                        <i class="bi bi-trash"></i>
-                    </button>
-
-                        <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
-                            Salvato!
-                        </div>
-                </td>
-
-            `;
-
-            table.insertBefore(newRow, table.firstChild);
-            newRow.querySelector('.quantita').focus();
-            $(newRow).find(".autocomplete-titolo").autocomplete({
-    minLength: 2,
-    source: function(request, response) {
-        const matches = libri.filter(libro =>
-            libro.titolo.toLowerCase().includes(request.term.toLowerCase())
-        );
-        response(matches.map(libro => ({
-            label: `${libro.titolo} [${libro.isbn}]`,
-            value: libro.titolo,
-            id: libro.id
-        })));
-    },
-    select: function(event, ui) {
-        const libroSelezionato = libri.find(libro =>
-            libro.titolo === ui.item.value && libro.id === ui.item.id
-        );
-        const parentRow = $(this).closest("tr");
-
-        if (libroSelezionato) {
-            parentRow.find(".isbn").val(libroSelezionato.isbn);
-            parentRow.find(".prezzo").val(libroSelezionato.prezzo);
-            parentRow.find(".marchio").val(libroSelezionato.marchio_editoriale ? libroSelezionato.marchio_editoriale.nome : "N/D");
-            if (categoria === "magazzino editore") {
-                parentRow.find(".costo_sconto").val(libroSelezionato.costo_produzione);
-            } else {
-                parentRow.find(".costo_sconto").val('');
-            }
-        }
-    }
-});
-
-        });
-
-    e.target.value = '';
-});
-</script>
-
-<script>
 document.addEventListener('click', function (e) {
     const btn = e.target.closest('.salvaSingola');
         if (btn) {
@@ -746,65 +646,109 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-    <script>
-        // === SCANSIONE BARCODE ===
-        document.addEventListener('DOMContentLoaded', function () {
-            const campoScan = document.getElementById('barcode-scan-giacenze');
-            if (!campoScan) return;
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const campoScan = document.getElementById('barcode-scan-giacenze');
+    if (!campoScan) return;
 
-            campoScan.addEventListener('keydown', function (e) {
-                if (e.key !== 'Enter') return;
+    // Focus automatico all’avvio
+    campoScan.focus();
 
-                e.preventDefault();
-                const codice = campoScan.value.trim();
-                if (!codice) return;
+    campoScan.addEventListener('blur', () => setTimeout(() => campoScan.focus(), 100));
 
-                let rigaTrovata = null;
+    campoScan.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
 
-                document.querySelectorAll('#giacenzeTable tbody tr').forEach(row => {
-                    const isbn = row.querySelector('.isbn')?.value.trim();
-                    if (isbn === codice) rigaTrovata = row;
-                });
+        const codice = campoScan.value.trim();
+        if (!codice) return;
 
-                if (rigaTrovata) {
-                    rigaTrovata.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    rigaTrovata.querySelector('.quantita')?.focus();
-                    campoScan.value = '';
-                    return;
-                }
-
-                const libro = libri.find(l => l.isbn === codice);
-                if (!libro) {
-                    alert("ISBN non trovato tra i libri esistenti.");
-                    campoScan.value = '';
-                    return;
-                }
-
-                const tbody = document.querySelector('#giacenzeTable tbody');
-                const index = tbody.querySelectorAll('tr').length;
-
-                const riga = document.createElement('tr');
-                riga.innerHTML = `
-                    <td>${libro.marchio || ''}</td>
-                    <td><input type="text" name="righe[${index}][isbn]" class="form-control isbn" value="${libro.isbn}" readonly></td>
-                    <td><input type="text" name="righe[${index}][titolo]" class="form-control titolo" value="${libro.titolo}" readonly></td>
-                    <td><input type="number" name="righe[${index}][quantita]" class="form-control quantita" value="0"></td>
-                    <td><input type="number" name="righe[${index}][prezzo]" class="form-control prezzo" value="${parseFloat(libro.prezzo).toFixed(2)}"></td>
-                    <td><input type="number" name="righe[${index}][sconto]" class="form-control sconto" value="0"></td>
-                    <td><input type="number" name="righe[${index}][costo]" class="form-control costo" value="${parseFloat(libro.costo_produzione).toFixed(2)}"></td>
-                    <td><input type="text" name="righe[${index}][note]" class="form-control note"></td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-success salva-singola">✔</button>
-                    </td>
-                `;
-
-                tbody.appendChild(riga);
-                riga.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                riga.querySelector('.quantita').focus();
-
-                campoScan.value = '';
-            });
+        // Cerca riga già esistente
+        let rigaEsistente = null;
+        document.querySelectorAll('#giacenzeTable tbody tr').forEach(row => {
+            const isbn = row.querySelector('.isbn')?.value.trim();
+            if (isbn === codice) rigaEsistente = row;
         });
-    </script>
+
+        if (rigaEsistente) {
+            rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            rigaEsistente.querySelector('.quantita')?.focus();
+            campoScan.value = '';
+            return;
+        }
+
+        // Cerca il libro nell'array libri (disponibile globalmente)
+        const libro = libri.find(l => l.isbn === codice);
+        if (!libro) {
+            alert("ISBN non trovato tra i libri esistenti.");
+            campoScan.value = '';
+            return;
+        }
+
+        const categoria = "{{ $magazzino->anagrafica->categoria }}";
+        const tbody = document.querySelector('#giacenzeTable tbody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" class="form-control marchio" value="${libro.marchio_editoriale?.nome || 'N/D'}" readonly></td>
+            <td><input type="text" class="form-control isbn" value="${libro.isbn}" readonly></td>
+            <td><input type="text" class="form-control titolo autocomplete-titolo" value="${libro.titolo}" placeholder="cerca/scansiona titolo..."></td>
+            <td><input type="number" class="form-control quantita" value="1"></td>
+            <td><input type="text" class="form-control prezzo" value="${libro.prezzo}" readonly></td>
+            <td><input type="text" class="form-control costo_sconto" value="${categoria === 'magazzino editore' ? libro.costo_produzione : ''}"></td>
+            <td class="data-aggiornamento">-</td>
+            <td><input type="text" class="form-control note"></td>
+            <td>
+                <button class="btn btn-primary btn-sm salvaSingola" title="Salva riga">
+                    <i class="bi bi-save"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm deleteRow" title="Elimina riga">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <div class="alert alert-success alert-salvata mt-1 d-none" role="alert" style="font-size: 12px; padding: 4px;">
+                    Salvato!
+                </div>
+            </td>
+        `;
+
+        tbody.insertBefore(newRow, tbody.firstChild);
+        newRow.querySelector('.quantita').focus();
+
+        // Autocomplete sul nuovo titolo
+        $(newRow).find(".autocomplete-titolo").autocomplete({
+            minLength: 2,
+            source: function(request, response) {
+                const matches = libri.filter(libro =>
+                    libro.titolo.toLowerCase().includes(request.term.toLowerCase())
+                );
+                response(matches.map(libro => ({
+                    label: `${libro.titolo} [${libro.isbn}]`,
+                    value: libro.titolo,
+                    id: libro.id
+                })));
+            },
+            select: function(event, ui) {
+                const libroSelezionato = libri.find(libro =>
+                    libro.titolo === ui.item.value && libro.id === ui.item.id
+                );
+                const parentRow = $(this).closest("tr");
+
+                if (libroSelezionato) {
+                    parentRow.find(".isbn").val(libroSelezionato.isbn);
+                    parentRow.find(".prezzo").val(libroSelezionato.prezzo);
+                    parentRow.find(".marchio").val(libroSelezionato.marchio_editoriale ? libroSelezionato.marchio_editoriale.nome : "N/D");
+                    if (categoria === "magazzino editore") {
+                        parentRow.find(".costo_sconto").val(libroSelezionato.costo_produzione);
+                    } else {
+                        parentRow.find(".costo_sconto").val('');
+                    }
+                }
+            }
+        });
+
+        campoScan.value = '';
+    });
+});
+</script>
+
 
 @endsection
