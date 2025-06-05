@@ -684,9 +684,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (rigaEsistente) {
             rigaEsistente.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
             setTimeout(() => {
-                rigaEsistente.querySelector('.quantita')?.focus();
+                rigaEsistente.querySelector('.quantita')?.focus({ preventScroll: true });
             }, 300);
+
             campoScan.value = '';
             return;
         }
