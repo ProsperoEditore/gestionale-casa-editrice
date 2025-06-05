@@ -549,4 +549,48 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<script>
+function aggiungiRiga() {
+    const tbody = document.querySelector('#registroVenditeBody');
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td><input type="date" name="data[]" class="form-control data" required></td>
+        <td><input type="text" name="isbn[]" class="form-control isbn"></td>
+        <td><input type="text" name="titolo[]" class="form-control titolo autocomplete-titolo" placeholder="Cerca libro..."></td>
+        <td><input type="number" name="quantita[]" class="form-control quantita" value="1"></td>
+        <td><input type="number" name="prezzo[]" class="form-control prezzo" step="0.01" value="0.00"></td>
+        <td><input type="number" name="valore_vendita_lordo[]" class="form-control valore_vendita_lordo" step="0.01" value="0.00" readonly></td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm delete-row" onclick="rimuoviRiga(this)">✖</button>
+        </td>
+    `;
+    tbody.appendChild(newRow);
+    aggiornaEventiRiga(newRow); // collega eventi a input quantità/prezzo
+    aggiornaValoreLordo(newRow); // calcola valore lordo iniziale
+}
+
+function aggiornaEventiRiga(row) {
+    const quantita = row.querySelector('.quantita');
+    const prezzo = row.querySelector('.prezzo');
+    if (quantita && prezzo) {
+        quantita.addEventListener('input', () => aggiornaValoreLordo(row));
+        prezzo.addEventListener('input', () => aggiornaValoreLordo(row));
+    }
+}
+
+function aggiornaValoreLordo(row) {
+    const quantita = parseFloat(row.querySelector('.quantita')?.value || 0);
+    const prezzo = parseFloat(row.querySelector('.prezzo')?.value || 0);
+    const valore = quantita * prezzo;
+    const valoreInput = row.querySelector('.valore_vendita_lordo');
+    if (valoreInput) valoreInput.value = valore.toFixed(2);
+}
+
+function rimuoviRiga(btn) {
+    const row = btn.closest('tr');
+    if (row) row.remove();
+}
+</script>
+
+
 @endsection
