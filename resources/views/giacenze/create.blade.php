@@ -46,7 +46,7 @@
 
     <h4>Aggiungi con penna ottica</h4>
     <div class="mt-3 mb-3" style="max-width: 400px;">
-        <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona codice a barre..." autofocus>
+       <input type="text" id="barcode-scan-giacenze" class="form-control" placeholder="Scansiona ISBN...">
     </div>
 
 <div id="riepilogo-totali">
