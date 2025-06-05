@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         tbody.insertBefore(newRow, tbody.firstChild);
-        newRow.querySelector('.quantita').focus();
+        newRow.querySelector('.quantita')?.focus({ preventScroll: true });
 
         // Autocomplete sul nuovo titolo
         $(newRow).find(".autocomplete-titolo").autocomplete({
