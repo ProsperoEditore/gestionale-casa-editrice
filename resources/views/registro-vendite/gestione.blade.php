@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
- $('#barcode-scan-registro').on('keydown', function(e) {
+$('#barcode-scan-registro').on('keydown', function(e) {
     // Intercetto solo il tasto ENTER
     if (e.key === 'Enter' || e.which === 13) {
         e.preventDefault();
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let dd   = String(oggi.getDate()).padStart(2, '0');
         let todayStr = `${yyyy}-${mm}-${dd}`;
 
-        // Cerco se, nella tabella, esiste già una riga con data = oggi e isbn = scannedCode
+        // Controllo se esiste già la riga
         let rigaTrovata = null;
         $('#registroVenditeBody tr').each(function() {
             let $tr = $(this);
@@ -562,24 +562,25 @@ document.addEventListener('DOMContentLoaded', function () {
             let rowIsbn = $tr.find('.isbn').val().trim();
             if (rowDate === todayStr && rowIsbn === scannedCode) {
                 rigaTrovata = $tr;
-                return false; // esco dal ciclo each
+                return false; // esco dal .each
             }
         });
 
         if (rigaTrovata) {
-            // Se la riga esiste, sposto il focus su .quantita di quella riga
+            // Se la riga esiste, focus su Quantità
+            console.log("Riga già esistente trovata:", rigaTrovata);
             rigaTrovata.find('.quantita').focus();
             $('#barcode-scan-registro').val('');
             return;
         }
 
-        // Se non esiste, chiedo conferma all'utente
+        // Se non esiste, chiedo conferma
         let messaggio = 
           "Non esiste ancora una riga con ISBN \"" + scannedCode + 
           "\" per la data odierna (" + todayStr + ").\n" +
           "Vuoi aggiungere una nuova riga ?";
         if (confirm(messaggio)) {
-            console.log('Ho premuto OK, creo la nuova riga');
+            console.log('Ho premuto OK, entro nel ramo di creazione. newIndex =', $('#registroVenditeBody tr').length);
 
             let newIndex = $('#registroVenditeBody tr').length;
             let $newRow = $(`
@@ -598,7 +599,6 @@ document.addEventListener('DOMContentLoaded', function () {
                            class="form-control isbn" value="${scannedCode}" readonly />
                   </td>
                   <td data-label="Titolo">
-                    <!-- Aggiungo class="titolo" per autocomplete e futuro prefill -->
                     <input type="text" name="righe[${newIndex}][titolo]"
                            class="form-control titolo" placeholder="Cerca titolo..." />
                   </td>
@@ -607,12 +607,10 @@ document.addEventListener('DOMContentLoaded', function () {
                            class="form-control quantita" placeholder="Quantità" />
                   </td>
                   <td data-label="Prezzo">
-                    <!-- Previsione di .prezzo in caso di libro trovato -->
                     <input type="number" name="righe[${newIndex}][prezzo]" value="0.00"
                            class="form-control prezzo" step="0.01" readonly />
                   </td>
                   <td data-label="Valore Vendita">
-                    <!-- Valore lordo, verrà aggiornato via JS -->
                     <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00"
                            class="form-control valore-lordo" step="0.01" />
                   </td>
@@ -621,67 +619,73 @@ document.addEventListener('DOMContentLoaded', function () {
                   </td>
                 </tr>
             `);
+            console.log('$newRow creato (HTML):', $newRow.prop('outerHTML'));
 
-            console.log('$newRow creato:', $newRow.prop('outerHTML'));
-
-            // ─── Pre‐riempio il campo “Periodo” con calcolaPeriodo(todayStr) ───
+            // Pre‐riempio Periodo
             let $dataInput     = $newRow.find('.data-row');
             let $periodoInput  = $newRow.find('.periodo-row');
-            $periodoInput.val(calcolaPeriodo(todayStr));
-            // Se l’utente cambia la data nella riga creata, aggiorno Periodo
-            $dataInput.on('change', function() {
-                let d = $(this).val();
-                $(this).closest('tr').find('.periodo-row').val(calcolaPeriodo(d));
-            });
-
-            // ─── Cerco l’oggetto libro corrispondente all’ISBN e, se esiste, 
-            //     prefill titolo, prezzo e ricalcolo valore lordo ───
-            let libroTrovato = libri.find(l => l.isbn === scannedCode);
-            if (libroTrovato) {
-                // Setto il titolo dal libro trovato
-                $newRow.find('.titolo').val(libroTrovato.titolo);
-
-                // Setto il prezzo dal libro trovato (due decimali)
-                let prezzoFormattato = parseFloat(libroTrovato.prezzo).toFixed(2);
-                $newRow.find('.prezzo').val(prezzoFormattato);
-
-                // Aggiorno subito il valore lordo (quantità iniziale = 0)
-                // (lo farà automaticamente quando l’utente immetterà una quantità > 0)
-                aggiornaValoreLordo($newRow[0]);
+            if ($dataInput.length === 0 || $periodoInput.length === 0) {
+                console.error("Non ho trovato data-row o periodo-row nel newRow!");
+            } else {
+                let periodoDefault = calcolaPeriodo(todayStr);
+                console.log("Periodo calcolato:", periodoDefault);
+                $periodoInput.val(periodoDefault);
+                // Listener su modifica data
+                $dataInput.on('change', function() {
+                    let d = $(this).val();
+                    $(this).closest('tr').find('.periodo-row').val(calcolaPeriodo(d));
+                });
             }
-            // ─────────────────────────────────────────────────────────────────
+
+            // Prefill Titolo e Prezzo, se esiste in libri
+            if (typeof libri === 'undefined') {
+                console.error("Variabile 'libri' NON definita!");
+            } else {
+                let libroTrovato = libri.find(l => l.isbn === scannedCode);
+                console.log("Risultato libri.find:", libroTrovato);
+                if (libroTrovato) {
+                    $newRow.find('.titolo').val(libroTrovato.titolo);
+                    let prezzoFormattato = parseFloat(libroTrovato.prezzo).toFixed(2);
+                    $newRow.find('.prezzo').val(prezzoFormattato);
+                    // Ricalcolo valore lordo con quantità a 0
+                    aggiornaValoreLordo($newRow[0]);
+                }
+            }
 
             // Inserisco la riga in testa alla tabella
+            console.log("Sto per fare prepend su #registroVenditeBody");
             $('#registroVenditeBody').prepend($newRow);
-
             console.log('Righe totali dopo l\'inserimento:', $('#registroVenditeBody tr').length);
 
-            // ─── Ricollego eventi: autocomplete, ricalcolo valore e delete ───
-            // Applico autocomplete al nuovo campo “titolo”
-            initAutocomplete($newRow.find('.titolo'));
-
-            // Ricollego lo “input” su quantita e prezzo per ricalcolare valore lordo
+            // Ricollego eventi
+            try {
+                initAutocomplete($newRow.find('.titolo'));
+            } catch(err) {
+                console.error("Errore chiamando initAutocomplete:", err);
+            }
             $newRow.find('.quantita, .prezzo').on('input', function() {
                 aggiornaValoreLordo($newRow[0]);
             });
+            try {
+                gestisciEventiElimina();
+            } catch(err) {
+                console.error("Errore chiamando gestisciEventiElimina():", err);
+            }
 
-            // Ricollego il pulsante “Elimina” per questa nuova riga
-            gestisciEventiElimina();
-            // ─────────────────────────────────────────────────────────────────
-
-            // Metto il focus sul campo “Quantità” della riga appena creata
+            // Focus su Quantità
             $newRow.find('.quantita').focus();
 
-            // Pulisco il campo barcode pronti per la prossima scansione
+            // Pulisco il campo barcode
             $('#barcode-scan-registro').val('');
 
             rigaIndex++;
         } else {
-            // Se l’utente ha scelto “No” alla conferma
+            // Se l’utente ha scelto “No”
             $('#barcode-scan-registro').val('');
         }
     }
 });
+
 
 
 });
