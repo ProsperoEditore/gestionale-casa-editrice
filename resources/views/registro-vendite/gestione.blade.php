@@ -578,77 +578,111 @@ document.addEventListener('DOMContentLoaded', function () {
           "Non esiste ancora una riga con ISBN \"" + scannedCode + 
           "\" per la data odierna (" + todayStr + ").\n" +
           "Vuoi aggiungere una nuova riga ?";
-            if (confirm(messaggio)) {
-                console.log('Ho premuto OK, creo la nuova riga');
+        if (confirm(messaggio)) {
+            console.log('Ho premuto OK, creo la nuova riga');
 
-                let newIndex = $('#registroVenditeBody tr').length;
-                let $newRow = $(`
-                    <tr>
-                    <td data-label="Data">
-                        <input type="hidden" name="righe[${newIndex}][id]" value="">
-                        <input type="date" name="righe[${newIndex}][data]" value="${todayStr}" class="form-control data-row" />
-                    </td>
-                    <td data-label="Periodo">
-                        <input type="text" name="righe[${newIndex}][periodo]" class="form-control periodo-row" placeholder="Periodo" />
-                    </td>
-                    <td data-label="ISBN">
-                        <input type="text" name="righe[${newIndex}][isbn]" class="form-control isbn" value="${scannedCode}" readonly />
-                    </td>
-                    <td data-label="Titolo">
-                        <input type="text" name="righe[${newIndex}][titolo]" class="form-control titolo" placeholder="Cerca titolo..." />
-                    </td>
-                    <td data-label="Quantità">
-                        <input type="number" name="righe[${newIndex}][quantita]" value="0" class="form-control quantita" placeholder="Quantità" />
-                    </td>
-                    <td data-label="Prezzo">
-                        <input type="number" name="righe[${newIndex}][prezzo]" value="0.00" class="form-control prezzo" step="0.01" readonly />
-                    </td>
-                    <td data-label="Valore Vendita">
-                        <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00" class="form-control valore-lordo" step="0.01" />
-                    </td>
-                    <td data-label="Azioni">
-                        <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
-                    </td>
-                    </tr>
-                `);
+            let newIndex = $('#registroVenditeBody tr').length;
+            let $newRow = $(`
+                <tr>
+                  <td data-label="Data">
+                    <input type="hidden" name="righe[${newIndex}][id]" value="">
+                    <input type="date" name="righe[${newIndex}][data]" value="${todayStr}"
+                           class="form-control data-row" />
+                  </td>
+                  <td data-label="Periodo">
+                    <input type="text" name="righe[${newIndex}][periodo]"
+                           class="form-control periodo-row" placeholder="Periodo" />
+                  </td>
+                  <td data-label="ISBN">
+                    <input type="text" name="righe[${newIndex}][isbn]"
+                           class="form-control isbn" value="${scannedCode}" readonly />
+                  </td>
+                  <td data-label="Titolo">
+                    <!-- Aggiungo class="titolo" per autocomplete e futuro prefill -->
+                    <input type="text" name="righe[${newIndex}][titolo]"
+                           class="form-control titolo" placeholder="Cerca titolo..." />
+                  </td>
+                  <td data-label="Quantità">
+                    <input type="number" name="righe[${newIndex}][quantita]" value="0"
+                           class="form-control quantita" placeholder="Quantità" />
+                  </td>
+                  <td data-label="Prezzo">
+                    <!-- Previsione di .prezzo in caso di libro trovato -->
+                    <input type="number" name="righe[${newIndex}][prezzo]" value="0.00"
+                           class="form-control prezzo" step="0.01" readonly />
+                  </td>
+                  <td data-label="Valore Vendita">
+                    <!-- Valore lordo, verrà aggiornato via JS -->
+                    <input type="number" name="righe[${newIndex}][valore_lordo]" value="0.00"
+                           class="form-control valore-lordo" step="0.01" />
+                  </td>
+                  <td data-label="Azioni">
+                    <button type="button" class="btn btn-danger btn-sm delete-row">Elimina</button>
+                  </td>
+                </tr>
+            `);
 
-                console.log('$newRow creato:', $newRow.prop('outerHTML'));
+            console.log('$newRow creato:', $newRow.prop('outerHTML'));
 
-                //  ─── Pre‐riempio il campo “Periodo” basandosi su todayStr ───
-                let $dataInput = $newRow.find('.data-row');
-                let $periodoInput = $newRow.find('.periodo-row');
-                $periodoInput.val( calcolaPeriodo(todayStr) );
-                // Se l’utente cambia la data nella riga creata, aggiorno Periodo
-                $dataInput.on('change', function() {
-                    let d = $(this).val();
-                    $(this).closest('tr').find('.periodo-row').val( calcolaPeriodo(d) );
-                });
-                // ─────────────────────────────────────────────────────────────────
+            // ─── Pre‐riempio il campo “Periodo” con calcolaPeriodo(todayStr) ───
+            let $dataInput     = $newRow.find('.data-row');
+            let $periodoInput  = $newRow.find('.periodo-row');
+            $periodoInput.val(calcolaPeriodo(todayStr));
+            // Se l’utente cambia la data nella riga creata, aggiorno Periodo
+            $dataInput.on('change', function() {
+                let d = $(this).val();
+                $(this).closest('tr').find('.periodo-row').val(calcolaPeriodo(d));
+            });
 
-                // Inserisco la riga in testa alla tabella
-                $('#registroVenditeBody').prepend($newRow);
+            // ─── Cerco l’oggetto libro corrispondente all’ISBN e, se esiste, 
+            //     prefill titolo, prezzo e ricalcolo valore lordo ───
+            let libroTrovato = libri.find(l => l.isbn === scannedCode);
+            if (libroTrovato) {
+                // Setto il titolo dal libro trovato
+                $newRow.find('.titolo').val(libroTrovato.titolo);
 
-                console.log('Righe totali dopo l\'inserimento:', $('#registroVenditeBody tr').length);
+                // Setto il prezzo dal libro trovato (due decimali)
+                let prezzoFormattato = parseFloat(libroTrovato.prezzo).toFixed(2);
+                $newRow.find('.prezzo').val(prezzoFormattato);
 
-                // Ricollego eventi: autocomplete, ricalcolo valore e delete
-                initAutocomplete($newRow.find('.titolo'));
-                $newRow.find('.quantita, .prezzo').on('input', function() {
-                    aggiornaValoreLordo($newRow[0]);
-                });
-                gestisciEventiElimina();
-
-                // Focus su “Quantità”
-                $newRow.find('.quantita').focus();
-
-                // Pulisco il campo barcode
-                $('#barcode-scan-registro').val('');
-
-                rigaIndex++;
-            } else {
-                $('#barcode-scan-registro').val('');
+                // Aggiorno subito il valore lordo (quantità iniziale = 0)
+                // (lo farà automaticamente quando l’utente immetterà una quantità > 0)
+                aggiornaValoreLordo($newRow[0]);
             }
+            // ─────────────────────────────────────────────────────────────────
+
+            // Inserisco la riga in testa alla tabella
+            $('#registroVenditeBody').prepend($newRow);
+
+            console.log('Righe totali dopo l\'inserimento:', $('#registroVenditeBody tr').length);
+
+            // ─── Ricollego eventi: autocomplete, ricalcolo valore e delete ───
+            // Applico autocomplete al nuovo campo “titolo”
+            initAutocomplete($newRow.find('.titolo'));
+
+            // Ricollego lo “input” su quantita e prezzo per ricalcolare valore lordo
+            $newRow.find('.quantita, .prezzo').on('input', function() {
+                aggiornaValoreLordo($newRow[0]);
+            });
+
+            // Ricollego il pulsante “Elimina” per questa nuova riga
+            gestisciEventiElimina();
+            // ─────────────────────────────────────────────────────────────────
+
+            // Metto il focus sul campo “Quantità” della riga appena creata
+            $newRow.find('.quantita').focus();
+
+            // Pulisco il campo barcode pronti per la prossima scansione
+            $('#barcode-scan-registro').val('');
+
+            rigaIndex++;
+        } else {
+            // Se l’utente ha scelto “No” alla conferma
+            $('#barcode-scan-registro').val('');
+        }
     }
 });
+
 
 });
 </script>
