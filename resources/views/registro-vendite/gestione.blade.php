@@ -521,7 +521,13 @@ $(document).ready(function () {
 
             $('#registroVenditeBody').prepend($newRow);
             gestisciEventiElimina();
-            $newRow.find('.quantita').focus();
+            const inputQuantita = $newRow.find('.quantita')[0];
+                setTimeout(() => {
+                    inputQuantita.click(); 
+                    inputQuantita.focus(); 
+                    inputQuantita.setSelectionRange(0, inputQuantita.value.length); // seleziona contenuto per digitazione immediata
+                }, 100);
+
             $('#barcode-scan-registro').val('');
         }
     });
