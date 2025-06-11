@@ -4,87 +4,95 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
 @endphp
 
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
-<FatturaElettronica versione="FPR12" xmlns="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
-  <FatturaElettronicaHeader>
-    <DatiTrasmissione>
-      <IdTrasmittente>
-        <IdPaese>IT</IdPaese>
-        <IdCodice>{{ $marchio->partita_iva }}</IdCodice>
-      </IdTrasmittente>
-      <ProgressivoInvio>{{ str_pad($ordine->id, 5, '0', STR_PAD_LEFT) }}</ProgressivoInvio>
-      <FormatoTrasmissione>FPR12</FormatoTrasmissione>
-      <CodiceDestinatario>{{ $cliente->codice_univoco ?? '0000000' }}</CodiceDestinatario>
+<p:FatturaElettronica versione="FPR12"
+    xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2
+    http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2.2/Schema_del_file_xml_FatturaPA_versione_1.2.2.xsd">
+
+  <p:FatturaElettronicaHeader>
+    <p:DatiTrasmissione>
+      <p:IdTrasmittente>
+        <p:IdPaese>IT</p:IdPaese>
+        <p:IdCodice>{{ $marchio->partita_iva }}</p:IdCodice>
+      </p:IdTrasmittente>
+      <p:ProgressivoInvio>{{ str_pad($ordine->id, 5, '0', STR_PAD_LEFT) }}</p:ProgressivoInvio>
+      <p:FormatoTrasmissione>FPR12</p:FormatoTrasmissione>
+      <p:CodiceDestinatario>{{ $cliente->codice_univoco ?? '0000000' }}</p:CodiceDestinatario>
       @if($cliente->pec)
-      <PECDestinatario>{{ $cliente->pec }}</PECDestinatario>
+      <p:PECDestinatario>{{ $cliente->pec }}</p:PECDestinatario>
       @endif
-    </DatiTrasmissione>
-    <CedentePrestatore>
-      <DatiAnagrafici>
-        <IdFiscaleIVA>
-          <IdPaese>IT</IdPaese>
-          <IdCodice>{{ $marchio->partita_iva }}</IdCodice>
-        </IdFiscaleIVA>
-        <Anagrafica>
-          <Denominazione>{{ $marchio->nome }}</Denominazione>
-        </Anagrafica>
-        <RegimeFiscale>RF01</RegimeFiscale>
-      </DatiAnagrafici>
-      <Sede>
-        <Indirizzo>{{ $marchio->indirizzo_sede_legale }}</Indirizzo>
-        <CAP>00000</CAP>
-        <Comune>Milano</Comune>
-        <Provincia>MI</Provincia>
-        <Nazione>IT</Nazione>
-      </Sede>
-    </CedentePrestatore>
-    <CessionarioCommittente>
-      <DatiAnagrafici>
-        <CodiceFiscale>{{ $cliente->codice_fiscale ?? 'ND' }}</CodiceFiscale>
-        <Anagrafica>
-          <Denominazione>{{ $cliente->nome }}</Denominazione>
-        </Anagrafica>
-      </DatiAnagrafici>
-      <Sede>
-        <Indirizzo>{{ $cliente->indirizzo_fatturazione }}</Indirizzo>
-        <CAP>00000</CAP>
-        <Comune>Roma</Comune>
-        <Provincia>RM</Provincia>
-        <Nazione>IT</Nazione>
-      </Sede>
-    </CessionarioCommittente>
-  </FatturaElettronicaHeader>
+    </p:DatiTrasmissione>
 
-  <FatturaElettronicaBody>
-    <DatiGenerali>
-      <DatiGeneraliDocumento>
-        <TipoDocumento>TD01</TipoDocumento>
-        <Divisa>EUR</Divisa>
-        <Data>{{ $ordine->data }}</Data>
-        <Numero>{{ $ordine->codice }}</Numero>
-      </DatiGeneraliDocumento>
-    </DatiGenerali>
+    <p:CedentePrestatore>
+      <p:DatiAnagrafici>
+        <p:IdFiscaleIVA>
+          <p:IdPaese>IT</p:IdPaese>
+          <p:IdCodice>{{ $marchio->partita_iva }}</p:IdCodice>
+        </p:IdFiscaleIVA>
+        <p:Anagrafica>
+          <p:Denominazione>{{ $marchio->nome }}</p:Denominazione>
+        </p:Anagrafica>
+        <p:RegimeFiscale>RF01</p:RegimeFiscale>
+      </p:DatiAnagrafici>
+      <p:Sede>
+        <p:Indirizzo>{{ $marchio->indirizzo_sede_legale }}</p:Indirizzo>
+        <p:CAP>00000</p:CAP>
+        <p:Comune>Milano</p:Comune>
+        <p:Provincia>MI</p:Provincia>
+        <p:Nazione>IT</p:Nazione>
+      </p:Sede>
+    </p:CedentePrestatore>
 
-    <DatiBeniServizi>
+    <p:CessionarioCommittente>
+      <p:DatiAnagrafici>
+        <p:CodiceFiscale>{{ $cliente->codice_fiscale ?? 'ND' }}</p:CodiceFiscale>
+        <p:Anagrafica>
+          <p:Denominazione>{{ $cliente->nome }}</p:Denominazione>
+        </p:Anagrafica>
+      </p:DatiAnagrafici>
+      <p:Sede>
+        <p:Indirizzo>{{ $cliente->indirizzo_fatturazione }}</p:Indirizzo>
+        <p:CAP>00000</p:CAP>
+        <p:Comune>Roma</p:Comune>
+        <p:Provincia>RM</p:Provincia>
+        <p:Nazione>IT</p:Nazione>
+      </p:Sede>
+    </p:CessionarioCommittente>
+  </p:FatturaElettronicaHeader>
+
+  <p:FatturaElettronicaBody>
+    <p:DatiGenerali>
+      <p:DatiGeneraliDocumento>
+        <p:TipoDocumento>TD01</p:TipoDocumento>
+        <p:Divisa>EUR</p:Divisa>
+        <p:Data>{{ $ordine->data }}</p:Data>
+        <p:Numero>{{ $ordine->codice }}</p:Numero>
+      </p:DatiGeneraliDocumento>
+    </p:DatiGenerali>
+
+    <p:DatiBeniServizi>
       @foreach($ordine->libri as $index => $libro)
-      <DettaglioLinee>
-        <NumeroLinea>{{ $index + 1 }}</NumeroLinea>
-        <Descrizione>{{ $libro->titolo }}</Descrizione>
-        <Quantita>{{ $libro->pivot->quantita }}</Quantita>
-        <PrezzoUnitario>{{ number_format($libro->pivot->prezzo_copertina, 2, '.', '') }}</PrezzoUnitario>
-        <PrezzoTotale>{{ number_format($libro->pivot->valore_vendita_lordo, 2, '.', '') }}</PrezzoTotale>
-        <Natura>N2.2</Natura>
-        <RiferimentoNormativo>IVA assolta all'origine dall'editore, ai sensi dell'art.74 co. 1 lett. c del DPR 633/72</RiferimentoNormativo>
-      </DettaglioLinee>
+      <p:DettaglioLinee>
+        <p:NumeroLinea>{{ $index + 1 }}</p:NumeroLinea>
+        <p:Descrizione>{{ $libro->titolo }}</p:Descrizione>
+        <p:Quantita>{{ $libro->pivot->quantita }}</p:Quantita>
+        <p:PrezzoUnitario>{{ number_format($libro->pivot->prezzo_copertina, 2, '.', '') }}</p:PrezzoUnitario>
+        <p:PrezzoTotale>{{ number_format($libro->pivot->valore_vendita_lordo, 2, '.', '') }}</p:PrezzoTotale>
+        <p:Natura>N2.2</p:Natura>
+        <p:RiferimentoNormativo>IVA assolta all'origine dall'editore, ai sensi dell'art.74 co. 1 lett. c del DPR 633/72</p:RiferimentoNormativo>
+      </p:DettaglioLinee>
       @endforeach
-    </DatiBeniServizi>
+    </p:DatiBeniServizi>
 
-    <DatiPagamento>
-      <Condizioni>TP02</Condizioni>
-      <DettaglioPagamento>
-        <ModalitaPagamento>MP01</ModalitaPagamento>
-        <DataScadenzaPagamento>{{ \Carbon\Carbon::parse($ordine->data)->addDays(30)->toDateString() }}</DataScadenzaPagamento>
-        <ImportoPagamento>{{ number_format($ordine->totale_netto_compilato, 2, '.', '') }}</ImportoPagamento>
-      </DettaglioPagamento>
-    </DatiPagamento>
-  </FatturaElettronicaBody>
-</FatturaElettronica>
+    <p:DatiPagamento>
+      <p:Condizioni>TP02</p:Condizioni>
+      <p:DettaglioPagamento>
+        <p:ModalitaPagamento>MP01</p:ModalitaPagamento>
+        <p:DataScadenzaPagamento>{{ \Carbon\Carbon::parse($ordine->data)->addDays(30)->toDateString() }}</p:DataScadenzaPagamento>
+        <p:ImportoPagamento>{{ number_format($ordine->totale_netto_compilato, 2, '.', '') }}</p:ImportoPagamento>
+      </p:DettaglioPagamento>
+    </p:DatiPagamento>
+  </p:FatturaElettronicaBody>
+</p:FatturaElettronica>
