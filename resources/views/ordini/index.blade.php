@@ -85,6 +85,11 @@
                                 <i class="bi bi-printer fs-4"></i>
                             </a>
 
+                            @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                            <a href="{{ route('ordini.esportaXML', $ordine->id) }}" class="text-primary" title="Esporta XML" target="_blank">
+                                <i class="bi bi-file-earmark-code fs-4"></i>
+                            </a>
+                            @endif
                         </div>
                     </td>
 
@@ -139,6 +144,12 @@
                     <a href="{{ route('ordini.stampa', $ordine->id) }}" class="btn btn-sm btn-dark" title="Stampa">
                         <i class="bi bi-printer"></i>
                     </a>
+      
+                    @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                    <a href="{{ route('ordini.esportaXML', $ordine->id) }}" class="btn btn-sm btn-primary" title="Esporta XML" target="_blank">
+                        <i class="bi bi-file-earmark-code"></i>
+                    </a>
+                    @endif
                 </div>
             </div>
         </div>

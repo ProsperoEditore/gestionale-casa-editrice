@@ -24,8 +24,15 @@
         <a href="{{ route('ordini.stampa', $ordine->id) }}" target="_blank" class="btn btn-danger">
             📄 Stampa
         </a>
+
+        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+        <a href="{{ route('ordini.esportaXML', $ordine->id) }}" target="_blank" class="btn btn-outline-primary">
+            📤 Esporta XML
+        </a>
+        @endif
     @endif
 </div>
+
 
 
 <div class="card">

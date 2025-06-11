@@ -130,6 +130,7 @@ Route::get('/api/libro-da-barcode', function (Request $request) {
     ]);
 });
 
+Route::get('/ordini/{id}/esporta-xml', [OrdineController::class, 'esportaXML'])->name('ordini.esportaXML');
 
 
 // Registro Tirature

@@ -598,4 +598,15 @@ public function importLibri(Request $request, $id)
     
     
 
+    public function esportaXML($id)
+    {
+    $ordine = Ordine::with('anagrafica', 'libri')->findOrFail($id);
+    $xml = view('ordini.xml', compact('ordine'))->render();
+
+    return response($xml)
+        ->header('Content-Type', 'application/xml')
+        ->header('Content-Disposition', 'attachment; filename="ordine_'.$ordine->codice.'.xml"');
+    }
+
+
 }

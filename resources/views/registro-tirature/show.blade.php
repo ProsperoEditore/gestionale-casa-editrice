@@ -108,7 +108,7 @@
         <tbody>
             @foreach($dettagli as $dettaglio)
             <tr>
-                <td>{{ $dettaglio->data }}</td>
+                <td>{{ \Carbon\Carbon::parse($dettaglio->data)->format('d-m-Y') }}</td>
                 <td>{{ $dettaglio->titolo->titolo ?? '—' }}</td>
                 <td>{{ $dettaglio->copie_stampate }}</td>
                 <td>{{ number_format($dettaglio->prezzo_vendita_iva, 3, ',', '') }}</td>
