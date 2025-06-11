@@ -108,7 +108,7 @@ public function destroy(RegistroTirature $registroTirature, RegistroTiraturaDett
         'file' => 'required|file|mimes:xlsx,xls',
     ]);
 
-    Excel::import(new RegistroTiraturaDettaglioImportAdvanced($registroTirature), $request->file('file'));
+    Excel::import(new RegistroTiraturaDettaglioImport($registroTirature), $request->file('file'));
 
         if (session()->has('righe_ambigue_tirature')) {
             session()->reflash(); // conserva righe + errori
