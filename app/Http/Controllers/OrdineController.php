@@ -208,37 +208,36 @@ public function update(Request $request, $id)
         $query->withPivot(['quantita', 'sconto', 'info_spedizione']);
     }]);
 
-    // ✅ GESTIONE GIACENZA CONTO DEPOSITO (solo copie di questo ordine)
+    // ✅ GESTIONE GIACENZA CONTO DEPOSITO
     if ($ordine->tipo_ordine === 'conto deposito') {
         $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
 
         if ($magazzino) {
             foreach ($ordine->libri as $libro) {
                 $libroId = $libro->id;
-                $quantitaPrecedente = (int) ($libriPrecedenti[$libroId]->pivot->quantita ?? 0);
                 $quantitaNuova = (int) $libro->pivot->quantita;
-                $differenza = $quantitaNuova - $quantitaPrecedente;
 
                 $giacenza = \App\Models\Giacenza::firstOrNew([
                     'magazzino_id' => $magazzino->id,
                     'libro_id' => $libroId,
-                    'ordine_id' => $ordine->id, // vincolata solo a questo ordine
+                    'ordine_id' => $ordine->id,
                 ]);
 
                 $giacenza->isbn = $libro->isbn;
                 $giacenza->titolo = $libro->titolo;
-                $giacenza->quantita = max(0, $quantitaPrecedente + $differenza); // sempre ricalcolo mirato
+                $giacenza->quantita = $quantitaNuova; // ✅ sovrascrive, non somma
                 $giacenza->prezzo = $libro->prezzo_copertina;
                 $giacenza->sconto = $libro->pivot->sconto;
                 $giacenza->costo_produzione = $libro->costo_produzione;
                 $giacenza->data_ultimo_aggiornamento = now();
                 $giacenza->note = 'Aggiornata da ordine ' . $ordine->codice;
+
                 $giacenza->save();
             }
         }
     }
 
-    // 📦 GESTIONE SPEDIZIONE: sottrazione da magazzino editore
+    // 📦 GESTIONE SPEDIZIONE (magazzino editore)
     foreach ($ordine->libri as $libro) {
         $libroId = $libro->id;
         $quantitaPrecedente = (int) ($libriPrecedenti[$libroId]->pivot->quantita ?? 0);
@@ -285,12 +284,11 @@ public function update(Request $request, $id)
 
         $registro->save();
 
-        // 🔁 Elimina righe precedenti di questo ordine
+        // 🔁 Elimina solo righe di questo ordine
         \App\Models\RegistroVenditeDettaglio::where('registro_vendita_id', $registro->id)
             ->where('ordine_id', $ordine->id)
             ->delete();
 
-        // ➕ Reinserisci le righe aggiornate
         foreach ($ordine->libri as $libro) {
             \App\Models\RegistroVenditeDettaglio::create([
                 'registro_vendita_id' => $registro->id,
@@ -308,6 +306,7 @@ public function update(Request $request, $id)
 
     return redirect()->route('ordini.index')->with('success', 'Ordine aggiornato con successo.');
 }
+
 
     
     
