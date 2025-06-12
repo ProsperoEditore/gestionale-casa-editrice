@@ -214,32 +214,36 @@ class OrdineController extends Controller
         }]);
 
         // ✅ GESTIONE GIACENZA CONTO DEPOSITO
-        if ($ordine->tipo_ordine === 'conto deposito') {
-            $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
+            if ($ordine->tipo_ordine === 'conto deposito') {
+                $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
 
-            if ($magazzino) {
-                foreach ($ordine->libri as $libro) {
-                    $libroId = $libro->id;
-                    $quantitaNuova = (int) $libro->pivot->quantita;
+                if ($magazzino) {
+                    foreach ($ordine->libri as $libro) {
+                        $libroId = $libro->id;
+                        $quantitaNuova = (int) $libro->pivot->quantita;
 
-                    $giacenza = \App\Models\Giacenza::firstOrNew([
-                        'magazzino_id' => $magazzino->id,
-                        'libro_id' => $libroId,
-                    ]);
-                    $giacenza->ordine_id = $ordine->id; 
-                    $giacenza->isbn = $libro->isbn;
-                    $giacenza->titolo = $libro->titolo;
-                    $giacenza->quantita = $quantitaNuova;
-                    $giacenza->prezzo = $libro->prezzo_copertina;
-                    $giacenza->sconto = $libro->pivot->sconto;
-                    $giacenza->costo_produzione = $libro->costo_produzione;
-                    $giacenza->data_ultimo_aggiornamento = now();
-                    $giacenza->note = 'Aggiornata da ordine ' . $ordine->codice;
+                        // 🧹 Pulisce eventuali righe esistenti per questo libro e magazzino
+                        \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
+                            ->where('libro_id', $libroId)
+                            ->delete();
 
-                    $giacenza->save();
+                        // ✏️ Inserisce nuova riga
+                        \App\Models\Giacenza::create([
+                            'magazzino_id' => $magazzino->id,
+                            'libro_id' => $libroId,
+                            'ordine_id' => $ordine->id,
+                            'isbn' => $libro->isbn,
+                            'titolo' => $libro->titolo,
+                            'quantita' => $quantitaNuova,
+                            'prezzo' => $libro->prezzo_copertina,
+                            'sconto' => $libro->pivot->sconto,
+                            'costo_produzione' => $libro->costo_produzione,
+                            'data_ultimo_aggiornamento' => now(),
+                            'note' => 'Aggiornata da ordine ' . $ordine->codice,
+                        ]);
+                    }
                 }
             }
-        }
 
         // 📦 GESTIONE SPEDIZIONE (magazzino editore)
         foreach ($ordine->libri as $libro) {
