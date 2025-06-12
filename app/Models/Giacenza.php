@@ -21,7 +21,8 @@ class Giacenza extends Model
         'sconto',
         'costo_produzione',
         'data_ultimo_aggiornamento',
-        'note'
+        'note',
+        'ordine_id'
     ];
 
     protected $casts = [

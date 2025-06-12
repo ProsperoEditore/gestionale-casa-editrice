@@ -12,7 +12,7 @@ class RegistroVenditeDettaglio extends Model
     protected $table = 'registro_vendita_dettagli';
 
     protected $fillable = [
-        'registro_vendita_id', 'ordine_id', 'data', 'periodo', 'isbn', 'titolo', 'quantita', 'prezzo', 'valore_lordo'
+        'registro_vendita_id', 'ordine_id', 'data', 'periodo', 'isbn', 'titolo', 'quantita', 'prezzo', 'valore_lordo',
     ];
 
     public function registroVendite()
