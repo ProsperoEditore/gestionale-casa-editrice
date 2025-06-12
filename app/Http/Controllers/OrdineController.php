@@ -175,7 +175,13 @@ public function update(Request $request, $id)
     $ordine = \App\Models\Ordine::findOrFail($id);
 
     // 📌 Salva quantità precedenti
-    $libriPrecedenti = $ordine->libri()->withPivot(['quantita'])->get()->keyBy('id');
+    $libriPrecedenti = $ordine->libri()
+    ->withPivot(['quantita'])
+    ->get()
+    ->mapWithKeys(function ($libro) {
+        return [$libro->id => (int) $libro->pivot->quantita];
+    });
+
 
     // ✏️ Aggiorna dati ordine
     $ordine->update([
@@ -240,7 +246,7 @@ public function update(Request $request, $id)
     // 📦 GESTIONE SPEDIZIONE (magazzino editore)
     foreach ($ordine->libri as $libro) {
         $libroId = $libro->id;
-        $quantitaPrecedente = (int) ($libriPrecedenti[$libroId]->pivot->quantita ?? 0);
+        $quantitaPrecedente = $libriPrecedenti[$libroId] ?? 0;
         $quantitaNuova = (int) $libro->pivot->quantita;
 
         $info = strtolower(trim($libro->pivot->info_spedizione ?? ''));
