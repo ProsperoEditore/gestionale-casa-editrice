@@ -145,9 +145,6 @@ class OrdineController extends Controller
     
     
     
-    
-    
-    
 
     public function edit($id)
     {
@@ -165,158 +162,158 @@ class OrdineController extends Controller
     }
 
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'data' => 'required|date',
-        'anagrafica_id' => 'required|exists:anagraficas,id',
-    ]);
-
-    $ordine = \App\Models\Ordine::findOrFail($id);
-
-    // 📌 Salva quantità precedenti
-    $libriPrecedenti = $ordine->libri()
-    ->withPivot(['quantita'])
-    ->get()
-    ->mapWithKeys(function ($libro) {
-        return [$libro->id => (int) $libro->pivot->quantita];
-    });
 
 
-    // ✏️ Aggiorna dati ordine
-    $ordine->update([
-        'data' => $request->input('data'),
-        'anagrafica_id' => $request->input('anagrafica_id'),
-        'tipo_ordine' => $request->input('tipo_ordine'),
-        'causale' => $request->input('causale'),
-        'condizioni_conto_deposito' => $request->input('condizioni_conto_deposito'),
-        'totale_netto_compilato' => $request->input('totale_netto_compilato'),
-        'tempi_pagamento' => $request->input('tempi_pagamento'),
-        'modalita_pagamento' => $request->input('modalita_pagamento'),
-        'pagato' => $request->input('pagato'),
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'data' => 'required|date',
+            'anagrafica_id' => 'required|exists:anagraficas,id',
+        ]);
 
-    // 🔄 Sincronizza libri
-    if ($request->has('libri')) {
-        $libriSync = [];
-        foreach ($request->input('libri') as $libroId => $dati) {
-            $libriSync[$libroId] = [
-                'quantita' => $dati['quantita'],
-                'sconto' => $dati['sconto'] ?? 0,
-                'info_spedizione' => $dati['info_spedizione'] ?? null,
-            ];
-        }
-        $ordine->libri()->sync($libriSync);
-    }
+        $ordine = \App\Models\Ordine::findOrFail($id);
 
-    $ordine->refresh();
-    $ordine->load(['libri' => function ($query) {
-        $query->withPivot(['quantita', 'sconto', 'info_spedizione']);
-    }]);
+        // 📌 Salva quantità precedenti
+        $libriPrecedenti = $ordine->libri()
+        ->withPivot(['quantita'])
+        ->get()
+        ->mapWithKeys(function ($libro) {
+            return [$libro->id => (int) $libro->pivot->quantita];
+        });
 
-    // ✅ GESTIONE GIACENZA CONTO DEPOSITO
-    if ($ordine->tipo_ordine === 'conto deposito') {
-        $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
 
-        if ($magazzino) {
-            foreach ($ordine->libri as $libro) {
-                $libroId = $libro->id;
-                $quantitaNuova = (int) $libro->pivot->quantita;
+        // ✏️ Aggiorna dati ordine
+        $ordine->update([
+            'data' => $request->input('data'),
+            'anagrafica_id' => $request->input('anagrafica_id'),
+            'tipo_ordine' => $request->input('tipo_ordine'),
+            'causale' => $request->input('causale'),
+            'condizioni_conto_deposito' => $request->input('condizioni_conto_deposito'),
+            'totale_netto_compilato' => $request->input('totale_netto_compilato'),
+            'tempi_pagamento' => $request->input('tempi_pagamento'),
+            'modalita_pagamento' => $request->input('modalita_pagamento'),
+            'pagato' => $request->input('pagato'),
+        ]);
 
-                $giacenza = \App\Models\Giacenza::firstOrNew([
-                    'magazzino_id' => $magazzino->id,
-                    'libro_id' => $libroId,
-                    'ordine_id' => $ordine->id,
-                ]);
-
-                $giacenza->isbn = $libro->isbn;
-                $giacenza->titolo = $libro->titolo;
-                $giacenza->quantita = $quantitaNuova; // ✅ sovrascrive, non somma
-                $giacenza->prezzo = $libro->prezzo_copertina;
-                $giacenza->sconto = $libro->pivot->sconto;
-                $giacenza->costo_produzione = $libro->costo_produzione;
-                $giacenza->data_ultimo_aggiornamento = now();
-                $giacenza->note = 'Aggiornata da ordine ' . $ordine->codice;
-
-                $giacenza->save();
+        // 🔄 Sincronizza libri
+        if ($request->has('libri')) {
+            $libriSync = [];
+            foreach ($request->input('libri') as $libroId => $dati) {
+                $libriSync[$libroId] = [
+                    'quantita' => $dati['quantita'],
+                    'sconto' => $dati['sconto'] ?? 0,
+                    'info_spedizione' => $dati['info_spedizione'] ?? null,
+                ];
             }
+            $ordine->libri()->sync($libriSync);
         }
-    }
 
-    // 📦 GESTIONE SPEDIZIONE (magazzino editore)
-    foreach ($ordine->libri as $libro) {
-        $libroId = $libro->id;
-        $quantitaPrecedente = $libriPrecedenti[$libroId] ?? 0;
-        $quantitaNuova = (int) $libro->pivot->quantita;
+        $ordine->refresh();
+        $ordine->load(['libri' => function ($query) {
+            $query->withPivot(['quantita', 'sconto', 'info_spedizione']);
+        }]);
 
-        $info = strtolower(trim($libro->pivot->info_spedizione ?? ''));
-        if (in_array($info, ['spedito da magazzino editore', 'consegna a mano']) && $quantitaNuova > $quantitaPrecedente) {
-            $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
-                $query->where('categoria', 'magazzino editore');
-            })->first();
+        // ✅ GESTIONE GIACENZA CONTO DEPOSITO
+        if ($ordine->tipo_ordine === 'conto deposito') {
+            $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
 
-            if ($magazzinoEditore) {
-                $giacenzaEditore = \App\Models\Giacenza::where('magazzino_id', $magazzinoEditore->id)
-                    ->where('libro_id', $libroId)
-                    ->first();
+            if ($magazzino) {
+                foreach ($ordine->libri as $libro) {
+                    $libroId = $libro->id;
+                    $quantitaNuova = (int) $libro->pivot->quantita;
 
-                if ($giacenzaEditore) {
-                    $delta = $quantitaNuova - $quantitaPrecedente;
-                    $giacenzaEditore->quantita = max(0, $giacenzaEditore->quantita - $delta);
-                    $giacenzaEditore->note = 'Aggiornato (aggiunta copie in ordine ' . $ordine->codice . ')';
-                    $giacenzaEditore->data_ultimo_aggiornamento = now();
-                    $giacenzaEditore->save();
+                    $giacenza = \App\Models\Giacenza::firstOrNew([
+                        'magazzino_id' => $magazzino->id,
+                        'libro_id' => $libroId,
+                    ]);
+                    $giacenza->ordine_id = $ordine->id; 
+                    $giacenza->isbn = $libro->isbn;
+                    $giacenza->titolo = $libro->titolo;
+                    $giacenza->quantita = $quantitaNuova;
+                    $giacenza->prezzo = $libro->prezzo_copertina;
+                    $giacenza->sconto = $libro->pivot->sconto;
+                    $giacenza->costo_produzione = $libro->costo_produzione;
+                    $giacenza->data_ultimo_aggiornamento = now();
+                    $giacenza->note = 'Aggiornata da ordine ' . $ordine->codice;
+
+                    $giacenza->save();
                 }
             }
         }
-    }
 
-    // 📘 AGGIORNAMENTO REGISTRO VENDITE
-    if ($ordine->tipo_ordine === 'acquisto' && $ordine->canale !== 'acquisto autore') {
-        $registro = \App\Models\RegistroVendite::firstOrNew([
-            'ordine_id' => $ordine->id,
-        ], [
-            'anagrafica_id' => $ordine->anagrafica_id,
-            'periodo' => date('Y'),
-        ]);
-
-        $registro->ordine_id = $ordine->id;
-        $registro->canale_vendita = match (strtolower(trim($ordine->canale))) {
-            'vendite indirette' => 'Vendite indirette',
-            'vendite dirette' => 'Vendite dirette',
-            'evento' => 'Evento',
-            default => 'Altro',
-        };
-
-        $registro->save();
-
-        // 🔁 Elimina solo righe di questo ordine
-        \App\Models\RegistroVenditeDettaglio::where('registro_vendita_id', $registro->id)
-            ->where('ordine_id', $ordine->id)
-            ->delete();
-
+        // 📦 GESTIONE SPEDIZIONE (magazzino editore)
         foreach ($ordine->libri as $libro) {
-            \App\Models\RegistroVenditeDettaglio::updateOrCreate([
-                'registro_vendita_id' => $registro->id,
-                'ordine_id' => $ordine->id,
-                'isbn' => $libro->isbn,
-                'titolo' => $libro->titolo,
-                'quantita' => $libro->pivot->quantita,
-                'data' => $ordine->data,
-                'periodo' => date('Y'),
-                'prezzo' => $libro->prezzo ?? $libro->prezzo_copertina,
-                'valore_lordo' => $libro->pivot->valore_vendita_lordo ?? ($libro->prezzo * $libro->pivot->quantita),
-            ]);
+            $libroId = $libro->id;
+            $quantitaPrecedente = $libriPrecedenti[$libroId] ?? 0;
+            $quantitaNuova = (int) $libro->pivot->quantita;
+
+            $info = strtolower(trim($libro->pivot->info_spedizione ?? ''));
+            if (in_array($info, ['spedito da magazzino editore', 'consegna a mano']) && $quantitaNuova > $quantitaPrecedente) {
+                $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
+                    $query->where('categoria', 'magazzino editore');
+                })->first();
+
+                if ($magazzinoEditore) {
+                    $giacenzaEditore = \App\Models\Giacenza::where('magazzino_id', $magazzinoEditore->id)
+                        ->where('libro_id', $libroId)
+                        ->first();
+
+                    if ($giacenzaEditore) {
+                        $delta = $quantitaNuova - $quantitaPrecedente;
+                        $giacenzaEditore->quantita = max(0, $giacenzaEditore->quantita - $delta);
+                        $giacenzaEditore->note = 'Aggiornato (aggiunta copie in ordine ' . $ordine->codice . ')';
+                        $giacenzaEditore->data_ultimo_aggiornamento = now();
+                        $giacenzaEditore->save();
+                    }
+                }
+            }
         }
+
+        // 📘 AGGIORNAMENTO REGISTRO VENDITE
+        if ($ordine->tipo_ordine === 'acquisto' && $ordine->canale !== 'acquisto autore') {
+            $registro = \App\Models\RegistroVendite::firstOrNew([
+                'ordine_id' => $ordine->id,
+            ], [
+                'anagrafica_id' => $ordine->anagrafica_id,
+                'periodo' => date('Y'),
+            ]);
+
+            $registro->ordine_id = $ordine->id;
+            $registro->canale_vendita = match (strtolower(trim($ordine->canale))) {
+                'vendite indirette' => 'Vendite indirette',
+                'vendite dirette' => 'Vendite dirette',
+                'evento' => 'Evento',
+                default => 'Altro',
+            };
+
+            $registro->save();
+
+            // 🔁 Elimina solo righe di questo ordine
+            \App\Models\RegistroVenditeDettaglio::where('registro_vendita_id', $registro->id)
+                ->where('ordine_id', $ordine->id)
+                ->delete();
+
+            foreach ($ordine->libri as $libro) {
+                \App\Models\RegistroVenditeDettaglio::updateOrCreate([
+                    'registro_vendita_id' => $registro->id,
+                    'ordine_id' => $ordine->id,
+                    'isbn' => $libro->isbn,
+                    'titolo' => $libro->titolo,
+                    'quantita' => $libro->pivot->quantita,
+                    'data' => $ordine->data,
+                    'periodo' => date('Y'),
+                    'prezzo' => $libro->prezzo ?? $libro->prezzo_copertina,
+                    'valore_lordo' => $libro->pivot->valore_vendita_lordo ?? ($libro->prezzo * $libro->pivot->quantita),
+                ]);
+            }
+        }
+
+        return redirect()->route('ordini.index')->with('success', 'Ordine aggiornato con successo.');
     }
 
-    return redirect()->route('ordini.index')->with('success', 'Ordine aggiornato con successo.');
-}
-
 
     
-    
-    
+        
     
 
     public function stampa($id)
