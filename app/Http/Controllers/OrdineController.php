@@ -290,7 +290,7 @@ public function update(Request $request, $id)
             ->delete();
 
         foreach ($ordine->libri as $libro) {
-            \App\Models\RegistroVenditeDettaglio::create([
+            \App\Models\RegistroVenditeDettaglio::updateOrCreate([
                 'registro_vendita_id' => $registro->id,
                 'ordine_id' => $ordine->id,
                 'isbn' => $libro->isbn,
