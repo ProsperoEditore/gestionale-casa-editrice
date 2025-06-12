@@ -218,23 +218,20 @@ class OrdineController extends Controller
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
 
                 if ($magazzino) {
+                    // 🔥 PRIMA: elimina TUTTE le righe di giacenza legate a quell’ordine
+                    \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
+                        ->where('ordine_id', $ordine->id)
+                        ->delete();
+
+                    // 🧱 POI: ricrea da zero le nuove righe
                     foreach ($ordine->libri as $libro) {
-                        $libroId = $libro->id;
-                        $quantitaNuova = (int) $libro->pivot->quantita;
-
-                        // 🧹 Pulisce eventuali righe esistenti per questo libro e magazzino
-                        \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
-                            ->where('libro_id', $libroId)
-                            ->delete();
-
-                        // ✏️ Inserisce nuova riga
                         \App\Models\Giacenza::create([
                             'magazzino_id' => $magazzino->id,
-                            'libro_id' => $libroId,
+                            'libro_id' => $libro->id,
                             'ordine_id' => $ordine->id,
                             'isbn' => $libro->isbn,
                             'titolo' => $libro->titolo,
-                            'quantita' => $quantitaNuova,
+                            'quantita' => $libro->pivot->quantita,
                             'prezzo' => $libro->prezzo_copertina,
                             'sconto' => $libro->pivot->sconto,
                             'costo_produzione' => $libro->costo_produzione,
@@ -244,6 +241,7 @@ class OrdineController extends Controller
                     }
                 }
             }
+
 
         // 📦 GESTIONE SPEDIZIONE (magazzino editore)
         foreach ($ordine->libri as $libro) {
