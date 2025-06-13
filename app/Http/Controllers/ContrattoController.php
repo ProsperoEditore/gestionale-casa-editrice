@@ -23,15 +23,17 @@ class ContrattoController extends Controller
     {
         $request->validate([
             'nome_contratto' => 'required|string|max:255',
+            'royalties_vendite_indirette' => 'required|numeric',
+
+            // Tutti gli altri campi sono facoltativi
             'sconto_proprio_libro' => 'nullable|numeric',
             'sconto_altri_libri' => 'nullable|numeric',
-            'royalties_vendite_indirette' => 'nullable|numeric',
-            'royalties_vendite_indirette_soglia_1' => 'required|integer',
-            'royalties_vendite_indirette_percentuale_1' => 'required|numeric',
-            'royalties_vendite_indirette_soglia_2' => 'required|integer',
-            'royalties_vendite_indirette_percentuale_2' => 'required|numeric',
-            'royalties_vendite_indirette_soglia_3' => 'required|integer',
-            'royalties_vendite_indirette_percentuale_3' => 'required|numeric',
+            'royalties_vendite_indirette_soglia_1' => 'nullable|integer',
+            'royalties_vendite_indirette_percentuale_1' => 'nullable|numeric',
+            'royalties_vendite_indirette_soglia_2' => 'nullable|integer',
+            'royalties_vendite_indirette_percentuale_2' => 'nullable|numeric',
+            'royalties_vendite_indirette_soglia_3' => 'nullable|integer',
+            'royalties_vendite_indirette_percentuale_3' => 'nullable|numeric',
             'royalties_vendite_dirette' => 'nullable|numeric',
             'royalties_eventi' => 'nullable|numeric',
         ]);
@@ -50,15 +52,17 @@ class ContrattoController extends Controller
     {
         $request->validate([
             'nome_contratto' => 'required|string|max:255',
+            'royalties_vendite_indirette' => 'required|numeric',
+
+            // Tutti gli altri campi sono facoltativi
             'sconto_proprio_libro' => 'nullable|numeric',
             'sconto_altri_libri' => 'nullable|numeric',
-            'royalties_vendite_indirette' => 'nullable|numeric',
-            'royalties_vendite_indirette_soglia_1' => 'required|integer',
-            'royalties_vendite_indirette_percentuale_1' => 'required|numeric',
-            'royalties_vendite_indirette_soglia_2' => 'required|integer',
-            'royalties_vendite_indirette_percentuale_2' => 'required|numeric',
-            'royalties_vendite_indirette_soglia_3' => 'required|integer',
-            'royalties_vendite_indirette_percentuale_3' => 'required|numeric',
+            'royalties_vendite_indirette_soglia_1' => 'nullable|integer',
+            'royalties_vendite_indirette_percentuale_1' => 'nullable|numeric',
+            'royalties_vendite_indirette_soglia_2' => 'nullable|integer',
+            'royalties_vendite_indirette_percentuale_2' => 'nullable|numeric',
+            'royalties_vendite_indirette_soglia_3' => 'nullable|integer',
+            'royalties_vendite_indirette_percentuale_3' => 'nullable|numeric',
             'royalties_vendite_dirette' => 'nullable|numeric',
             'royalties_eventi' => 'nullable|numeric',
         ]);

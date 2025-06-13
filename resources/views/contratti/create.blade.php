@@ -10,7 +10,7 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label class="form-label">Nome Contratto</label>
+                    <label class="form-label">Nome Contratto <span class="text-danger">*</span></label>
                     <input type="text" name="nome_contratto" class="form-control" required>
                 </div>
 
@@ -25,11 +25,9 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Royalties Vendite Indirette (%)</label>
-                    <input type="number" name="royalties_vendite_indirette" class="form-control">
+                    <label class="form-label">Royalties Vendite Indirette (%) <span class="text-danger">*</span></label>
+                    <input type="number" name="royalties_vendite_indirette" class="form-control" required>
                 </div>
-
-
 
                 <div class="form-group">
                     <label for="royalties_vendite_indirette_soglia_1">Soglia 1 (Quantità):</label>
