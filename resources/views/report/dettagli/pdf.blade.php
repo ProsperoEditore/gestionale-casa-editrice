@@ -66,14 +66,18 @@
             </tr>
         @endif
         </tbody>
-        <tfoot>
-            <tr class="totali-row">
-                <td colspan="2">TOTALE</td>
-                <td>{{ $totali['quantita'] }}</td>
-                <td colspan="4"></td>
-                <td class="royalties">€ {{ number_format($totali['royalties'], 2, ',', '.') }}</td>
-            </tr>
-        </tfoot>
+            <tfoot>
+                <tr class="totali-row">
+                    <td></td> <!-- Data -->
+                    <td></td> <!-- Periodo -->
+                    <td>TOTALE</td> <!-- Luogo -->
+                    <td>{{ $totali['quantita'] }}</td> <!-- Q.tà -->
+                    <td></td> <!-- Prezzo unitario -->
+                    <td></td> <!-- Valore lordo -->
+                    <td></td> <!-- Canale -->
+                    <td class="royalties">€ {{ number_format($totali['royalties'], 2, ',', '.') }}</td> <!-- Royalties -->
+                </tr>
+            </tfoot>
     </table>
 
     <!-- Footer con numerazione delle pagine -->
