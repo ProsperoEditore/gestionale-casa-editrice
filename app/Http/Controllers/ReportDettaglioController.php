@@ -40,58 +40,63 @@ class ReportDettaglioController extends Controller
         $quantita_cumulata = 0;
     
         // Applica i calcoli per ogni riga
-        $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
-            $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
-            $luogo = $item->registroVendite->anagrafica->nome ?? 'N/A';
-    
-            $item->prezzo_unitario = $item->prezzo;
-            $item->canale = ucfirst($canale);
-            $item->luogo = $luogo;
-            $item->data_formattata = $item->data
-            ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
-            : null;        
+$dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
+    $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
+    $luogo = $item->registroVendite->anagrafica->nome ?? 'N/A';
 
-    
-            $quantita = $item->quantita;
-            $prezzo_unitario = $item->prezzo;
-            $royalties_totali = 0;
-    
-            if ($canale === 'vendite indirette') {
-                $iniziale = $quantita_cumulata + 1;
-                $finale = $quantita_cumulata + $quantita;
-    
-                for ($i = $iniziale; $i <= $finale; $i++) {
-                    $s1 = $contratto->royalties_vendite_indirette_soglia_1 ?? PHP_INT_MAX;
-                    $s2 = $contratto->royalties_vendite_indirette_soglia_2 ?? PHP_INT_MAX;
-                    
-                    $p1 = $contratto->royalties_vendite_indirette_percentuale_1 ?? $percentuali['indiretta'];
-                    $p2 = $contratto->royalties_vendite_indirette_percentuale_2 ?? $percentuali['indiretta'];
-                    $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
-                    
-                    if ($i <= $s1) {
-                        $percentuale = $p1;
-                    } elseif ($i <= $s2) {
-                        $percentuale = $p2;
-                    } else {
-                        $percentuale = $p3;
-                    }
-                    
-    
-                    $royalties_totali += round($prezzo_unitario * ($percentuale / 100), 2);
-                }
-            } elseif ($canale === 'vendite dirette') {
-                $percentuale = $percentuali['diretta'];
-                $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
-            } elseif ($canale === 'evento') {
-                $percentuale = $percentuali['evento'];
-                $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
+    $item->prezzo_unitario = $item->prezzo;
+    $item->canale = ucfirst($canale);
+    $item->luogo = $luogo;
+    $item->periodo_testo = $item->periodo;
+    $item->data_formattata = $item->data
+        ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
+        : null;
+
+    $quantita = $item->quantita;
+    $prezzo_unitario = $item->prezzo;
+    $royalties_totali = 0;
+
+    if ($canale === 'vendite indirette') {
+        $iniziale = $quantita_cumulata + 1;
+        $finale = $quantita_cumulata + $quantita;
+
+        $s1 = $contratto->royalties_vendite_indirette_soglia_1 ?? PHP_INT_MAX;
+        $s2 = $contratto->royalties_vendite_indirette_soglia_2 ?? PHP_INT_MAX;
+
+        $p1 = $contratto->royalties_vendite_indirette_percentuale_1 ?? $percentuali['indiretta'];
+        $p2 = $contratto->royalties_vendite_indirette_percentuale_2 ?? $percentuali['indiretta'];
+        $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
+
+        $step = $quantita >= 0 ? 1 : -1;
+
+        for ($i = $iniziale; $step > 0 ? $i <= $finale : $i >= $finale; $i += $step) {
+            $posizione = abs($i);
+            if ($posizione <= $s1) {
+                $percentuale = $p1;
+            } elseif ($posizione <= $s2) {
+                $percentuale = $p2;
+            } else {
+                $percentuale = $p3;
             }
-    
-            $item->royalties = $royalties_totali;
-            $quantita_cumulata += $quantita;
-    
-            return $item;
-        });
+
+            $royalties_totali += round($prezzo_unitario * ($percentuale / 100) * $step, 2);
+        }
+
+    } elseif ($canale === 'vendite dirette') {
+        $percentuale = $percentuali['diretta'];
+        $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
+
+    } elseif ($canale === 'evento') {
+        $percentuale = $percentuali['evento'];
+        $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
+    }
+
+    $item->royalties = $royalties_totali;
+    $quantita_cumulata += $quantita;
+
+    return $item;
+});
+
 
         $dettagli = $dettagli->sortByDesc(fn($item) => $item->data)->values();
 
@@ -157,32 +162,44 @@ class ReportDettaglioController extends Controller
             if ($canale === 'vendite indirette') {
                 $iniziale = $quantita_cumulata + 1;
                 $finale = $quantita_cumulata + $quantita;
-    
+
                 $s1 = $contratto->royalties_vendite_indirette_soglia_1 ?? PHP_INT_MAX;
                 $s2 = $contratto->royalties_vendite_indirette_soglia_2 ?? PHP_INT_MAX;
-    
+
                 $p1 = $contratto->royalties_vendite_indirette_percentuale_1 ?? $percentuali['indiretta'];
                 $p2 = $contratto->royalties_vendite_indirette_percentuale_2 ?? $percentuali['indiretta'];
                 $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
-    
-                for ($i = $iniziale; $i <= $finale; $i++) {
-                    $percentuale = $i <= $s1 ? $p1 : ($i <= $s2 ? $p2 : $p3);
-                    $royalties_totali += round($prezzo_unitario * ($percentuale / 100), 2);
+
+                $step = $quantita >= 0 ? 1 : -1;
+
+                for ($i = $iniziale; $step > 0 ? $i <= $finale : $i >= $finale; $i += $step) {
+                    $posizione = abs($i);
+                    if ($posizione <= $s1) {
+                        $percentuale = $p1;
+                    } elseif ($posizione <= $s2) {
+                        $percentuale = $p2;
+                    } else {
+                        $percentuale = $p3;
+                    }
+
+                    $royalties_totali += round($prezzo_unitario * ($percentuale / 100) * $step, 2);
                 }
+
             } elseif ($canale === 'vendite dirette') {
                 $percentuale = $percentuali['diretta'];
                 $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
+
             } elseif ($canale === 'evento') {
                 $percentuale = $percentuali['evento'];
                 $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
             }
-    
+
             $item->royalties = $royalties_totali;
             $quantita_cumulata += $quantita;
-    
+
             return $item;
-        });
-    
+            });
+
         $totali = [
             'quantita' => $dettagli->sum('quantita'),
             'royalties' => $dettagli->sum('royalties'),
