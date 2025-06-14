@@ -11,7 +11,7 @@
                 @method('PUT')
 
                 <div class="mb-3">
-                    <label class="form-label">Nome Contratto</label>
+                    <label class="form-label">Nome Contratto <span class="text-danger">*</span></label>
                     <input type="text" name="nome_contratto" value="{{ old('nome_contratto', $contratto->nome_contratto) }}" class="form-control" required>
                 </div>
 
@@ -26,7 +26,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Royalties Vendite Indirette (%)</label>
+                    <label class="form-label">Royalties Vendite Indirette (%) <span class="text-danger">*</span></label>
+
                     <input type="number" name="royalties_vendite_indirette" value="{{ old('royalties_vendite_indirette', $contratto->royalties_vendite_indirette) }}" class="form-control">
                 </div>
 
@@ -65,13 +66,13 @@
 
 
                 <div class="mb-3">
-                    <label class="form-label">Royalties Vendite Dirette (%)</label>
-                    <input type="number" name="royalties_vendite_dirette" value="{{ old('royalties_vendite_dirette', $contratto->royalties_vendite_dirette) }}" class="form-control">
+                    <label class="form-label">Royalties Vendite Dirette (%) <span class="text-danger">*</span></label>
+                    <input type="number" name="royalties_vendite_dirette" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Royalties Eventi (%)</label>
-                    <input type="number" name="royalties_eventi" value="{{ old('royalties_eventi', $contratto->royalties_eventi) }}" class="form-control">
+                    <label class="form-label">Royalties Eventi (%) <span class="text-danger">*</span></label>
+                    <input type="number" name="royalties_eventi" class="form-control" required>
                 </div>
 
                 <div class="text-center mt-3">
