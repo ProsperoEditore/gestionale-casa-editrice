@@ -218,29 +218,32 @@ class OrdineController extends Controller
                 $magazzino = \App\Models\Magazzino::where('anagrafica_id', $ordine->anagrafica_id)->first();
 
                 if ($magazzino) {
-                    // 🔥 PRIMA: elimina TUTTE le righe di giacenza legate a quell’ordine
-                    \App\Models\Giacenza::where('magazzino_id', $magazzino->id)
-                        ->where('ordine_id', $ordine->id)
+                    // ✅ Prima rimuovi tutte le giacenze collegate a questo ordine
+                    \App\Models\Giacenza::where('ordine_id', $ordine->id)
+                        ->where('magazzino_id', $magazzino->id)
                         ->delete();
 
-                    // 🧱 POI: ricrea da zero le nuove righe
+                    // ✅ Poi ricrea da zero solo le righe attuali
                     foreach ($ordine->libri as $libro) {
-                        \App\Models\Giacenza::create([
-                            'magazzino_id' => $magazzino->id,
-                            'libro_id' => $libro->id,
-                            'ordine_id' => $ordine->id,
-                            'isbn' => $libro->isbn,
-                            'titolo' => $libro->titolo,
-                            'quantita' => $libro->pivot->quantita,
-                            'prezzo' => $libro->prezzo_copertina,
-                            'sconto' => $libro->pivot->sconto,
-                            'costo_produzione' => $libro->costo_produzione,
-                            'data_ultimo_aggiornamento' => now(),
-                            'note' => 'Aggiornata da ordine ' . $ordine->codice,
-                        ]);
+                        $libroId = $libro->id;
+
+                        $giacenza = new \App\Models\Giacenza();
+                        $giacenza->magazzino_id = $magazzino->id;
+                        $giacenza->libro_id = $libroId;
+                        $giacenza->isbn = $libro->isbn;
+                        $giacenza->titolo = $libro->titolo;
+                        $giacenza->quantita = (int) $libro->pivot->quantita;
+                        $giacenza->prezzo = $libro->prezzo_copertina;
+                        $giacenza->sconto = $libro->pivot->sconto;
+                        $giacenza->costo_produzione = $libro->costo_produzione;
+                        $giacenza->data_ultimo_aggiornamento = now();
+                        $giacenza->note = 'Aggiornata da ordine ' . $ordine->codice;
+                        $giacenza->ordine_id = $ordine->id;
+                        $giacenza->save();
                     }
                 }
             }
+
 
 
         // 📦 GESTIONE SPEDIZIONE (magazzino editore)
