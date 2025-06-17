@@ -62,13 +62,13 @@
 
 
                 <div class="mb-3">
-                    <label class="form-label">Royalties Vendite Dirette (%)</label>
-                    <input type="number" name="royalties_vendite_dirette" class="form-control">
+                    <label class="form-label">Royalties Vendite Dirette (%) <span class="text-danger">*</span></label>
+                    <input type="number" name="royalties_vendite_dirette" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Royalties Eventi (%)</label>
-                    <input type="number" name="royalties_eventi" class="form-control">
+                    <label class="form-label">Royalties Eventi (%) <span class="text-danger">*</span></label>
+                    <input type="number" name="royalties_eventi" class="form-control" required>
                 </div>
 
                 <div class="text-center mt-3">

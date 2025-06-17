@@ -353,38 +353,40 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    document.addEventListener("click", function(event) {
-        if (event.target.classList.contains("deleteRow")) {
-            let row = event.target.closest("tr");
-            let giacenzaId = row.getAttribute("data-id");
+document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("deleteRow") || event.target.closest('.deleteRow')) {
+        let row = event.target.closest("tr");
+        let giacenzaId = row.getAttribute("data-id");
 
-            if (giacenzaId) {
-                fetch(`/giacenze/${giacenzaId}`, {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        row.remove();
-                        alert("Giacenza eliminata con successo.");
-                        aggiornaTotaliGiacenze();
-                    } else {
-                        alert("Errore nell'eliminazione: " + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error("Errore:", error);
-                    alert("Errore nell'eliminazione!");
-                });
-            } else {
-                row.remove();
-                aggiornaTotaliGiacenze();
-            }
+        if (!confirm("Vuoi davvero eliminare questa riga?")) return;
+
+        if (giacenzaId) {
+            fetch(`/giacenze/${giacenzaId}`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                    aggiornaTotaliGiacenze();
+                } else {
+                    alert("Errore nell'eliminazione: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Errore:", error);
+                alert("Errore nell'eliminazione!");
+            });
+        } else {
+            row.remove();
+            aggiornaTotaliGiacenze();
         }
-    });
+    }
+});
+
 
     document.getElementById("saveTable").addEventListener("click", function() {
     let rows = [];
@@ -606,43 +608,6 @@ document.addEventListener('click', function (e) {
         });
 
     }
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.deleteRow').forEach(button => {
-        button.addEventListener('click', function () {
-            if (!confirm('Vuoi davvero eliminare questa riga?')) return;
-
-            const row = this.closest('tr');
-            const id = row.dataset.id;
-
-            if (!id) {
-                row.remove(); // Rimuove righe non ancora salvate
-                return;
-            }
-
-            fetch(`/giacenze/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    row.remove();
-                } else {
-                    alert("Errore: " + (data.message || "Impossibile eliminare la giacenza."));
-                }
-            })
-            .catch(() => {
-                alert("Errore nella richiesta al server.");
-            });
-        });
-    });
 });
 </script>
 
