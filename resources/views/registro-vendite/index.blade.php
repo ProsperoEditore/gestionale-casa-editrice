@@ -24,7 +24,7 @@
       <tbody>
         @foreach($items as $item)
           <tr>
-            <td>{{ $item->anagrafica->nome }}</td>
+            <td>{{ $item->anagrafica->nome_completo }}</td>
             <td>
               <form action="{{ route('registro-vendite.updateCanale', $item->id) }}" method="POST" class="d-flex align-items-center">
                 @csrf
@@ -66,7 +66,7 @@
     @foreach($items as $item)
       <div class="card mb-3">
         <div class="card-body">
-          <h5 class="card-title">{{ $item->anagrafica->nome }}</h5>
+          <h5 class="card-title">{{ $item->anagrafica->nome_completo }}</h5>
           <form action="{{ route('registro-vendite.updateCanale', $item->id) }}" method="POST" class="d-flex align-items-center mb-2">
             @csrf
             @method('PATCH')

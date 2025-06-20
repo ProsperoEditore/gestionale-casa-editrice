@@ -48,7 +48,7 @@ class SingoloExport implements FromCollection, WithHeadings
                 case 'Ordine':
                     return [
                         'ID' => $item->id,
-                        'Cliente' => $item->anagrafica->nome ?? '',
+                        'Cliente' => $item->anagrafica->nome_completo ?? '',
                         'Data' => $item->data,
                         'Totale righe' => $item->righe->count(),
                         'Libri ordinati' => $item->righe->pluck('titolo')->implode(', ')
@@ -66,7 +66,7 @@ class SingoloExport implements FromCollection, WithHeadings
                 case 'RegistroVendite':
                     return [
                         'ID' => $item->id,
-                        'Cliente' => $item->anagrafica->nome ?? '',
+                        'Cliente' => $item->anagrafica->nome_completo ?? '',
                         'Anno' => $item->anno,
                         'Totale righe' => $item->dettagli->count()
                     ];

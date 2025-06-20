@@ -30,7 +30,7 @@
         <tbody>
             @foreach($scarichi as $item)
                 <tr>
-                    <td>{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</td>
+                    <td>{{ $item->anagrafica->nome_completo ?? $item->destinatario_nome }}</td>
                     <td>{{ $item->ordine->codice ?? $item->altro_ordine }}</td>
                     <td>
                         <form action="{{ route('scarichi.updateInfoSpedizione', $item->id) }}" method="POST" class="d-inline-block">
@@ -83,7 +83,7 @@
         <div class="col-12 mb-3">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title mb-2">{{ $item->anagrafica->nome ?? $item->destinatario_nome }}</h5>
+                    <h5 class="card-title mb-2">{{ $item->anagrafica->nome_completo ?? $item->destinatario_nome }}</h5>
 
                     <p class="mb-1"><strong>Ordine:</strong> {{ $item->ordine->codice ?? $item->altro_ordine }}</p>
 
