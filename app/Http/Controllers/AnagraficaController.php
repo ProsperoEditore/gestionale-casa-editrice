@@ -20,7 +20,18 @@ class AnagraficaController extends Controller
             $query->where('categoria', $request->categoria);
         }
     
-        $items = $query->paginate(50);
+        $items = $query
+    ->orderByRaw("
+        COALESCE(NULLIF(denominazione, ''), '')
+    ")
+    ->orderByRaw("
+        CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(cognome, '')) ELSE '' END
+    ")
+    ->orderByRaw("
+        CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(nome, '')) ELSE '' END
+    ")
+    ->paginate(50);
+
     
         return view('anagrafiche.index', compact('items'));
     }

@@ -14,8 +14,8 @@ class Anagrafica extends Model
     protected $fillable = [
         'categoria',
         'nome',
-        'cognome',         // ✅ aggiunto
-        'denominazione',   // ✅ aggiunto
+        'cognome',
+        'denominazione', 
         'partita_iva',
         'codice_fiscale',
         'email',
