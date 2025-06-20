@@ -48,7 +48,7 @@
                     <h5 class="mt-4">Indirizzo di Fatturazione</h5>
 <div class="row">
     <div class="col-md-4 mb-3">
-        <label class="form-label">Via</label>
+        <label class="form-label">Indirizzo</label>
         <input type="text" name="via_fatturazione" value="{{ $item->via_fatturazione }}" class="form-control">
     </div>
     <div class="col-md-2 mb-3">
@@ -76,7 +76,7 @@
 <h5 class="mt-4">Indirizzo di Spedizione</h5>
 <div class="row">
     <div class="col-md-4 mb-3">
-        <label class="form-label">Via</label>
+        <label class="form-label">Indirizzo</label>
         <input type="text" name="via_spedizione" value="{{ $item->via_spedizione }}" class="form-control">
     </div>
     <div class="col-md-2 mb-3">
