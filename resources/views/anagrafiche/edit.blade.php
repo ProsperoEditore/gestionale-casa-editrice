@@ -45,7 +45,62 @@
                         </div>
                     </div>
 
-                    @include('anagrafiche.partials._indirizzi', ['item' => $item])
+                    <h5 class="mt-4">Indirizzo di Fatturazione</h5>
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label class="form-label">Via</label>
+        <input type="text" name="via_fatturazione" value="{{ $item->via_fatturazione }}" class="form-control">
+    </div>
+    <div class="col-md-2 mb-3">
+        <label class="form-label">Civico</label>
+        <input type="text" name="civico_fatturazione" value="{{ $item->civico_fatturazione }}" class="form-control">
+    </div>
+    <div class="col-md-2 mb-3">
+        <label class="form-label">CAP</label>
+        <input type="text" name="cap_fatturazione" value="{{ $item->cap_fatturazione }}" class="form-control">
+    </div>
+    <div class="col-md-2 mb-3">
+        <label class="form-label">Comune</label>
+        <input type="text" name="comune_fatturazione" value="{{ $item->comune_fatturazione }}" class="form-control">
+    </div>
+    <div class="col-md-1 mb-3">
+        <label class="form-label">Provincia</label>
+        <input type="text" name="provincia_fatturazione" value="{{ $item->provincia_fatturazione }}" class="form-control">
+    </div>
+    <div class="col-md-1 mb-3">
+        <label class="form-label">Nazione</label>
+        <input type="text" name="nazione_fatturazione" value="{{ $item->nazione_fatturazione }}" class="form-control">
+    </div>
+</div>
+
+<h5 class="mt-4">Indirizzo di Spedizione</h5>
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label class="form-label">Via</label>
+        <input type="text" name="via_spedizione" value="{{ $item->via_spedizione }}" class="form-control">
+    </div>
+    <div class="col-md-2 mb-3">
+        <label class="form-label">Civico</label>
+        <input type="text" name="civico_spedizione" value="{{ $item->civico_spedizione }}" class="form-control">
+    </div>
+    <div class="col-md-2 mb-3">
+        <label class="form-label">CAP</label>
+        <input type="text" name="cap_spedizione" value="{{ $item->cap_spedizione }}" class="form-control">
+    </div>
+    <div class="col-md-2 mb-3">
+        <label class="form-label">Comune</label>
+        <input type="text" name="comune_spedizione" value="{{ $item->comune_spedizione }}" class="form-control">
+    </div>
+    <div class="col-md-1 mb-3">
+        <label class="form-label">Provincia</label>
+        <input type="text" name="provincia_spedizione" value="{{ $item->provincia_spedizione }}" class="form-control">
+    </div>
+    <div class="col-md-1 mb-3">
+        <label class="form-label">Nazione</label>
+        <input type="text" name="nazione_spedizione" value="{{ $item->nazione_spedizione }}" class="form-control">
+    </div>
+</div>
+
 
                     <div class="mb-3">
                         <label class="form-label">Partita IVA</label>
