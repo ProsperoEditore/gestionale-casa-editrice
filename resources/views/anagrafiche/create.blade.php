@@ -28,6 +28,23 @@
                         </select>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Tipo di Fatturazione <span class="text-danger">*</span>
+                        </label>
+                        <select name="tipo_fatturazione" class="form-select" required>
+                            <option value="">-- Seleziona --</option>
+                            <option value="B2B" {{ old('tipo_fatturazione', $item->tipo_fatturazione ?? 'B2B') === 'B2B' ? 'selected' : '' }}>
+                                Fatturazione elettronica B2B
+                            </option>
+                            <option value="PA" {{ old('tipo_fatturazione', $item->tipo_fatturazione ?? 'B2B') === 'PA' ? 'selected' : '' }}>
+                                Fatturazione elettronica PA
+                            </option>
+                        </select>
+                    </div>
+
+
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
