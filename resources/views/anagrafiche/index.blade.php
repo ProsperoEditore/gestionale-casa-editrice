@@ -14,7 +14,7 @@
                 <option value="">Cerca per categoria...</option>
                 @foreach([
                     'magazzino editore','sito','libreria c.e.','libreria cliente','privato','biblioteca',
-                    'associazione','università','grossista','distributore','fiere','festival','altro'
+                    'associazione','università', 'scuola', 'grossista','distributore','fiere','festival','altro'
                 ] as $categoria)
                     <option value="{{ $categoria }}" {{ request('categoria') == $categoria ? 'selected' : '' }}>{{ ucfirst($categoria) }}</option>
                 @endforeach
