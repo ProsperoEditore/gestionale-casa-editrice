@@ -20,7 +20,7 @@
                             <option value="biblioteca">Biblioteca</option>
                             <option value="associazione">Associazione</option>
                             <option value="università">Università</option>
-                            <option value="scuola">Università</option>
+                            <option value="scuola">Scuola</option>
                             <option value="grossista">Grossista</option>
                             <option value="distributore">Distributore</option>
                             <option value="fiere">Fiere</option>

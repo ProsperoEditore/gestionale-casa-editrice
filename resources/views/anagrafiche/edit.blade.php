@@ -22,7 +22,7 @@
                             <option value="biblioteca" {{ $item->categoria == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
                             <option value="associazione" {{ $item->categoria == 'associazione' ? 'selected' : '' }}>Associazione</option>
                             <option value="università" {{ $item->categoria == 'università' ? 'selected' : '' }}>Università</option>
-                            <option value="scuola" {{ $item->categoria == 'università' ? 'selected' : '' }}>Università</option>
+                            <option value="scuola" {{ $item->categoria == 'scuola' ? 'selected' : '' }}>Scuola</option>
                             <option value="grossista" {{ $item->categoria == 'grossista' ? 'selected' : '' }}>Grossista</option>
                             <option value="distributore" {{ $item->categoria == 'distributore' ? 'selected' : '' }}>Distributore</option>
                             <option value="fiere" {{ $item->categoria == 'fiere' ? 'selected' : '' }}>Fiere</option>
