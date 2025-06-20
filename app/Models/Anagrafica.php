@@ -12,6 +12,8 @@ class Anagrafica extends Model
     protected $table = 'anagraficas';
 
     protected $fillable = [
+        'tipo_fatturazione',
+
         'categoria',
         'nome',
         'cognome',
@@ -39,7 +41,7 @@ class Anagrafica extends Model
         'provincia_spedizione',
         'nazione_spedizione',
 
-        // campi legacy (manteniamoli per ora)
+        // campi legacy
         'indirizzo_fatturazione',
         'indirizzo_spedizione',
     ];

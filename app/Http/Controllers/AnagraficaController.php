@@ -45,6 +45,7 @@ class AnagraficaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'tipo_fatturazione' => 'required|in:B2B,PA',
             'categoria' => 'required|string',
             'email' => 'nullable|email',
             'telefono' => 'nullable|string',
@@ -98,6 +99,7 @@ class AnagraficaController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'tipo_fatturazione' => 'required|in:B2B,PA',
             'categoria' => 'required|string',
             'email' => 'nullable|email',
             'telefono' => 'nullable|string',
