@@ -32,14 +32,69 @@
                         <label class="form-label">Nome</label>
                         <input type="text" name="nome" class="form-control" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Indirizzo di Fatturazione</label>
-                        <input type="text" name="indirizzo_fatturazione" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Indirizzo di Spedizione</label>
-                        <input type="text" name="indirizzo_spedizione" class="form-control">
-                    </div>
+                        <h5 class="mt-4">Indirizzo di Fatturazione</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Indirizzo *</label>
+                                <input type="text" name="via_fatturazione" class="form-control" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Numero civico</label>
+                                <input type="text" name="civico_fatturazione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">CAP *</label>
+                                <input type="text" name="cap_fatturazione" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Comune *</label>
+                                <input type="text" name="comune_fatturazione" class="form-control" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Provincia</label>
+                                <input type="text" name="provincia_fatturazione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nazione *</label>
+                                <input type="text" name="nazione_fatturazione" class="form-control" value="IT" required>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" class="form-check-input" id="copiaIndirizzo" checked>
+                            <label class="form-check-label" for="copiaIndirizzo">
+                                L'indirizzo di spedizione è uguale a quello di fatturazione
+                            </label>
+                        </div>
+
+                        <h5 class="mt-4">Indirizzo di Spedizione</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Indirizzo *</label>
+                                <input type="text" name="via_spedizione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Numero civico</label>
+                                <input type="text" name="civico_spedizione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">CAP *</label>
+                                <input type="text" name="cap_spedizione" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Comune *</label>
+                                <input type="text" name="comune_spedizione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Provincia</label>
+                                <input type="text" name="provincia_spedizione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nazione *</label>
+                                <input type="text" name="nazione_spedizione" class="form-control" value="IT">
+                            </div>
+                        </div>
+
                     <div class="mb-3">
                         <label class="form-label">Partita IVA</label>
                         <input type="text" name="partita_iva" class="form-control">
@@ -88,5 +143,27 @@
     });
     </script>
 
+    <script>
+    document.getElementById('copiaIndirizzo').addEventListener('change', function () {
+        const copia = this.checked;
+        const campi = ['via', 'civico', 'cap', 'comune', 'provincia', 'nazione'];
+
+        campi.forEach(campo => {
+            const fatt = document.querySelector(`[name="${campo}_fatturazione"]`);
+            const sped = document.querySelector(`[name="${campo}_spedizione"]`);
+            if (fatt && sped) {
+                if (copia) {
+                    sped.value = fatt.value;
+                    sped.readOnly = true;
+                } else {
+                    sped.readOnly = false;
+                }
+            }
+        });
+    });
+
+    // Copia all'avvio se checkbox attiva
+    document.getElementById('copiaIndirizzo').dispatchEvent(new Event('change'));
+    </script>
 
 @endsection
