@@ -14,6 +14,8 @@ class Anagrafica extends Model
     protected $fillable = [
         'categoria',
         'nome',
+        'cognome',         // ✅ aggiunto
+        'denominazione',   // ✅ aggiunto
         'partita_iva',
         'codice_fiscale',
         'email',
@@ -46,6 +48,4 @@ class Anagrafica extends Model
     {
         return $this->denominazione ?: trim("{$this->nome} {$this->cognome}");
     }
-
-
 }

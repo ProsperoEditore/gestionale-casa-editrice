@@ -136,14 +136,26 @@ class AnagraficaController extends Controller
     }
 
     public function autocomplete(Request $request)
-{
-    $query = $request->input('term');
+    {
+        $query = $request->input('term');
 
-    $anagrafiche = Anagrafica::where('nome', 'LIKE', "%{$query}%")
+        $anagrafiche = Anagrafica::whereRaw("
+            LOWER(CONCAT_WS(' ', COALESCE(denominazione, ''), COALESCE(nome, ''), COALESCE(cognome, '')))
+            LIKE ?
+        ", ["%".strtolower($query)."%"])
         ->limit(10)
-        ->get(['id', 'nome']);
+        ->get(['id', 'denominazione', 'nome', 'cognome']);
 
-    return response()->json($anagrafiche);
-}
+        // Restituisce 'nome_completo' per ciascun risultato
+        $results = $anagrafiche->map(function ($a) {
+            return [
+                'id' => $a->id,
+                'nome' => $a->nome_completo,
+            ];
+        });
+
+        return response()->json($results);
+    }
+
 
 }
