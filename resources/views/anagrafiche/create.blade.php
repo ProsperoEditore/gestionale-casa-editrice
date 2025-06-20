@@ -28,20 +28,24 @@
                         </select>
                     </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Denominazione</label>
-                                <input type="text" name="denominazione" id="denominazione" class="form-control">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" name="nome" id="nome" class="form-control">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Cognome</label>
-                                <input type="text" name="cognome" id="cognome" class="form-control">
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Denominazione <span class="text-danger">*</span>
+                                <span title="Alternativo a Nome + Cognome" style="cursor: help;">ℹ️</span>
+                            </label>
+                            <input type="text" name="denominazione" id="denominazione" class="form-control">
                         </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Nome <span class="text-danger">*</span></label>
+                            <input type="text" name="nome" id="nome" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Cognome <span class="text-danger">*</span></label>
+                            <input type="text" name="cognome" id="cognome" class="form-control">
+                        </div>
+                    </div>
+
 
                         <h5 class="mt-4">Indirizzo di Fatturazione</h5>
                         <div class="row">
