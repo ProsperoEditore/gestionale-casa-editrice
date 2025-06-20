@@ -44,6 +44,8 @@ class Anagrafica extends Model
         'indirizzo_spedizione',
     ];
 
+    protected $appends = ['nome_completo'];
+
     public function getNomeCompletoAttribute()
     {
         return $this->denominazione ?: trim("{$this->nome} {$this->cognome}");
