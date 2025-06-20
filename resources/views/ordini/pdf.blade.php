@@ -162,7 +162,6 @@
 
         <div class="cliente-info">
             <h4>{{ $ordine->anagrafica->nome_completo }}</h4>
-
             @if(!empty($ordine->anagrafica->indirizzo_fatturazione))
                 <strong>Indirizzo Fatturazione:</strong> {{ $ordine->anagrafica->indirizzo_fatturazione }}<br>
             @endif
