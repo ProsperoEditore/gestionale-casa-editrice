@@ -161,13 +161,8 @@
     </div>
 
         <div class="cliente-info">
-            <h4>Dati Cliente</h4>
-            @if(!empty($ordine->anagrafica->nome))
-                <strong>Nome:</strong> {{ $ordine->anagrafica->nome }}<br>
-            @endif
-            @if(!empty($ordine->anagrafica->categoria))
-                <strong>Categoria:</strong> {{ $ordine->anagrafica->categoria }}<br>
-            @endif
+            <h4>$ordine->anagrafica->nome</h4>
+            
             @if(!empty($ordine->anagrafica->indirizzo_fatturazione))
                 <strong>Indirizzo Fatturazione:</strong> {{ $ordine->anagrafica->indirizzo_fatturazione }}<br>
             @endif
