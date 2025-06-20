@@ -14,13 +14,32 @@ class Anagrafica extends Model
     protected $fillable = [
         'categoria',
         'nome',
-        'indirizzo_fatturazione',
-        'indirizzo_spedizione',
         'partita_iva',
         'codice_fiscale',
         'email',
         'telefono',
         'pec',
-        'codice_univoco'
+        'codice_univoco',
+
+        // indirizzo fatturazione (scomposto)
+        'via_fatturazione',
+        'civico_fatturazione',
+        'cap_fatturazione',
+        'comune_fatturazione',
+        'provincia_fatturazione',
+        'nazione_fatturazione',
+
+        // indirizzo spedizione (scomposto)
+        'via_spedizione',
+        'civico_spedizione',
+        'cap_spedizione',
+        'comune_spedizione',
+        'provincia_spedizione',
+        'nazione_spedizione',
+
+        // campi legacy (manteniamoli per ora)
+        'indirizzo_fatturazione',
+        'indirizzo_spedizione',
     ];
+
 }
