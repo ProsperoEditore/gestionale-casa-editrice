@@ -33,21 +33,47 @@ class AnagraficaController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'categoria' => 'required|string',
-            'nome' => 'required|string',
-            'indirizzo_fatturazione' => 'nullable|string',
-            'indirizzo_spedizione' => 'nullable|string',
-            'partita_iva' => 'nullable|string',
-            'codice_fiscale' => 'nullable|string',
             'email' => 'nullable|email',
             'telefono' => 'nullable|string',
             'pec' => 'nullable|string',
             'codice_univoco' => 'nullable|string',
+            'partita_iva' => 'nullable|string',
+            'codice_fiscale' => 'nullable|string',
+            'denominazione' => 'nullable|string',
+            'nome' => 'nullable|string',
+            'cognome' => 'nullable|string',
         ]);
-        
 
-        Anagrafica::create($validated);
+        // Validazione logica alternativa
+        if (empty($request->denominazione) && (empty($request->nome) || empty($request->cognome))) {
+            return back()->withInput()->withErrors([
+                'denominazione' => 'Compila la denominazione oppure nome e cognome.',
+            ]);
+        }
+
+        $data = $request->all();
+
+        // Compone indirizzo fatturazione
+        $data['indirizzo_fatturazione'] = implode(', ', array_filter([
+            $data['via_fatturazione'] ?? '',
+            $data['civico_fatturazione'] ?? ''
+        ])) . ' - ' . implode(', ', array_filter([
+            $data['cap_fatturazione'] ?? '',
+            $data['comune_fatturazione'] ?? ''
+        ])) . (!empty($data['provincia_fatturazione']) ? ' (' . $data['provincia_fatturazione'] . ')' : '');
+
+        // Compone indirizzo spedizione
+        $data['indirizzo_spedizione'] = implode(', ', array_filter([
+            $data['via_spedizione'] ?? '',
+            $data['civico_spedizione'] ?? ''
+        ])) . ' - ' . implode(', ', array_filter([
+            $data['cap_spedizione'] ?? '',
+            $data['comune_spedizione'] ?? ''
+        ])) . (!empty($data['provincia_spedizione']) ? ' (' . $data['provincia_spedizione'] . ')' : '');
+
+        Anagrafica::create($data);
 
         return redirect()->route('anagrafiche.index')->with('success', 'Anagrafica aggiunta con successo.');
     }
@@ -60,23 +86,45 @@ class AnagraficaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        $request->validate([
             'categoria' => 'required|string',
-            'nome' => 'required|string',
-            'indirizzo_fatturazione' => 'nullable|string',
-            'indirizzo_spedizione' => 'nullable|string',
-            'partita_iva' => 'nullable|string',
-            'codice_fiscale' => 'nullable|string',
             'email' => 'nullable|email',
             'telefono' => 'nullable|string',
             'pec' => 'nullable|string',
             'codice_univoco' => 'nullable|string',
+            'partita_iva' => 'nullable|string',
+            'codice_fiscale' => 'nullable|string',
+            'denominazione' => 'nullable|string',
+            'nome' => 'nullable|string',
+            'cognome' => 'nullable|string',
         ]);
-        
+
+        if (empty($request->denominazione) && (empty($request->nome) || empty($request->cognome))) {
+            return back()->withInput()->withErrors([
+                'denominazione' => 'Compila la denominazione oppure nome e cognome.',
+            ]);
+        }
+
+        $data = $request->all();
+
+        $data['indirizzo_fatturazione'] = implode(', ', array_filter([
+            $data['via_fatturazione'] ?? '',
+            $data['civico_fatturazione'] ?? ''
+        ])) . ' - ' . implode(', ', array_filter([
+            $data['cap_fatturazione'] ?? '',
+            $data['comune_fatturazione'] ?? ''
+        ])) . (!empty($data['provincia_fatturazione']) ? ' (' . $data['provincia_fatturazione'] . ')' : '');
+
+        $data['indirizzo_spedizione'] = implode(', ', array_filter([
+            $data['via_spedizione'] ?? '',
+            $data['civico_spedizione'] ?? ''
+        ])) . ' - ' . implode(', ', array_filter([
+            $data['cap_spedizione'] ?? '',
+            $data['comune_spedizione'] ?? ''
+        ])) . (!empty($data['provincia_spedizione']) ? ' (' . $data['provincia_spedizione'] . ')' : '');
 
         $anagrafica = Anagrafica::findOrFail($id);
-
-        $anagrafica->update($validated);
+        $anagrafica->update($data);
 
         return redirect()->route('anagrafiche.index')->with('success', 'Anagrafica aggiornata con successo.');
     }
