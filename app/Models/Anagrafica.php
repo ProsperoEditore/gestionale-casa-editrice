@@ -42,4 +42,10 @@ class Anagrafica extends Model
         'indirizzo_spedizione',
     ];
 
+    public function getNomeCompletoAttribute()
+    {
+        return $this->denominazione ?: trim("{$this->nome} {$this->cognome}");
+    }
+
+
 }

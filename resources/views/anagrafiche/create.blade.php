@@ -28,35 +28,46 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Nome</label>
-                        <input type="text" name="nome" class="form-control" required>
-                    </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Denominazione</label>
+                                <input type="text" name="denominazione" id="denominazione" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nome</label>
+                                <input type="text" name="nome" id="nome" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Cognome</label>
+                                <input type="text" name="cognome" id="cognome" class="form-control">
+                            </div>
+                        </div>
+
                         <h5 class="mt-4">Indirizzo di Fatturazione</h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Indirizzo *</label>
-                                <input type="text" name="via_fatturazione" class="form-control" required>
+                                <label class="form-label">Indirizzo</label>
+                                <input type="text" name="via_fatturazione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Numero civico</label>
                                 <input type="text" name="civico_fatturazione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">CAP *</label>
-                                <input type="text" name="cap_fatturazione" class="form-control" required>
+                                <label class="form-label">CAP</label>
+                                <input type="text" name="cap_fatturazione" class="form-control">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Comune *</label>
-                                <input type="text" name="comune_fatturazione" class="form-control" required>
+                                <label class="form-label">Comune</label>
+                                <input type="text" name="comune_fatturazione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Provincia</label>
                                 <input type="text" name="provincia_fatturazione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">Nazione *</label>
-                                <input type="text" name="nazione_fatturazione" class="form-control" value="IT" required>
+                                <label class="form-label">Nazione</label>
+                                <input type="text" name="nazione_fatturazione" class="form-control" value="IT">
                             </div>
                         </div>
 
@@ -70,7 +81,7 @@
                         <h5 class="mt-4">Indirizzo di Spedizione</h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Indirizzo *</label>
+                                <label class="form-label">Indirizzo</label>
                                 <input type="text" name="via_spedizione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
@@ -78,11 +89,11 @@
                                 <input type="text" name="civico_spedizione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">CAP *</label>
+                                <label class="form-label">CAP</label>
                                 <input type="text" name="cap_spedizione" class="form-control">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Comune *</label>
+                                <label class="form-label">Comune</label>
                                 <input type="text" name="comune_spedizione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
@@ -90,7 +101,7 @@
                                 <input type="text" name="provincia_spedizione" class="form-control">
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label class="form-label">Nazione *</label>
+                                <label class="form-label">Nazione</label>
                                 <input type="text" name="nazione_spedizione" class="form-control" value="IT">
                             </div>
                         </div>
@@ -165,5 +176,53 @@
     // Copia all'avvio se checkbox attiva
     document.getElementById('copiaIndirizzo').dispatchEvent(new Event('change'));
     </script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const denominazione = document.getElementById('denominazione');
+    const nome = document.getElementById('nome');
+    const cognome = document.getElementById('cognome');
+    const form = document.querySelector('form');
+
+    function aggiornaCampi() {
+        const den = denominazione.value.trim();
+        const nom = nome.value.trim();
+        const cog = cognome.value.trim();
+
+        if (den !== '') {
+            nome.disabled = true;
+            cognome.disabled = true;
+        } else {
+            nome.disabled = false;
+            cognome.disabled = false;
+        }
+
+        if (nom !== '' || cog !== '') {
+            denominazione.disabled = true;
+        } else {
+            denominazione.disabled = false;
+        }
+    }
+
+    denominazione.addEventListener('input', aggiornaCampi);
+    nome.addEventListener('input', aggiornaCampi);
+    cognome.addEventListener('input', aggiornaCampi);
+
+    form.addEventListener('submit', function (e) {
+        const den = denominazione.value.trim();
+        const nom = nome.value.trim();
+        const cog = cognome.value.trim();
+
+        if (den === '' && (nom === '' || cog === '')) {
+            e.preventDefault();
+            alert('Compila la denominazione oppure nome + cognome');
+        }
+    });
+
+    aggiornaCampi();
+});
+</script>
+
 
 @endsection

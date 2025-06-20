@@ -10,35 +10,63 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Categoria con Select -->
                     <div class="mb-3">
                         <label class="form-label">Categoria</label>
                         <select name="categoria" class="form-control" required>
-                            <option value="magazzino editore" {{ $item->categoria == 'magazzino editore' ? 'selected' : '' }}>Magazzino Editore</option>
-                            <option value="sito" {{ $item->categoria == 'sito' ? 'selected' : '' }}>Sito</option>
-                            <option value="libreria c.e." {{ $item->categoria == 'libreria c.e.' ? 'selected' : '' }}>Libreria C.E.</option>
-                            <option value="libreria cliente" {{ $item->categoria == 'libreria cliente' ? 'selected' : '' }}>Libreria Cliente</option>
-                            <option value="privato" {{ $item->categoria == 'privato' ? 'selected' : '' }}>Privato</option>
-                            <option value="biblioteca" {{ $item->categoria == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
-                            <option value="associazione" {{ $item->categoria == 'associazione' ? 'selected' : '' }}>Associazione</option>
-                            <option value="università" {{ $item->categoria == 'università' ? 'selected' : '' }}>Università</option>
-                            <option value="grossista" {{ $item->categoria == 'grossista' ? 'selected' : '' }}>Grossista</option>
-                            <option value="distributore" {{ $item->categoria == 'distributore' ? 'selected' : '' }}>Distributore</option>
-                            <option value="fiere" {{ $item->categoria == 'fiere' ? 'selected' : '' }}>Fiere</option>
-                            <option value="festival" {{ $item->categoria == 'festival' ? 'selected' : '' }}>Festival</option>
-                            <option value="altro" {{ $item->categoria == 'altro' ? 'selected' : '' }}>Altro</option>
+                            @foreach(['magazzino editore','sito','libreria c.e.','libreria cliente','privato','biblioteca','associazione','università','grossista','distributore','fiere','festival','altro'] as $cat)
+                                <option value="{{ $cat }}" {{ $item->categoria == $cat ? 'selected' : '' }}>{{ ucfirst($cat) }}</option>
+                            @endforeach
                         </select>
                     </div>
 
-                    <div class="mb-3"><label class="form-label">Nome</label><input type="text" name="nome" value="{{ $item->nome }}" class="form-control" required></div>
-                    <div class="mb-3"><label class="form-label">Indirizzo di Fatturazione</label><input type="text" name="indirizzo_fatturazione" value="{{ $item->indirizzo_fatturazione }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Indirizzo di Spedizione</label><input type="text" name="indirizzo_spedizione" value="{{ $item->indirizzo_spedizione }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Partita IVA</label><input type="text" name="partita_iva" value="{{ $item->partita_iva }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Codice Fiscale</label><input type="text" name="codice_fiscale" id="codice_fiscale" value="{{ $item->codice_fiscale }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" value="{{ $item->email }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Numero di Telefono</label><input type="text" name="telefono" value="{{ $item->telefono }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">PEC</label><input type="email" name="pec" value="{{ $item->pec }}" class="form-control"></div>
-                    <div class="mb-3"><label class="form-label">Codice Univoco</label><input type="text" name="codice_univoco" id="codice_univoco" value="{{ $item->codice_univoco }}" class="form-control"></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Denominazione</label>
+                            <input type="text" name="denominazione" id="denominazione" class="form-control" value="{{ $item->denominazione }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Nome</label>
+                            <input type="text" name="nome" id="nome" class="form-control" value="{{ $item->nome }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Cognome</label>
+                            <input type="text" name="cognome" id="cognome" class="form-control" value="{{ $item->cognome }}">
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">Indirizzo di Fatturazione</h5>
+                    <div class="row">
+                        @foreach(['via','civico','cap','comune','provincia','nazione'] as $field)
+                            <div class="col-md-{{ $field == 'via' || $field == 'comune' ? 6 : 3 }} mb-3">
+                                <label class="form-label">{{ ucfirst($field) }}</label>
+                                <input type="text" name="{{ $field }}_fatturazione" class="form-control" value="{{ $item[$field.'_fatturazione'] }}">
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input type="checkbox" class="form-check-input" id="copiaIndirizzo" checked>
+                        <label class="form-check-label" for="copiaIndirizzo">
+                            L'indirizzo di spedizione è uguale a quello di fatturazione
+                        </label>
+                    </div>
+
+                    <h5 class="mt-4">Indirizzo di Spedizione</h5>
+                    <div class="row">
+                        @foreach(['via','civico','cap','comune','provincia','nazione'] as $field)
+                            <div class="col-md-{{ $field == 'via' || $field == 'comune' ? 6 : 3 }} mb-3">
+                                <label class="form-label">{{ ucfirst($field) }}</label>
+                                <input type="text" name="{{ $field }}_spedizione" class="form-control" value="{{ $item[$field.'_spedizione'] }}">
+                            </div>
+                        @endforeach
+                    </div>
+
+                    @foreach(['partita_iva','codice_fiscale','email','telefono','pec','codice_univoco'] as $field)
+                        <div class="mb-3">
+                            <label class="form-label">{{ ucwords(str_replace('_', ' ', $field)) }}</label>
+                            <input type="text" name="{{ $field }}" id="{{ $field }}" class="form-control" value="{{ $item[$field] }}">
+                        </div>
+                    @endforeach
 
                     <div class="text-center mt-3">
                         <button type="submit" class="btn btn-primary">Aggiorna</button>
@@ -49,20 +77,53 @@
         </div>
     </div>
 
-
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        ['codice_fiscale', 'codice_univoco'].forEach(function (id) {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', function () {
-                    this.value = this.value.toUpperCase();
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            ['codice_fiscale', 'codice_univoco'].forEach(function (id) {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function () {
+                        this.value = this.value.toUpperCase();
+                    });
+                }
+            });
+
+            const denominazione = document.getElementById('denominazione');
+            const nome = document.getElementById('nome');
+            const cognome = document.getElementById('cognome');
+
+            function aggiornaCampi() {
+                if (denominazione.value.trim() !== '') {
+                    nome.disabled = true;
+                    cognome.disabled = true;
+                } else {
+                    nome.disabled = false;
+                    cognome.disabled = false;
+                }
+
+                if (nome.value.trim() !== '' || cognome.value.trim() !== '') {
+                    denominazione.disabled = true;
+                } else {
+                    denominazione.disabled = false;
+                }
             }
+
+            [denominazione, nome, cognome].forEach(i => i.addEventListener('input', aggiornaCampi));
+            aggiornaCampi();
+
+            document.getElementById('copiaIndirizzo').addEventListener('change', function () {
+                const copia = this.checked;
+                ['via','civico','cap','comune','provincia','nazione'].forEach(function (campo) {
+                    const fatt = document.querySelector(`[name="${campo}_fatturazione"]`);
+                    const sped = document.querySelector(`[name="${campo}_spedizione"]`);
+                    if (fatt && sped) {
+                        sped.readOnly = copia;
+                        if (copia) sped.value = fatt.value;
+                    }
+                });
+            });
+
+            document.getElementById('copiaIndirizzo').dispatchEvent(new Event('change'));
         });
-    });
     </script>
-
-
-
 @endsection

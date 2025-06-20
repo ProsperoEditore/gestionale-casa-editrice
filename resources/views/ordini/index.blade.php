@@ -12,7 +12,7 @@
                 <option value="">Cerca per anagrafica...</option>
                 @foreach($tutteAnagrafiche as $anagrafica)
                     <option value="{{ $anagrafica->id }}" {{ request('search') == $anagrafica->id ? 'selected' : '' }}>
-                        {{ $anagrafica->nome }}
+                        {{ $anagrafica->nome_completo }}
                     </option>
                 @endforeach
             </select>

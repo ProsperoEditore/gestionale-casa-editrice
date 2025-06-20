@@ -14,7 +14,7 @@
                     <select class="form-control select2" name="anagrafica_id" required>
                         <option></option> <!-- necessario per placeholder -->
                         @foreach ($anagrafiche as $anagrafica)
-                            <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome }}</option>
+                            <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome_completo }}</option>
                         @endforeach
                     </select>
                 </div>

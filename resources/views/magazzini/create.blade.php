@@ -14,7 +14,7 @@
                     <select name="anagrafica_id" id="anagrafica_id" class="form-control select2" required>
                         <option value="">Seleziona un'anagrafica</option>
                         @foreach($anagrafiche as $anagrafica)
-                            <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome }} ({{ $anagrafica->categoria }})</option>
+                            <option value="{{ $anagrafica->id }}">{{ $anagrafica->nome_completo }} ({{ $anagrafica->categoria }})</option>
                         @endforeach
                     </select>
                 </div>

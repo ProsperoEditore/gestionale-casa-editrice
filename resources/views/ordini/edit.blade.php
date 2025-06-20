@@ -22,7 +22,7 @@
                         <select name="anagrafica_id" class="form-control" required>
                             @foreach($anagrafiche as $anagrafica)
                                 <option value="{{ $anagrafica->id }}" {{ $ordine->anagrafica_id == $anagrafica->id ? 'selected' : '' }}>
-                                    {{ $anagrafica->nome }}
+                                    {{ $anagrafica->nome_completo }}
                                 </option>
                             @endforeach
                         </select>

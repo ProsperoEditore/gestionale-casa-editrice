@@ -11,8 +11,8 @@
             <select name="search" class="form-control select2" onchange="this.form.submit()">
                 <option value="">Cerca per nome...</option>
                 @foreach(\App\Models\Anagrafica::orderBy('nome')->get() as $anagrafica)
-                    <option value="{{ $anagrafica->nome }}" {{ request('search') == $anagrafica->nome ? 'selected' : '' }}>
-                        {{ $anagrafica->nome }}
+                    <option value="{{ $anagrafica->nome_completo }}" {{ request('search') == $anagrafica->nome_completo ? 'selected' : '' }}>
+                        {{ $anagrafica->nome_completo }}
                     </option>
                 @endforeach
             </select>
