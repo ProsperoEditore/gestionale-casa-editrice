@@ -7,7 +7,7 @@
 </script>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Gestione Giacenze - {{ $magazzino->anagrafica->nome ?? 'Sconosciuto' }}</h2>
+    <h2 class="text-center mb-4">Gestione Giacenze - {{ $magazzino->anagrafica->nome_completo ?? 'Sconosciuto' }}</h2>
 
     <div class="alert alert-warning text-center" role="alert">
     ⚠️ <strong>Attenzione:</strong> usa il pulsante <strong>Salva</strong> in alto per registrare le nuove righe aggiunte.<br>

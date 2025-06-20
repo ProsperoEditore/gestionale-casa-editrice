@@ -42,7 +42,7 @@ class ReportDettaglioController extends Controller
         // Applica i calcoli per ogni riga
 $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
     $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
-    $luogo = $item->registroVendite->anagrafica->nome ?? 'N/A';
+    $luogo = $item->registroVendite->anagrafica->nome_completo ?? 'N/A';
 
     $item->prezzo_unitario = $item->prezzo;
     $item->canale = ucfirst($canale);
@@ -144,7 +144,7 @@ $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &
     
         $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
             $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
-            $luogo = $item->registroVendite->anagrafica->nome ?? 'N/A';
+            $luogo = $item->registroVendite->anagrafica->nome_completo ?? 'N/A';
     
             $item->prezzo_unitario = $item->prezzo;
             $item->canale = ucfirst($canale);

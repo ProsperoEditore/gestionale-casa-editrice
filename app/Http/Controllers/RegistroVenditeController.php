@@ -355,7 +355,7 @@ public function stampa($id, Request $request)
     // Nome file
     $inizio = $dataDa ? Carbon::parse($dataDa)->format('d-m-Y') : 'inizio';
     $fine = $dataA ? Carbon::parse($dataA)->format('d-m-Y') : 'oggi';
-    $nomeFile = "Registro_{$registro->anagrafica->nome}_da_{$inizio}_a_{$fine}.pdf";
+    $nomeFile = "Registro_{$registro->anagrafica->nome_completo}_da_{$inizio}_a_{$fine}.pdf";
 
     return Pdf::loadView('registro-vendite.pdf', [
         'registro' => $registro,

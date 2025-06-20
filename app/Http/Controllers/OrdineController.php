@@ -47,7 +47,7 @@ class OrdineController extends Controller
         if ($tipoCmp !== 0) return $tipoCmp;
 
         // Se stesso tipo ordine, ordina per nome anagrafica
-        return strcmp($a->anagrafica->nome ?? '', $b->anagrafica->nome ?? '');
+        return strcmp($a->anagrafica->nome_completo ?? '', $b->anagrafica->nome_completo ?? '');
     });
 
     // Paginazione manuale
@@ -348,7 +348,7 @@ class OrdineController extends Controller
         $pdf = Pdf::loadView('ordini.pdf', compact('ordine', 'marchio'));
 
         // Nome del file PDF
-        $nomeCliente = preg_replace('/[\/:*?"<>|]/', '', $ordine->anagrafica->nome ?? '');
+        $nomeCliente = preg_replace('/[\/:*?"<>|]/', '', $ordine->anagrafica->nome_completo ?? '');
         $filename = preg_replace('/[\/\\\\]/', '-', $ordine->codice . ' ' . $nomeCliente) . '.pdf';
 
 

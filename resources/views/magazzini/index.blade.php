@@ -44,7 +44,7 @@
                     @foreach ($magazzini as $magazzino)
                         <tr>
                             <td>{{ $magazzino->anagrafica->categoria ?? 'N/A' }}</td>
-                            <td>{{ $magazzino->anagrafica->nome ?? 'N/A' }}</td>
+                            <td>{{ $magazzino->anagrafica->nome_completo ?? 'N/A' }}</td>
                             <td>
                                 {{ $magazzino->anagrafica->email ?? 'N/A' }}<br>
                                 <small>{{ $magazzino->anagrafica->telefono ?? 'N/A' }}</small>
@@ -95,7 +95,7 @@
     @foreach($magazzini as $magazzino)
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{ $magazzino->anagrafica->nome ?? 'N/A' }}</h5>
+                <h5 class="card-title">{{ $magazzino->anagrafica->nome_completo ?? 'N/A' }}</h5>
                 <p class="mb-1"><strong>Categoria:</strong> {{ $magazzino->anagrafica->categoria ?? 'N/A' }}</p>
                 <p class="mb-1"><strong>Contatti:</strong><br>
                     {{ $magazzino->anagrafica->email ?? 'N/A' }}<br>

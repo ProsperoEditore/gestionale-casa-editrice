@@ -17,8 +17,8 @@
                         @if($scarico->ordine)
                             <option value="{{ $scarico->ordine->id }}" selected
                                 data-anagrafica-id="{{ $scarico->ordine->anagrafica->id }}"
-                                data-nome-cliente="{{ $scarico->ordine->anagrafica->nome }}">
-                                {{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}
+                                data-nome-cliente="{{ $scarico->ordine->anagrafica->nome_completo }}">
+                                {{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome_completo }}
                             </option>
                         @endif
                     </select>
@@ -37,7 +37,7 @@
                 <div class="mb-3">
                     <label class="form-label">Destinatario</label>
                     <input type="text" name="destinatario_nome" id="destinatario_nome" class="form-control"
-                           value="{{ $scarico->anagrafica->nome ?? $scarico->destinatario_nome }}"
+                           value="{{ $scarico->anagrafica->nome_completo ?? $scarico->destinatario_nome }}"
                            @if($scarico->ordine_id) readonly @endif>
                     <input type="hidden" name="anagrafica_id" id="anagrafica_id" value="{{ old('anagrafica_id', $scarico->anagrafica_id ?? '') }}">
                 </div>
@@ -112,7 +112,7 @@ altroOrdineInput.addEventListener('input', function () {
 
         // Solo se destinatario è stato compilato automaticamente lo azzero
         // (es. se readonly o è uguale al vecchio ordine)
-        if (destinatarioNome.readOnly || destinatarioNome.value === '{{ $scarico->ordine->anagrafica->nome ?? '' }}') {
+        if (destinatarioNome.readOnly || destinatarioNome.value === '{{ $scarico->ordine->anagrafica->nome_completo ?? '' }}') {
             destinatarioNome.value = '';
         }
 
@@ -126,13 +126,13 @@ altroOrdineInput.addEventListener('input', function () {
     // Per ricaricare select2 con dati salvati
     @if($scarico->ordine)
         const option = new Option(
-            '{{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome }}',
+            '{{ $scarico->ordine->codice }} - {{ $scarico->ordine->anagrafica->nome_completo }}',
             '{{ $scarico->ordine->id }}',
             true,
             true
         );
         $(option).attr('data-anagrafica-id', '{{ $scarico->ordine->anagrafica->id }}');
-        $(option).attr('data-nome-cliente', '{{ $scarico->ordine->anagrafica->nome }}');
+        $(option).attr('data-nome-cliente', '{{ $scarico->ordine->anagrafica->nome_completo }}');
         $('#ordine_id').append(option).trigger('change');
     @endif
 

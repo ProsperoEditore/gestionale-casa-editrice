@@ -7,7 +7,7 @@
 @endphp
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Gestione Registro Vendite - {{ $registroVendita->anagrafica->nome }}</h3>
+    <h3 class="text-center mb-4">Gestione Registro Vendite - {{ $registroVendita->anagrafica->nome_completo }}</h3>
 
     <div class="mb-3">
         <a href="{{ route('registro-vendite.index') }}" class="btn btn-secondary">Torna ai Registri Vendite</a>

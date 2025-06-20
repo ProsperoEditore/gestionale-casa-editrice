@@ -39,7 +39,7 @@
                     <td>{{ $ordine->codice }}</td>
                     <td>{{ $ordine->data }}</td>
                     <td>{{ ucfirst($ordine->tipo_ordine) }}</td>
-                    <td>{{ $ordine->anagrafica->nome }}</td>
+                    <td>{{ $ordine->anagrafica->nome_completo }}</td>
 
                     <td>
                         @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
@@ -107,7 +107,7 @@
             <div class="card-body">
                 <h5 class="card-title">{{ $ordine->codice }} - {{ ucfirst($ordine->tipo_ordine) }}</h5>
                 <p class="mb-1"><strong>Data:</strong> {{ $ordine->data }}</p>
-                <p class="mb-1"><strong>Anagrafica:</strong> {{ $ordine->anagrafica->nome }}</p>
+                <p class="mb-1"><strong>Anagrafica:</strong> {{ $ordine->anagrafica->nome_completo }}</p>
                 <p class="mb-1"><strong>Pagato:</strong>
                     @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
                         <input type="date" class="form-control pagato-input"

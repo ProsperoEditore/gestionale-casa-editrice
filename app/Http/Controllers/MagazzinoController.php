@@ -45,11 +45,11 @@ class MagazzinoController extends Controller
         if ($aDate && !$bDate) return 1;
         if (!$aDate && !$bDate) {
             $catCmp = strcmp($a->anagrafica->categoria ?? '', $b->anagrafica->categoria ?? '');
-            return $catCmp !== 0 ? $catCmp : strcmp($a->anagrafica->nome ?? '', $b->anagrafica->nome ?? '');
+            return $catCmp !== 0 ? $catCmp : strcmp($a->anagrafica->nome_completo ?? '', $b->anagrafica->nome_completo ?? '');
         }
         if ($aDate->ne($bDate)) return $aDate->gt($bDate) ? 1 : -1;
         $catCmp = strcmp($a->anagrafica->categoria ?? '', $b->anagrafica->categoria ?? '');
-        return $catCmp !== 0 ? $catCmp : strcmp($a->anagrafica->nome ?? '', $b->anagrafica->nome ?? '');
+        return $catCmp !== 0 ? $catCmp : strcmp($a->anagrafica->nome_completo ?? '', $b->anagrafica->nome_completo ?? '');
         });
 
         // Merge e paginazione

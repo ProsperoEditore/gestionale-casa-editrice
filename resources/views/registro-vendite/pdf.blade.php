@@ -68,7 +68,7 @@
     </div>
 
     <div class="dati">
-        <p><strong>Anagrafica:</strong> {{ $registro->anagrafica->nome }}</p>
+        <p><strong>Anagrafica:</strong> {{ $registro->anagrafica->nome_completo }}</p>
 
         @if($filtro_date['da'] || $filtro_date['a'])
             <p><strong>Periodo:</strong>
