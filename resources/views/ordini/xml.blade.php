@@ -15,13 +15,13 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
     <p:DatiTrasmissione>
       <p:IdTrasmittente>
         <p:IdPaese>IT</p:IdPaese>
-        <p:IdCodice>{{ $marchio->partita_iva }}</p:IdCodice>
+        <p:IdCodice>{{ $marchio->partita_iva ?? '00000000000' }}</p:IdCodice>
       </p:IdTrasmittente>
       <p:ProgressivoInvio>{{ str_pad($ordine->id, 5, '0', STR_PAD_LEFT) }}</p:ProgressivoInvio>
       <p:FormatoTrasmissione>FPR12</p:FormatoTrasmissione>
       <p:CodiceDestinatario>{{ $cliente->codice_univoco ?? '0000000' }}</p:CodiceDestinatario>
       @if($cliente->pec)
-      <p:PECDestinatario>{{ $cliente->pec }}</p:PECDestinatario>
+        <p:PECDestinatario>{{ $cliente->pec }}</p:PECDestinatario>
       @endif
     </p:DatiTrasmissione>
 
@@ -29,7 +29,7 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
       <p:DatiAnagrafici>
         <p:IdFiscaleIVA>
           <p:IdPaese>IT</p:IdPaese>
-          <p:IdCodice>{{ $marchio->partita_iva }}</p:IdCodice>
+          <p:IdCodice>{{ $marchio->partita_iva ?? '00000000000' }}</p:IdCodice>
         </p:IdFiscaleIVA>
         <p:Anagrafica>
           <p:Denominazione>{{ $marchio->nome }}</p:Denominazione>
@@ -45,33 +45,38 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
       </p:Sede>
     </p:CedentePrestatore>
 
-<p:CessionarioCommittente>
-  <p:DatiAnagrafici>
-    @if($cliente->partita_iva)
-    <p:IdFiscaleIVA>
-      <p:IdPaese>IT</p:IdPaese>
-      <p:IdCodice>{{ $cliente->partita_iva }}</p:IdCodice>
-    </p:IdFiscaleIVA>
-    @endif
+    <p:CessionarioCommittente>
+      <p:DatiAnagrafici>
+        @if($cliente->partita_iva)
+        <p:IdFiscaleIVA>
+          <p:IdPaese>IT</p:IdPaese>
+          <p:IdCodice>{{ $cliente->partita_iva }}</p:IdCodice>
+        </p:IdFiscaleIVA>
+        @endif
 
-    @if($cliente->codice_fiscale)
-    <p:CodiceFiscale>{{ $cliente->codice_fiscale }}</p:CodiceFiscale>
-    @endif
+        @if($cliente->codice_fiscale)
+        <p:CodiceFiscale>{{ $cliente->codice_fiscale }}</p:CodiceFiscale>
+        @endif
 
-    <p:Anagrafica>
-      <p:Denominazione>{{ $cliente->nome }}</p:Denominazione>
-    </p:Anagrafica>
-  </p:DatiAnagrafici>
+        <p:Anagrafica>
+          @if($cliente->denominazione)
+            <p:Denominazione>{{ $cliente->denominazione }}</p:Denominazione>
+          @else
+            <p:Nome>{{ $cliente->nome ?? 'ND' }}</p:Nome>
+            <p:Cognome>{{ $cliente->cognome ?? 'ND' }}</p:Cognome>
+          @endif
+        </p:Anagrafica>
+      </p:DatiAnagrafici>
 
-  <p:Sede>
-    <p:Indirizzo>{{ $cliente->via_fatturazione }}</p:Indirizzo>
-    <p:NumeroCivico>{{ $cliente->civico_fatturazione }}</p:NumeroCivico>
-    <p:CAP>{{ $cliente->cap_fatturazione }}</p:CAP>
-    <p:Comune>{{ $cliente->comune_fatturazione }}</p:Comune>
-    <p:Provincia>{{ $cliente->provincia_fatturazione }}</p:Provincia>
-    <p:Nazione>{{ $cliente->nazione_fatturazione ?? 'IT' }}</p:Nazione>
-  </p:Sede>
-</p:CessionarioCommittente>
+      <p:Sede>
+        <p:Indirizzo>{{ $cliente->via_fatturazione ?? 'ND' }}</p:Indirizzo>
+        <p:NumeroCivico>{{ $cliente->civico_fatturazione ?? 'ND' }}</p:NumeroCivico>
+        <p:CAP>{{ $cliente->cap_fatturazione ?? '00000' }}</p:CAP>
+        <p:Comune>{{ $cliente->comune_fatturazione ?? 'ND' }}</p:Comune>
+        <p:Provincia>{{ $cliente->provincia_fatturazione ?? 'ND' }}</p:Provincia>
+        <p:Nazione>{{ $cliente->nazione_fatturazione ?? 'IT' }}</p:Nazione>
+      </p:Sede>
+    </p:CessionarioCommittente>
   </p:FatturaElettronicaHeader>
 
   <p:FatturaElettronicaBody>
