@@ -45,21 +45,33 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
       </p:Sede>
     </p:CedentePrestatore>
 
-    <p:CessionarioCommittente>
-      <p:DatiAnagrafici>
-        <p:CodiceFiscale>{{ $cliente->codice_fiscale ?? 'ND' }}</p:CodiceFiscale>
-        <p:Anagrafica>
-          <p:Denominazione>{{ $cliente->nome }}</p:Denominazione>
-        </p:Anagrafica>
-      </p:DatiAnagrafici>
-      <p:Sede>
-        <p:Indirizzo>{{ $cliente->indirizzo_fatturazione }}</p:Indirizzo>
-        <p:CAP>00000</p:CAP>
-        <p:Comune>Roma</p:Comune>
-        <p:Provincia>RM</p:Provincia>
-        <p:Nazione>IT</p:Nazione>
-      </p:Sede>
-    </p:CessionarioCommittente>
+<p:CessionarioCommittente>
+  <p:DatiAnagrafici>
+    @if($cliente->partita_iva)
+    <p:IdFiscaleIVA>
+      <p:IdPaese>IT</p:IdPaese>
+      <p:IdCodice>{{ $cliente->partita_iva }}</p:IdCodice>
+    </p:IdFiscaleIVA>
+    @endif
+
+    @if($cliente->codice_fiscale)
+    <p:CodiceFiscale>{{ $cliente->codice_fiscale }}</p:CodiceFiscale>
+    @endif
+
+    <p:Anagrafica>
+      <p:Denominazione>{{ $cliente->nome }}</p:Denominazione>
+    </p:Anagrafica>
+  </p:DatiAnagrafici>
+
+  <p:Sede>
+    <p:Indirizzo>{{ $cliente->via_fatturazione }}</p:Indirizzo>
+    <p:NumeroCivico>{{ $cliente->civico_fatturazione }}</p:NumeroCivico>
+    <p:CAP>{{ $cliente->cap_fatturazione }}</p:CAP>
+    <p:Comune>{{ $cliente->comune_fatturazione }}</p:Comune>
+    <p:Provincia>{{ $cliente->provincia_fatturazione }}</p:Provincia>
+    <p:Nazione>{{ $cliente->nazione_fatturazione ?? 'IT' }}</p:Nazione>
+  </p:Sede>
+</p:CessionarioCommittente>
   </p:FatturaElettronicaHeader>
 
   <p:FatturaElettronicaBody>
