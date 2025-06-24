@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mt-5">
-        <h3 class="text-center mb-4">Crea Nuovo Anagrafiche</h3>
+        <h3 class="text-center mb-4">Crea una nuova anagrafica</h3>
 
         <div class="card">
             <div class="card-body">

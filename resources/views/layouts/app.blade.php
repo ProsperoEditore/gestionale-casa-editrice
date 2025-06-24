@@ -186,16 +186,6 @@
                     <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro tirature</a>
                 </li>
             @endif
-            @if (auth()->user()->ruolo === 'admin')
-                <li class="mb-2">
-                    <a href="{{ route('utenti.index') }}" class="btn btn-prospero w-100 text-start"> Gestione utenti</a>
-                </li>
-            @endif
-            @if (auth()->user()->ruolo === 'admin')
-                <li class="mb-2">
-                    <a href="{{ route('backup.index') }}" class="btn btn-prospero w-100 text-start"> Backup database</a>
-                </li>
-            @endif
         @endauth
 
         </ul>
@@ -260,10 +250,6 @@
                 @if (auth()->user()->access_registro_tirature)
                     <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary">Registro tirature</a>
                 @endif
-                @if (auth()->user()->ruolo === 'admin')
-                    <a href="{{ route('utenti.index') }}" class="btn btn-prospero">Gestione Utenti</a>
-                    <a href="{{ route('backup.index') }}" class="btn btn-prospero">Backup database</a>
-                @endif
             @endauth
         </div>
     </div>
@@ -277,12 +263,25 @@
             <h1 class="h4 fw-bold mb-0">GHE PENSI MI <span class="fw-normal">- gestionale della casa editrice</span></h1>
 
             @auth
-                <div>
-                    <span class="me-3">{{ auth()->user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Logout</button>
-                    </form>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-5 me-2"></i> {{ auth()->user()->name }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="#">Profilo</a></li>
+                        @if(auth()->user()->ruolo === 'admin')
+                            <li><a class="dropdown-item" href="{{ route('utenti.index') }}">Gestione utenti</a></li>
+                            <li><a class="dropdown-item" href="{{ route('backup.index') }}">Backup database</a></li>
+                        @endif
+                        <li><a class="dropdown-item" href="#">Guida</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="dropdown-item text-danger" type="submit">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             @endauth
         </header>
