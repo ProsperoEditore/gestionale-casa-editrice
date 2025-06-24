@@ -1,6 +1,7 @@
 @php
 $cliente = $ordine->anagrafica;
-$marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->first();
+$profilo = \App\Models\Profilo::first();
+if (!$profilo) die('⚠️ Nessun profilo configurato per l’esportazione XML.');
 @endphp
 
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
@@ -15,7 +16,7 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
     <p:DatiTrasmissione>
       <p:IdTrasmittente>
         <p:IdPaese>IT</p:IdPaese>
-        <p:IdCodice>{{ $marchio->partita_iva ?? '00000000000' }}</p:IdCodice>
+        <p:IdCodice>{{ $profilo->partita_iva ?? '00000000000' }}</p:IdCodice>
       </p:IdTrasmittente>
       <p:ProgressivoInvio>{{ str_pad($ordine->id, 5, '0', STR_PAD_LEFT) }}</p:ProgressivoInvio>
       <p:FormatoTrasmissione>FPR12</p:FormatoTrasmissione>
@@ -29,19 +30,20 @@ $marchio = \App\Models\MarchioEditoriale::where('nome', 'Prospero Editore')->fir
       <p:DatiAnagrafici>
         <p:IdFiscaleIVA>
           <p:IdPaese>IT</p:IdPaese>
-          <p:IdCodice>{{ $marchio->partita_iva ?? '00000000000' }}</p:IdCodice>
+          <p:IdCodice>{{ $profilo->partita_iva ?? '00000000000' }}</p:IdCodice>
         </p:IdFiscaleIVA>
         <p:Anagrafica>
-          <p:Denominazione>{{ $marchio->nome }}</p:Denominazione>
+          <p:Denominazione>{{ $profilo->denominazione }}</p:Denominazione>
         </p:Anagrafica>
-        <p:RegimeFiscale>RF01</p:RegimeFiscale>
+        <p:RegimeFiscale>{{ $profilo->regime_fiscale ?? 'RF01' }}</p:RegimeFiscale>
       </p:DatiAnagrafici>
       <p:Sede>
-        <p:Indirizzo>{{ $marchio->indirizzo_sede_legale }}</p:Indirizzo>
-        <p:CAP>00000</p:CAP>
-        <p:Comune>Milano</p:Comune>
-        <p:Provincia>MI</p:Provincia>
-        <p:Nazione>IT</p:Nazione>
+        <p:Indirizzo>{{ $profilo->indirizzo_amministrativa }}</p:Indirizzo>
+        <p:NumeroCivico>{{ $profilo->numero_civico_amministrativa }}</p:NumeroCivico>
+        <p:CAP>{{ $profilo->cap_amministrativa ?? '00000' }}</p:CAP>
+        <p:Comune>{{ $profilo->comune_amministrativa }}</p:Comune>
+        <p:Provincia>{{ $profilo->provincia_amministrativa }}</p:Provincia>
+        <p:Nazione>{{ $profilo->nazione_amministrativa }}</p:Nazione>
       </p:Sede>
     </p:CedentePrestatore>
 

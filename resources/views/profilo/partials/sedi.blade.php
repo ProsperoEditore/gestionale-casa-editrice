@@ -1,5 +1,5 @@
 <div class="card mb-4">
-    <div class="card-header">Sede Amministrativa</div>
+    <div class="card-header">Sede Amministrativa<span class="text-danger">*</span></div>
     <div class="card-body row g-3">
         <div class="col-md-12">
             <div class="form-check">

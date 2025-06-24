@@ -1,5 +1,5 @@
 <div class="card mb-4">
-    <div class="card-header">Fatturazione</div>
+    <div class="card-header">Fatturazione<span class="text-danger">*</span></div>
     <div class="card-body row g-3">
         <div class="col-md-6">
             <label class="form-label">Codice destinatario</label>
