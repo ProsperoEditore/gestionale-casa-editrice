@@ -176,28 +176,50 @@
     });
     </script>
 
-    <script>
-    document.getElementById('copiaIndirizzo').addEventListener('change', function () {
-        const copia = this.checked;
-        const campi = ['via', 'civico', 'cap', 'comune', 'provincia', 'nazione'];
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.getElementById('copiaIndirizzo');
+    const campi = ['via', 'civico', 'cap', 'comune', 'provincia', 'nazione'];
+
+    function aggiornaStatoCampi() {
+        const copia = checkbox.checked;
 
         campi.forEach(campo => {
             const fatt = document.querySelector(`[name="${campo}_fatturazione"]`);
             const sped = document.querySelector(`[name="${campo}_spedizione"]`);
+
             if (fatt && sped) {
                 if (copia) {
                     sped.value = fatt.value;
-                    sped.readOnly = true;
+                    sped.setAttribute('disabled', true);
                 } else {
-                    sped.readOnly = false;
+                    sped.value = '';
+                    sped.removeAttribute('disabled');
                 }
             }
         });
+    }
+
+    // sincronizza automaticamente quando scrivi nei campi di fatturazione
+    campi.forEach(campo => {
+        const fatt = document.querySelector(`[name="${campo}_fatturazione"]`);
+        const sped = document.querySelector(`[name="${campo}_spedizione"]`);
+
+        if (fatt && sped) {
+            fatt.addEventListener('input', function () {
+                if (checkbox.checked) {
+                    sped.value = fatt.value;
+                }
+            });
+        }
     });
 
-    // Copia all'avvio se checkbox attiva
-    document.getElementById('copiaIndirizzo').dispatchEvent(new Event('change'));
-    </script>
+    checkbox.addEventListener('change', aggiornaStatoCampi);
+    aggiornaStatoCampi(); // inizializzazione al load
+});
+</script>
+
+
 
 
 <script>
