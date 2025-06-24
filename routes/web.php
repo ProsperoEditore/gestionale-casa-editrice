@@ -17,6 +17,7 @@ use App\Http\Controllers\RegistroTiraturaDettaglioController;
 use App\Http\Controllers\RegistroVenditeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportDettaglioController;
+use App\Http\Controllers\ProfiloController;
 use App\Http\Controllers\ScaricoController;
 use App\Http\Controllers\SchedaLibroController;
 use App\Http\Controllers\BackupController;
@@ -188,6 +189,10 @@ Route::patch('/scarichi/{id}/update-info', [ScaricoController::class, 'updateInf
 Route::get('/scarichi/autocomplete-ordini', [\App\Http\Controllers\ScaricoController::class, 'autocompleteOrdini'])
     ->name('scarichi.autocomplete-ordini');
 Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStato'])->name('scarichi.updateStato');
+
+// Profilo
+Route::get('/profilo', [ProfiloController::class, 'index'])->name('profilo.index');
+Route::post('/profilo', [ProfiloController::class, 'store'])->name('profilo.store');
 
 
 
