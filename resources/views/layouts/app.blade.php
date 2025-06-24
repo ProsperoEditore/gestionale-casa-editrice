@@ -268,7 +268,7 @@
                         <i class="bi bi-person-circle fs-5 me-2"></i> {{ auth()->user()->name }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="#">Profilo</a></li>
+                        <li><a class="dropdown-item" href="{{ route('profilo.index') }}">Profilo</a></li>
                         @if(auth()->user()->ruolo === 'admin')
                             <li><a class="dropdown-item" href="{{ route('utenti.index') }}">Gestione utenti</a></li>
                             <li><a class="dropdown-item" href="{{ route('backup.index') }}">Backup database</a></li>
