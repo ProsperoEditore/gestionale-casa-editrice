@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="container mt-5">
+
+    {{-- 🔔 AVVISO INFORMATIVO --}}
+    <div class="alert alert-warning">
+        <strong>⚠️ Attenzione:</strong> Questa sezione va compilata nel caso in cui si desideri esportare i file XML degli ordini per l'integrazione con un sistema di fatturazione elettronica.
+    </div>
+
     <h2 class="mb-4">Profilo fiscale e legale</h2>
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -10,10 +16,21 @@
     <form method="POST" action="{{ route('profilo.store') }}">
         @csrf
 
+        {{-- Titolo con asterisco rosso --}}
+        <h5 class="fw-bold text-decoration-underline mb-2 mt-4">Fatturazione <span class="text-danger">*</span></h5>
         @include('profilo.partials.fatturazione')
+
+        {{-- Titolo con asterisco rosso --}}
+        <h5 class="fw-bold text-decoration-underline mb-2 mt-4">Sede Amministrativa <span class="text-danger">*</span></h5>
         @include('profilo.partials.sedi')
+
+        <h5 class="fw-bold text-decoration-underline mb-2 mt-4">Contatti</h5>
         @include('profilo.partials.contatti')
+
+        <h5 class="fw-bold text-decoration-underline mb-2 mt-4">Dati iscrizione REA</h5>
         @include('profilo.partials.rea')
+
+        <h5 class="fw-bold text-decoration-underline mb-2 mt-4">Rappresentante legale</h5>
         @include('profilo.partials.rappresentante')
 
         <div class="text-end mt-4">
@@ -22,6 +39,7 @@
     </form>
 </div>
 
+{{-- JS gestione sede operativa --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const sedeUnicaCheckbox = document.querySelector('[name="sede_unica"]');
