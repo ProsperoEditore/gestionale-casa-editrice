@@ -61,15 +61,24 @@
                             </td>
 
                             @if(auth()->user()->ruolo !== 'utente')
-                                <td class="align-middle">
-                                    <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">
-                                            <i class="bi bi-trash fs-5"></i>
-                                        </button>
-                                    </form>
-                                </td>
+                            <td class="align-middle">
+                                <!-- 📩 Bottone INVIA EMAIL -->
+                                <form action="{{ route('magazzini.inviaRendiconto', $magazzino->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="Richiedi rendiconto via email">
+                                        <i class="bi bi-envelope fs-5"></i>
+                                    </button>
+                                </form>
+
+                                <!-- 🗑 Bottone ELIMINA -->
+                                <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn p-0 border-0 bg-transparent text-danger" title="Elimina" onclick="return confirm('Sei sicuro di voler eliminare questo magazzino?')">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </button>
+                                </form>
+                            </td>
                             @endif
 
                             <td class="align-middle">

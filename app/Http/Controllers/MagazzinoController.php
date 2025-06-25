@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Magazzino;
 use App\Models\Anagrafica;
 use Carbon\Carbon;
@@ -117,16 +118,36 @@ class MagazzinoController extends Controller
 
 
     public function destroy($id)
-    {
-        $magazzino = Magazzino::findOrFail($id);
+        {
+            $magazzino = Magazzino::findOrFail($id);
+        
+            // Elimina le giacenze associate al magazzino
+            $magazzino->giacenze()->delete();
+        
+            // Elimina il magazzino
+            $magazzino->delete();
+        
+            return redirect()->route('magazzini.index')->with('success', 'Magazzino e giacenze eliminate con successo.');
+        }
+
     
-        // Elimina le giacenze associate al magazzino
-        $magazzino->giacenze()->delete();
-    
-        // Elimina il magazzino
-        $magazzino->delete();
-    
-        return redirect()->route('magazzini.index')->with('success', 'Magazzino e giacenze eliminate con successo.');
-    }
+
+    public function inviaRendiconto($id)
+        {
+            $magazzino = \App\Models\Magazzino::with('anagrafica')->findOrFail($id);
+            $email = $magazzino->anagrafica->email;
+            $nome = $magazzino->anagrafica->nome_completo;
+
+            if (!$email) {
+                return back()->with('error', 'Nessun indirizzo email disponibile per questo magazzino.');
+            }
+
+            Mail::send('emails.richiesta_rendiconto', ['nome' => $nome], function ($message) use ($email) {
+                $message->to($email)
+                        ->subject('Richiesta invio rendiconto');
+            });
+
+            return back()->with('success', 'Email inviata con successo.');
+        }
     
 }

@@ -78,6 +78,8 @@ Route::get('/magazzini/create', [MagazzinoController::class, 'create'])->name('m
 Route::post('/magazzini/store', [MagazzinoController::class, 'store'])->name('magazzini.store');
 Route::delete('/magazzini/{id}', [MagazzinoController::class, 'destroy'])->name('magazzini.destroy');
 Route::put('/magazzini/{id}/update-scadenza', [MagazzinoController::class, 'updateScadenza'])->name('magazzini.updateScadenza');
+Route::post('/magazzini/{id}/invia-rendiconto', [\App\Http\Controllers\MagazzinoController::class, 'inviaRendiconto'])->name('magazzini.inviaRendiconto');
+
 
 // Giacenze collegate a un magazzino
 Route::get('/magazzini/{magazzino}/giacenze', [GiacenzaController::class, 'create'])->name('giacenze.create');
