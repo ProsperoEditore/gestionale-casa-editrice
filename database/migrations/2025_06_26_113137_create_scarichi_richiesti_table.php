@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('scarichi_richiesti', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ordine_id')->constrained()->onDelete('cascade');
-            $table->foreignId('libro_id')->constrained()->onDelete('cascade');
+            $table->foreignId('libro_id')->constrained('libri')->onDelete('cascade');
             $table->foreignId('magazzino_id')->constrained()->onDelete('cascade');
             $table->integer('quantita');
             $table->enum('stato', ['in attesa', 'approvato', 'rifiutato'])->default('in attesa');
