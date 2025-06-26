@@ -11,7 +11,7 @@ class ScaricoRichiestoController extends Controller
     public function index()
     {
         $richieste = ScaricoRichiesto::where('stato', 'in attesa')
-            ->with(['ordine', 'libro', 'magazzino'])
+            ->with(['ordine', 'libro', 'magazzino.anagrafica'])
             ->get();
 
         return view('scarichi_richiesti.index', compact('richieste'));
