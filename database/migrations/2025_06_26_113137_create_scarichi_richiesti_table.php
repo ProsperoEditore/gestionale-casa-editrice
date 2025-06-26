@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('ordine_id')->constrained()->onDelete('cascade');
             $table->foreignId('libro_id')->constrained('libri')->onDelete('cascade');
-            $table->foreignId('magazzino_id')->constrained()->onDelete('cascade');
+            $table->foreignId('magazzino_id')->constrained('magazzini')->onDelete('cascade');
             $table->integer('quantita');
             $table->enum('stato', ['in attesa', 'approvato', 'rifiutato'])->default('in attesa');
             $table->timestamps();
