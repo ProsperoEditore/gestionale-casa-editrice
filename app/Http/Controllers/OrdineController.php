@@ -480,7 +480,10 @@ public function importLibri(Request $request, $id)
                     ) {
                         $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
                             $query->where('categoria', 'magazzino editore');
-                        })->first();
+                        })
+                        ->whereNotNull('anagrafica_id')
+                        ->first();
+
 
                         if ($magazzinoEditore) {
                             \App\Models\ScaricoRichiesto::create([
