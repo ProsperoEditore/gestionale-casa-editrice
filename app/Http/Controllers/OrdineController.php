@@ -455,7 +455,7 @@ public function importLibri(Request $request, $id)
     
                     // 🔄 SOTTRAZIONE da magazzino editore solo se specificato
                     $info_normalized = strtolower(trim($info));
-                    if (in_array($info_normalized, ['spedito da magazzino editore', 'consegna a mano'])) {
+                    /*if (in_array($info_normalized, ['spedito da magazzino editore', 'consegna a mano'])) {
                         $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
                             $query->where('categoria', 'magazzino editore');
                         })->first();
@@ -471,6 +471,25 @@ public function importLibri(Request $request, $id)
                                 $giacenzaEditore->data_ultimo_aggiornamento = now();
                                 $giacenzaEditore->save();
                             }
+                        }
+                    }*/
+                    
+                    if (
+                        $ordine->tipo_ordine === 'conto deposito' &&
+                        in_array($info_normalized, ['spedito da magazzino editore', 'consegna a mano'])
+                    ) {
+                        $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
+                            $query->where('categoria', 'magazzino editore');
+                        })->first();
+
+                        if ($magazzinoEditore) {
+                            \App\Models\ScaricoRichiesto::create([
+                                'ordine_id' => $ordine->id,
+                                'libro_id' => $libro_id,
+                                'magazzino_id' => $magazzinoEditore->id,
+                                'quantita' => $quantita,
+                                'stato' => 'in attesa',
+                            ]);
                         }
                     }
                 }
