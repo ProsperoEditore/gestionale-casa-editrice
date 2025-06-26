@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ScaricoRichiesto extends Model
 {
+
+    protected $table = 'scarichi_richiesti';
+    
     protected $fillable = [
         'ordine_id',
         'libro_id',
