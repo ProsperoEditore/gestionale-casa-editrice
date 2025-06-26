@@ -86,7 +86,7 @@ $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &
         $percentuale = $percentuali['diretta'];
         $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
 
-    } elseif ($canale === 'evento') {
+    } elseif (in_array($canale, ['evento', 'eventi'])) {
         $percentuale = $percentuali['evento'];
         $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
     }
