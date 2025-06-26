@@ -4,6 +4,18 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Magazzini</h3>
 
+        @php
+            $scarichiDaApprovare = \App\Models\ScaricoRichiesto::where('stato', 'in attesa')->count();
+        @endphp
+
+        @if($scarichiDaApprovare > 0)
+            <div class="text-center mb-3">
+                <a href="{{ route('scarichi-richiesti.index') }}" class="btn btn-warning">
+                    ⚠️ Scarichi da approvare ({{ $scarichiDaApprovare }})
+                </a>
+            </div>
+        @endif
+
     <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
         <a href="{{ route('magazzini.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
