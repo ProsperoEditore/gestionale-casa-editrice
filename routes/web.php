@@ -19,6 +19,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportDettaglioController;
 use App\Http\Controllers\ProfiloController;
 use App\Http\Controllers\ScaricoController;
+use App\Http\Controllers\ScaricoRichiestoController;
 use App\Http\Controllers\SchedaLibroController;
 use App\Http\Controllers\BackupController;
 
@@ -185,12 +186,22 @@ Route::get('/report/{reportId}/dettagli/pdf', [ReportDettaglioController::class,
 Route::get('/report/autocomplete-libro', [App\Http\Controllers\ReportController::class, 'autocompleteLibro'])->name('report.autocomplete-libro');
 Route::post('report/{reportId}/dettagli/pdf', [ReportDettaglioController::class, 'exportPdf'])->name('report.dettagli.exportPdf');
 
-// Scarichi
+// Scarichi (spedizioni)
 Route::resource('scarichi', ScaricoController::class)->except(['show']);
 Route::patch('/scarichi/{id}/update-info', [ScaricoController::class, 'updateInfoSpedizione'])->name('scarichi.updateInfoSpedizione');
 Route::get('/scarichi/autocomplete-ordini', [\App\Http\Controllers\ScaricoController::class, 'autocompleteOrdini'])
     ->name('scarichi.autocomplete-ordini');
 Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStato'])->name('scarichi.updateStato');
+
+
+
+// Scarico-richiesto
+Route::get('/scarichi-richiesti', [ScaricoRichiestoController::class, 'index'])->name('scarichi-richiesti.index');
+Route::post('/scarichi-richiesti/{id}/approva', [ScaricoRichiestoController::class, 'approva'])->name('scarichi-richiesti.approva');
+Route::post('/scarichi-richiesti/{id}/rifiuta', [ScaricoRichiestoController::class, 'rifiuta'])->name('scarichi-richiesti.rifiuta');
+
+
+
 
 // Profilo
 Route::get('/profilo', [ProfiloController::class, 'index'])->name('profilo.index');
