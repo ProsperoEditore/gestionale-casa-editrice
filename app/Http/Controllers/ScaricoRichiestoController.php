@@ -15,15 +15,16 @@ class ScaricoRichiestoController extends Controller
             ->get();
 
         foreach ($richieste as $r) {
-            $giacenza = Giacenza::where('libro_id', $r->libro_id)
+            $giacenza = Giacenza::with('magazzino.anagrafica')
+                ->where('libro_id', $r->libro_id)
                 ->whereHas('magazzino.anagrafica', function ($q) {
                     $q->where('categoria', 'magazzino editore');
                 })
-                ->with('magazzino.anagrafica')
                 ->first();
 
-            $r->magazzino_individuato = $giacenza->magazzino ?? null;
+            $r->magazzino_individuato = $giacenza?->magazzino;
         }
+
 
         return view('scarichi_richiesti.index', compact('richieste'));
     }
