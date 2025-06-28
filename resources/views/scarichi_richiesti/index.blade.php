@@ -28,7 +28,11 @@
                         <td>{{ $r->libro->isbn }}</td>
                         <td>{{ $r->libro->titolo }}</td>
                         <td>{{ $r->quantita }}</td>
-                        <td>{{ $r->magazzino_individuato?->nome ?? 'N/D' }}</td>
+                        <td>
+                            {{ $r->magazzino_individuato?->nome 
+                                ?? $r->magazzino_individuato?->anagrafica?->nome 
+                                ?? 'N/D' }}
+                        </td>
                         <td>
                             <form action="{{ route('scarichi-richiesti.approva', $r->id) }}" method="POST" class="d-inline">
                                 @csrf
