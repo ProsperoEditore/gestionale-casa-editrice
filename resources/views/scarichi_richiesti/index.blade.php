@@ -26,10 +26,21 @@
                         <td>{{ $r->libro->titolo }}</td>
                         <td>{{ $r->quantita }}</td>
                         <td>
-                            ID: {{ $r->magazzino->id }}<br>
-                            Anagrafica ID: {{ $r->magazzino->anagrafica_id ?? 'N/A' }}<br>
-                            Nome Anagrafica: {{ $r->magazzino->anagrafica->nome ?? 'N/A' }}<br>
-                            Nome Magazzino: {{ $r->magazzino->nome ?? 'N/A' }}
+                            @php
+                                $giacenza = \App\Models\Giacenza::where('libro_id', $r->libro_id)
+                                    ->whereHas('magazzino.anagrafica', function ($q) {
+                                        $q->where('categoria', 'magazzino editore');
+                                    })
+                                    ->with('magazzino.anagrafica')
+                                    ->first();
+                            @endphp
+
+                            @if($giacenza)
+                                Nome Anagrafica: {{ $giacenza->magazzino->anagrafica->nome }}<br>
+                                Nome Magazzino: {{ $giacenza->magazzino->nome }}
+                            @else
+                                <span class="text-muted">N/D</span>
+                            @endif
                         </td>
 
                         <td>

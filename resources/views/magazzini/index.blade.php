@@ -10,8 +10,8 @@
 
         @if($scarichiDaApprovare > 0)
             <div class="text-center mb-3">
-                <a href="{{ route('scarichi-richiesti.index') }}" class="btn btn-warning">
-                    ⚠️ Scarichi da approvare ({{ $scarichiDaApprovare }})
+                <a href="{{ route('scarichi-richiesti.index') }}" class="btn btn-warning btn-lg fw-bold shadow px-4 py-2">
+                    ⚠️ Ci sono degli scarichi da approvare! ({{ $scarichiDaApprovare }})
                 </a>
             </div>
         @endif
