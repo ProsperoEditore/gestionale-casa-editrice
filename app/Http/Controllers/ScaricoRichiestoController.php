@@ -15,31 +15,15 @@ class ScaricoRichiestoController extends Controller
             ->get();
 
         foreach ($richieste as $r) {
-            $ordine = $r->ordine;
             $libroId = $r->libro_id;
 
-            // Leggi info_spedizione
-            $infoSpedizione = $ordine->libri()
+            // Cerco la giacenza del libro (come fa la sezione Ordini)
+            $giacenza = Giacenza::with('magazzino.anagrafica')
                 ->where('libro_id', $libroId)
-                ->first()
-                ->pivot
-                ->info_spedizione ?? null;
+                ->orderByDesc('data_ultimo_aggiornamento') // opzionale
+                ->first();
 
-            // Solo se è una tipologia che scarica davvero
-            if (in_array($infoSpedizione, ['spedito da magazzino editore', 'consegna a mano'])) {
-                // Cerca una giacenza con categoria magazzino editore
-                $giacenza = Giacenza::with('magazzino.anagrafica')
-                    ->where('libro_id', $libroId)
-                    ->whereHas('magazzino.anagrafica', function ($q) {
-                        $q->where('categoria', 'magazzino editore');
-                    })
-                    ->first();
-
-                // Assegna il magazzino (se trovato)
-                $r->magazzino_individuato = $giacenza?->magazzino;
-            } else {
-                $r->magazzino_individuato = null;
-            }
+            $r->magazzino_individuato = $giacenza?->magazzino;
         }
 
         return view('scarichi_richiesti.index', compact('richieste'));
@@ -48,28 +32,18 @@ class ScaricoRichiestoController extends Controller
     public function approva($id)
     {
         $richiesta = ScaricoRichiesto::findOrFail($id);
-        $ordine = $richiesta->ordine;
         $libroId = $richiesta->libro_id;
 
-        $infoSpedizione = $ordine->libri()
-            ->where('libro_id', $libroId)
-            ->first()
-            ->pivot
-            ->info_spedizione ?? null;
+        // Trova la giacenza da cui sottrarre
+        $giacenza = Giacenza::where('libro_id', $libroId)
+            ->orderByDesc('data_ultimo_aggiornamento') // opzionale ma consigliato
+            ->first();
 
-        if (in_array($infoSpedizione, ['spedito da magazzino editore', 'consegna a mano'])) {
-            $giacenza = Giacenza::where('libro_id', $libroId)
-                ->whereHas('magazzino.anagrafica', function ($q) {
-                    $q->where('categoria', 'magazzino editore');
-                })
-                ->first();
-
-            if ($giacenza) {
-                $giacenza->quantita = max(0, $giacenza->quantita - $richiesta->quantita);
-                $giacenza->note = 'Scarico approvato ordine ' . $ordine->codice;
-                $giacenza->data_ultimo_aggiornamento = now();
-                $giacenza->save();
-            }
+        if ($giacenza) {
+            $giacenza->quantita = max(0, $giacenza->quantita - $richiesta->quantita);
+            $giacenza->note = 'Scarico approvato ordine ' . $richiesta->ordine->codice;
+            $giacenza->data_ultimo_aggiornamento = now();
+            $giacenza->save();
         }
 
         $richiesta->update(['stato' => 'approvato']);
