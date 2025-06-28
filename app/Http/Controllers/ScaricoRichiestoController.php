@@ -24,7 +24,7 @@ class ScaricoRichiestoController extends Controller
                     ->orderByDesc('data_ultimo_aggiornamento')
                     ->first();
 
-                $r->magazzino_nome = $giacenza?->magazzino?->anagrafica?->nome ?? $giacenza?->magazzino?->nome;
+                $r->magazzino_nome = $giacenza?->magazzino?->anagrafica?->denominazione ?? $giacenza?->magazzino?->nome;
                 $r->quantita_disponibile = $giacenza?->quantita;
             }
 
