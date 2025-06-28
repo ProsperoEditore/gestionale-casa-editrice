@@ -14,10 +14,20 @@ class ScaricoRichiestoController extends Controller
             ->with(['ordine', 'libro'])
             ->get();
 
-        foreach ($richieste as $r) {
-            // Usa la funzione del model Libro per trovare il magazzino da mostrare
-            $r->magazzino_individuato = $r->libro?->magazzinoDisponibile();
-        }
+            foreach ($richieste as $r) {
+                $giacenza = \App\Models\Giacenza::with('magazzino.anagrafica')
+                    ->where('isbn', $r->libro->isbn)
+                    ->where('quantita', '>', 0)
+                    ->whereHas('magazzino.anagrafica', function ($q) {
+                        $q->where('categoria', 'magazzino editore');
+                    })
+                    ->orderByDesc('data_ultimo_aggiornamento')
+                    ->first();
+
+                $r->magazzino_individuato = $giacenza?->magazzino;
+                $r->quantita_disponibile = $giacenza?->quantita;
+            }
+
 
         return view('scarichi_richiesti.index', compact('richieste'));
     }
