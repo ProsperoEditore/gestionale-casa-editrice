@@ -199,6 +199,7 @@ Route::put('/scarichi/{id}/update-stato', [ScaricoController::class, 'updateStat
 Route::get('/scarichi-richiesti', [ScaricoRichiestoController::class, 'index'])->name('scarichi-richiesti.index');
 Route::post('/scarichi-richiesti/{id}/approva', [ScaricoRichiestoController::class, 'approva'])->name('scarichi-richiesti.approva');
 Route::post('/scarichi-richiesti/{id}/rifiuta', [ScaricoRichiestoController::class, 'rifiuta'])->name('scarichi-richiesti.rifiuta');
+Route::get('/scarichi-richiesti/stampa', [ScaricoRichiestoController::class, 'exportPdf'])->name('scarichi-richiesti.exportPdf');
 
 
 

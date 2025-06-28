@@ -15,6 +15,8 @@
                 </a>
             </div>
         @endif
+        <a href="{{ route('scarichi-richiesti.exportPdf') }}" class="btn btn-primary mb-3">🖨️ Stampa elenco scarichi richiesti</a>
+
 
     <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
         <a href="{{ route('magazzini.create') }}" class="btn btn-success">Aggiungi Nuovo</a>

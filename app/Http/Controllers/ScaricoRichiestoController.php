@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ScaricoRichiesto;
 use App\Models\Giacenza;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ScaricoRichiestoController extends Controller
 {
@@ -67,4 +68,34 @@ class ScaricoRichiestoController extends Controller
 
         return back()->with('success', 'Scarico rifiutato.');
     }
+
+
+
+public function exportPdf()
+{
+    $richieste = ScaricoRichiesto::where('stato', 'in attesa')
+        ->with(['ordine.anagrafica', 'libro'])
+        ->get();
+
+    foreach ($richieste as $r) {
+        $giacenza = \App\Models\Giacenza::with('magazzino.anagrafica')
+            ->where('isbn', $r->libro->isbn)
+            ->where('quantita', '>', 0)
+            ->whereHas('magazzino.anagrafica', function ($q) {
+                $q->where('categoria', 'magazzino editore');
+            })
+            ->orderByDesc('data_ultimo_aggiornamento')
+            ->first();
+
+        $r->magazzino_nome = $giacenza?->magazzino?->anagrafica?->denominazione ?? $giacenza?->magazzino?->nome;
+        $r->quantita_disponibile = $giacenza?->quantita;
+
+        $anagrafica = $r->ordine->anagrafica;
+        $r->destinatario = $anagrafica->denominazione ?? trim($anagrafica->nome . ' ' . $anagrafica->cognome);
+    }
+
+    $pdf = Pdf::loadView('scarichi_richiesti.pdf', compact('richieste'))->setPaper('A4', 'landscape');
+    return $pdf->download('scarichi-da-approvare.pdf');
+}
+
 }

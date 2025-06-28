@@ -3,6 +3,8 @@
 @section('content')
 <div class="container mt-5">
     <h3 class="mb-4">Scarichi da approvare</h3>
+    <a href="{{ route('scarichi-richiesti.exportPdf') }}" class="btn btn-primary mb-3">🖨️ Stampa</a>
+
 
     @if($richieste->isEmpty())
         <div class="alert alert-info">Nessuna richiesta di scarico in attesa.</div>

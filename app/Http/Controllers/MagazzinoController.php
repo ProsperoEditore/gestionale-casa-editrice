@@ -149,5 +149,6 @@ class MagazzinoController extends Controller
 
             return back()->with('success', 'Email inviata con successo.');
         }
+
     
 }
