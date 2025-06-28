@@ -47,11 +47,6 @@
                                 <button class="btn btn-danger btn-sm">Rifiuta</button>
                             </form>
                         </td>
-
-                        <td>
-                            {{ $r->ordine->libri->firstWhere('pivot.libro_id', $r->libro_id)?->pivot?->info_spedizione ?? '??' }}
-                        </td>
-
                     </tr>
                 @endforeach
             </tbody>
