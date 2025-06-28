@@ -11,23 +11,18 @@ class ScaricoRichiestoController extends Controller
     public function index()
     {
         $richieste = ScaricoRichiesto::where('stato', 'in attesa')
-            ->with(['ordine', 'libro'])
+            ->with(['ordine.libri', 'libro']) // carica libri con pivot
             ->get();
 
         foreach ($richieste as $r) {
             $ordine = $r->ordine;
             $libroId = $r->libro_id;
 
-            // Leggi info_spedizione
-            $infoSpedizione = $ordine->libri()
-                ->where('libro_id', $libroId)
-                ->first()
-                ->pivot
-                ->info_spedizione ?? null;
+            // ✅ Usa il pivot corretto
+            $pivot = $ordine->libri->firstWhere('pivot.libro_id', $libroId)?->pivot;
+            $infoSpedizione = $pivot?->info_spedizione;
 
-            // Solo se è una tipologia che scarica davvero
             if (in_array($infoSpedizione, ['spedito da magazzino editore', 'consegna a mano'])) {
-                // Cerca una giacenza compatibile
                 $giacenza = \App\Models\Giacenza::with('magazzino.anagrafica')
                     ->where('libro_id', $libroId)
                     ->whereHas('magazzino.anagrafica', function ($q) {
@@ -43,6 +38,7 @@ class ScaricoRichiestoController extends Controller
 
         return view('scarichi_richiesti.index', compact('richieste'));
     }
+
 
     public function approva($id)
     {
