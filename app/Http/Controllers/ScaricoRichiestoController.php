@@ -34,8 +34,11 @@ class ScaricoRichiestoController extends Controller
     {
         $richiesta = ScaricoRichiesto::findOrFail($id);
 
-        $giacenza = Giacenza::where('magazzino_id', $richiesta->magazzino_id)
-            ->where('libro_id', $richiesta->libro_id)
+        // ✅ Cerca la giacenza corrispondente in un magazzino editore
+        $giacenza = Giacenza::where('libro_id', $richiesta->libro_id)
+            ->whereHas('magazzino.anagrafica', function ($q) {
+                $q->where('categoria', 'magazzino editore');
+            })
             ->first();
 
         if ($giacenza) {
@@ -49,6 +52,7 @@ class ScaricoRichiestoController extends Controller
 
         return back()->with('success', 'Scarico approvato con successo.');
     }
+
 
     public function rifiuta($id)
     {
