@@ -14,22 +14,10 @@ class ScaricoRichiestoController extends Controller
             ->with(['ordine', 'libro'])
             ->get();
 
-            foreach ($richieste as $r) {
-                $libroId = $r->libro_id;
-
-                // Cerca la giacenza più recente con quantità > 0 da un magazzino editore
-                $giacenza = \App\Models\Giacenza::with('magazzino.anagrafica')
-                    ->where('libro_id', $libroId)
-                    ->where('quantita', '>', 0)
-                    ->whereHas('magazzino.anagrafica', function ($q) {
-                        $q->where('categoria', 'magazzino editore');
-                    })
-                    ->orderByDesc('data_ultimo_aggiornamento') // o per quantità decrescente
-                    ->first();
-
-                $r->magazzino_individuato = $giacenza?->magazzino;
-            }
-
+        foreach ($richieste as $r) {
+            // Usa la funzione del model Libro per trovare il magazzino da mostrare
+            $r->magazzino_individuato = $r->libro?->magazzinoDisponibile();
+        }
 
         return view('scarichi_richiesti.index', compact('richieste'));
     }
@@ -37,11 +25,15 @@ class ScaricoRichiestoController extends Controller
     public function approva($id)
     {
         $richiesta = ScaricoRichiesto::findOrFail($id);
-        $libroId = $richiesta->libro_id;
 
-        // Trova la giacenza da cui sottrarre
-        $giacenza = Giacenza::where('libro_id', $libroId)
-            ->orderByDesc('data_ultimo_aggiornamento') // opzionale ma consigliato
+        // Usa la stessa logica della index per trovare la giacenza corretta
+        $giacenza = Giacenza::with('magazzino.anagrafica')
+            ->where('libro_id', $richiesta->libro_id)
+            ->where('quantita', '>', 0)
+            ->whereHas('magazzino.anagrafica', function ($q) {
+                $q->where('categoria', 'magazzino editore');
+            })
+            ->orderByDesc('data_ultimo_aggiornamento')
             ->first();
 
         if ($giacenza) {
