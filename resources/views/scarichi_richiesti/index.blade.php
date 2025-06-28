@@ -14,11 +14,12 @@
             <thead>
                 <tr>
                     <th>Ordine</th>
+                    <th>Destinatario</th>
                     <th>ISBN</th>
                     <th>Titolo</th>
                     <th>Magazzino</th>
-                    <th>Quantità richiesta</th>
                     <th>Giacenza attuale</th>
+                    <th>Quantità richiesta</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
@@ -26,11 +27,12 @@
                 @foreach($richieste as $r)
                     <tr>
                         <td>{{ $r->ordine->codice }}</td>
+                        <td>{{ $r->destinatario ?? 'N/D' }}</td>
                         <td>{{ $r->libro->isbn }}</td>
                         <td>{{ $r->libro->titolo }}</td>
                         <td>{{ $r->magazzino_nome ?? 'N/D' }}</td>
-                        <td>{{ $r->quantita }}</td>
                         <td>{{ $r->quantita_disponibile ?? 'N/D' }}</td>
+                        <td>{{ $r->quantita }}</td>
                         <td>
                             <form action="{{ route('scarichi-richiesti.approva', $r->id) }}" method="POST" class="d-inline">
                                 @csrf

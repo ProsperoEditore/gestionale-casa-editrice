@@ -11,7 +11,7 @@ class ScaricoRichiestoController extends Controller
     public function index()
     {
         $richieste = ScaricoRichiesto::where('stato', 'in attesa')
-            ->with(['ordine', 'libro'])
+            ->with(['ordine.anagrafica', 'libro'])
             ->get();
 
             foreach ($richieste as $r) {
@@ -26,6 +26,8 @@ class ScaricoRichiestoController extends Controller
 
                 $r->magazzino_nome = $giacenza?->magazzino?->anagrafica?->denominazione ?? $giacenza?->magazzino?->nome;
                 $r->quantita_disponibile = $giacenza?->quantita;
+                $anagrafica = $r->ordine->anagrafica;
+                $r->destinatario = $anagrafica->denominazione ?? trim($anagrafica->nome . ' ' . $anagrafica->cognome);
             }
 
 
