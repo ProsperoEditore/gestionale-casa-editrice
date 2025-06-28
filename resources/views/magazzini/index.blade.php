@@ -4,6 +4,19 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4">Magazzini</h3>
 
+    @if(session('success'))
+        <div class="alert alert-success text-center">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger text-center">
+            {{ session('error') }}
+        </div>
+    @endif
+
+
         @php
             $scarichiDaApprovare = \App\Models\ScaricoRichiesto::where('stato', 'in attesa')->count();
         @endphp
