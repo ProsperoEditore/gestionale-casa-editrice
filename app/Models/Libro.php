@@ -134,7 +134,7 @@ class Libro extends Model
 public function magazzinoDisponibile()
 {
     $giacenza = \App\Models\Giacenza::with('magazzino.anagrafica')
-        ->where('libro_id', $this->id)
+        ->where('isbn', $this->isbn)
         ->where('quantita', '>', 0)
         ->whereHas('magazzino.anagrafica', function ($q) {
             $q->where('categoria', 'magazzino editore');
@@ -142,12 +142,9 @@ public function magazzinoDisponibile()
         ->orderByDesc('data_ultimo_aggiornamento')
         ->first();
 
-    if ($giacenza && $giacenza->magazzino) {
-        $giacenza->magazzino->setRelation('anagrafica', $giacenza->magazzino->anagrafica);
-    }
-
     return $giacenza?->magazzino;
 }
+
 
 
     
