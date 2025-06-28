@@ -6,24 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
-    {
-        Schema::table('profili', function (Blueprint $table) {
-            $table->string('email_mittente')->nullable();
-        });
-    }
+public function up()
+{
+    Schema::table('profilo', function (Blueprint $table) {
+        $table->string('email_mittente')->nullable()->after('pec');
+    });
+}
 
+public function down()
+{
+    Schema::table('profilo', function (Blueprint $table) {
+        $table->dropColumn('email_mittente');
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('profili', function (Blueprint $table) {
-            //
-        });
-    }
 };
