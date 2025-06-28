@@ -28,15 +28,7 @@
                         <td>{{ $r->libro->isbn }}</td>
                         <td>{{ $r->libro->titolo }}</td>
                         <td>{{ $r->quantita }}</td>
-                        <td>
-                            @if($r->magazzino_individuato)
-                                Nome Anagrafica: {{ $r->magazzino_individuato->anagrafica->nome }}<br>
-                                Nome Magazzino: {{ $r->magazzino_individuato->nome }}
-                            @else
-                                <span class="text-muted">N/D</span>
-                            @endif
-                        </td>
-
+                        <td>{{ $r->magazzino_individuato?->nome ?? 'N/D' }}</td>
                         <td>
                             <form action="{{ route('scarichi-richiesti.approva', $r->id) }}" method="POST" class="d-inline">
                                 @csrf
