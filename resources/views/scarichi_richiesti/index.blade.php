@@ -6,6 +6,9 @@
 
     @if($richieste->isEmpty())
         <div class="alert alert-info">Nessuna richiesta di scarico in attesa.</div>
+        <div class="text-center mt-3">
+            <a href="{{ route('magazzini.index') }}" class="btn btn-secondary">← Torna a Magazzini</a>
+        </div>
     @else
         <table class="table table-bordered table-striped">
             <thead>
@@ -26,18 +29,9 @@
                         <td>{{ $r->libro->titolo }}</td>
                         <td>{{ $r->quantita }}</td>
                         <td>
-                            @php
-                                $giacenza = \App\Models\Giacenza::where('libro_id', $r->libro_id)
-                                    ->whereHas('magazzino.anagrafica', function ($q) {
-                                        $q->where('categoria', 'magazzino editore');
-                                    })
-                                    ->with('magazzino.anagrafica')
-                                    ->first();
-                            @endphp
-
-                            @if($giacenza)
-                                Nome Anagrafica: {{ $giacenza->magazzino->anagrafica->nome }}<br>
-                                Nome Magazzino: {{ $giacenza->magazzino->nome }}
+                            @if($r->magazzino_individuato)
+                                Nome Anagrafica: {{ $r->magazzino_individuato->anagrafica->nome }}<br>
+                                Nome Magazzino: {{ $r->magazzino_individuato->nome }}
                             @else
                                 <span class="text-muted">N/D</span>
                             @endif

@@ -11,11 +11,23 @@ class ScaricoRichiestoController extends Controller
     public function index()
     {
         $richieste = ScaricoRichiesto::where('stato', 'in attesa')
-            ->with(['ordine', 'libro', 'magazzino.anagrafica'])
+            ->with(['ordine', 'libro'])
             ->get();
+
+        foreach ($richieste as $r) {
+            $giacenza = Giacenza::where('libro_id', $r->libro_id)
+                ->whereHas('magazzino.anagrafica', function ($q) {
+                    $q->where('categoria', 'magazzino editore');
+                })
+                ->with('magazzino.anagrafica')
+                ->first();
+
+            $r->magazzino_individuato = $giacenza->magazzino ?? null;
+        }
 
         return view('scarichi_richiesti.index', compact('richieste'));
     }
+
 
     public function approva($id)
     {
