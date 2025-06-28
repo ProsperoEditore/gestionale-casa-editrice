@@ -16,8 +16,8 @@
                     <th>Ordine</th>
                     <th>ISBN</th>
                     <th>Titolo</th>
-                    <th>Quantità richiesta</th>
                     <th>Magazzino</th>
+                    <th>Quantità richiesta</th>
                     <th>Giacenza attuale</th>
                     <th>Azioni</th>
                 </tr>
@@ -28,8 +28,8 @@
                         <td>{{ $r->ordine->codice }}</td>
                         <td>{{ $r->libro->isbn }}</td>
                         <td>{{ $r->libro->titolo }}</td>
-                        <td>{{ $r->quantita }}</td>
                         <td>{{ $r->magazzino_nome ?? 'N/D' }}</td>
+                        <td>{{ $r->quantita }}</td>
                         <td>{{ $r->quantita_disponibile ?? 'N/D' }}</td>
                         <td>
                             <form action="{{ route('scarichi-richiesti.approva', $r->id) }}" method="POST" class="d-inline">
