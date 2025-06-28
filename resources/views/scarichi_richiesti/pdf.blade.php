@@ -16,24 +16,24 @@
         <thead>
             <tr>
                 <th>Ordine</th>
+                <th>Destinatario</th>
                 <th>ISBN</th>
                 <th>Titolo</th>
-                <th>Quantità richiesta</th>
-                <th>Destinatario</th>
                 <th>Magazzino</th>
-                <th>Giacenza attuale</th>
+                <th>Giacenza attuale</th>                
+                <th>Quantità richiesta</th>
             </tr>
         </thead>
         <tbody>
             @foreach($richieste as $r)
                 <tr>
                     <td>{{ $r->ordine->codice }}</td>
+                    <td>{{ $r->destinatario ?? 'N/D' }}</td>
                     <td>{{ $r->libro->isbn }}</td>
                     <td>{{ $r->libro->titolo }}</td>
-                    <td>{{ $r->quantita }}</td>
-                    <td>{{ $r->destinatario ?? 'N/D' }}</td>
                     <td>{{ $r->magazzino_nome ?? 'N/D' }}</td>
                     <td>{{ $r->quantita_disponibile ?? 'N/D' }}</td>
+                    <td><strong style="color: red">{{ $r->quantita }}</strong></td>
                 </tr>
             @endforeach
         </tbody>

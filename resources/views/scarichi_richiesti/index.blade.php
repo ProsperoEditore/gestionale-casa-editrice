@@ -34,7 +34,7 @@
                         <td>{{ $r->libro->titolo }}</td>
                         <td>{{ $r->magazzino_nome ?? 'N/D' }}</td>
                         <td>{{ $r->quantita_disponibile ?? 'N/D' }}</td>
-                        <td>{{ $r->quantita }}</td>
+                        <td><strong style="color: red">{{ $r->quantita }}</strong></td>
                         <td>
                             <form action="{{ route('scarichi-richiesti.approva', $r->id) }}" method="POST" class="d-inline">
                                 @csrf
