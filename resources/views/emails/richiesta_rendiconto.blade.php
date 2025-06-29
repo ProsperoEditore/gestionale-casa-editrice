@@ -11,9 +11,9 @@
             <img src="{{ asset('images/logo-prospero.png') }}" alt="Logo Prospero" style="max-width: 180px;">
         </div>
 
-        <p>Gentile {{ $nome }},</p>
+        <p>Gentile <strong>{{ $nome }}</strong>,</p>
 
-        <p>La contattiamo per richiedere l'invio del <strong>rendiconto aggiornato</strong> delle vendite e delle giacenze per il suo punto vendita.</p>
+        <p>la contattiamo per richiedere l'invio del <strong>rendiconto aggiornato</strong> delle vendite e delle giacenze per il suo punto vendita.</p>
 
         <p style="margin-top: 30px;">Grazie per la collaborazione.</p>
 
