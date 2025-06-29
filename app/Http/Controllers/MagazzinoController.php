@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Magazzino;
 use App\Models\Anagrafica;
 use Carbon\Carbon;
+use App\Models\RendicontoEmailLog;
 
 class MagazzinoController extends Controller
 {
@@ -62,8 +63,19 @@ class MagazzinoController extends Controller
         $paginatedMagazzini->setPath($request->url());
         $paginatedMagazzini->appends($request->query());
 
-    // Passaggio alla view
-    return view('magazzini.index', ['magazzini' => $paginatedMagazzini]);
+        $inviati = RendicontoEmailLog::orderBy('created_at', 'desc')->get()
+            ->groupBy('magazzino_id')
+            ->map(function ($logs) {
+                return $logs->take(3)->map(function ($log) {
+                    return $log->created_at->format('d-m-y');
+                })->implode(', ');
+            });
+
+        // Passaggio alla view
+        return view('magazzini.index', [
+            'magazzini' => $paginatedMagazzini,
+            'inviati' => $inviati
+        ]);
     }
     
     

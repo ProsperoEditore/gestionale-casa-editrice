@@ -88,12 +88,21 @@
                             @if(auth()->user()->ruolo !== 'utente')
                             <td class="align-middle">
                                 <!-- 📩 Bottone INVIA EMAIL -->
-                                <form action="{{ route('magazzini.inviaRendiconto', $magazzino->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="Richiedi rendiconto via email">
-                                        <i class="bi bi-envelope fs-5"></i>
-                                    </button>
-                                </form>
+                                @if(optional($magazzino->anagrafica)->categoria !== 'magazzino editore')
+                                    @php
+                                        $tooltip = "Richiedi rendiconto via email";
+                                        if (isset($inviati[$magazzino->id])) {
+                                            $tooltip .= "\nUltimi invii: " . $inviati[$magazzino->id];
+                                        }
+                                    @endphp
+                                    <form action="{{ route('magazzini.inviaRendiconto', $magazzino->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="{{ $tooltip }}">
+                                            <i class="bi bi-envelope fs-5"></i>
+                                        </button>
+                                    </form>
+                                @endif
+
 
                                 <!-- 🗑 Bottone ELIMINA -->
                                 <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
