@@ -168,6 +168,12 @@ public function inviaRendiconto($id)
                     ->subject('Richiesta invio rendiconto');
         });
 
+                // ✅ Salva log
+        \App\Models\RendicontoEmailLog::create([
+            'magazzino_id' => $magazzino->id,
+            'email' => $email,
+        ]);
+
         return back()->with('success', 'Email inviata con successo.');
     } catch (\Exception $e) {
         return back()->with('error', 'Errore durante l’invio dell’email: ' . $e->getMessage());
