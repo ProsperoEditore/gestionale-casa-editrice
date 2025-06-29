@@ -157,8 +157,24 @@
                 </p>
 
                 @if(auth()->user()->ruolo !== 'utente')
-                    <div class="d-flex flex-wrap gap-3 mt-2">
+                    <div class="d-flex flex-wrap gap-3 mt-2 align-items-center">
                         <strong>Azioni:</strong>
+
+                        @if(optional($magazzino->anagrafica)->categoria !== 'magazzino editore')
+                            @php
+                                $tooltip = "Richiedi rendiconto via email";
+                                if (isset($inviati[$magazzino->id])) {
+                                    $tooltip .= "\nUltimi invii: " . $inviati[$magazzino->id];
+                                }
+                            @endphp
+                            <form action="{{ route('magazzini.inviaRendiconto', $magazzino->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-primary" title="{{ $tooltip }}">
+                                    <i class="bi bi-envelope"></i>
+                                </button>
+                            </form>
+                        @endif
+
                         <form action="{{ route('magazzini.destroy', $magazzino) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
@@ -168,6 +184,7 @@
                         </form>
                     </div>
                 @endif
+
 
                 <div class="d-flex flex-wrap gap-3 mt-2">
                     <strong>Giacenze:</strong>
