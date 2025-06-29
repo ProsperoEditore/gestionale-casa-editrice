@@ -26,9 +26,6 @@
                 <a href="{{ route('scarichi-richiesti.index') }}" class="btn btn-warning btn-lg fw-bold shadow px-4 py-2">
                     ⚠️ Ci sono degli scarichi da approvare! ({{ $scarichiDaApprovare }})
                 </a>
-                <a href="{{ route('scarichi-richiesti.exportPdf') }}" class="btn btn-primary">
-                    🖨️ Stampa elenco
-                </a>
             </div>
         @endif
 
