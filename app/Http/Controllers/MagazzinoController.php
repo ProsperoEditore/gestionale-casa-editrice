@@ -132,23 +132,36 @@ class MagazzinoController extends Controller
 
     
 
-    public function inviaRendiconto($id)
-        {
-            $magazzino = \App\Models\Magazzino::with('anagrafica')->findOrFail($id);
-            $email = $magazzino->anagrafica->email;
-            $nome = $magazzino->anagrafica->nome_completo;
+public function inviaRendiconto($id)
+{
+    $magazzino = \App\Models\Magazzino::with('anagrafica')->findOrFail($id);
+    $email = $magazzino->anagrafica->email;
+    $nome = $magazzino->anagrafica->nome_completo;
 
-            if (!$email) {
-                return back()->with('error', 'Nessun indirizzo email disponibile per questo magazzino.');
-            }
+    if (!$email) {
+        return back()->with('error', 'Nessun indirizzo email disponibile per questo magazzino.');
+    }
 
-            Mail::send('emails.richiesta_rendiconto', ['nome' => $nome], function ($message) use ($email) {
-                $message->to($email)
-                        ->subject('Richiesta invio rendiconto');
-            });
+    $profilo = \App\Models\Profilo::first();
+    $mittenteEmail = $profilo->email ?? config('mail.from.address');
+    $mittenteNome = $profilo->denominazione ?? config('mail.from.name');
 
-            return back()->with('success', 'Email inviata con successo.');
-        }
+    try {
+        Mail::send('emails.richiesta_rendiconto', [
+            'nome' => $nome,
+            'profilo' => $profilo,
+        ], function ($message) use ($email, $mittenteEmail, $mittenteNome) {
+            $message->to($email)
+                    ->from($mittenteEmail, $mittenteNome)
+                    ->subject('Richiesta invio rendiconto');
+        });
+
+        return back()->with('success', 'Email inviata con successo.');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Errore durante l’invio dell’email: ' . $e->getMessage());
+    }
+}
+
 
     
 }
