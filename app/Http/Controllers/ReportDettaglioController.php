@@ -40,62 +40,69 @@ class ReportDettaglioController extends Controller
         $quantita_cumulata = 0;
     
         // Applica i calcoli per ogni riga
-$dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
-    $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
-    $luogo = $item->registroVendite->anagrafica->nome_completo ?? 'N/A';
+        $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
+            $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
+            $luogo = $item->registroVendite->anagrafica->nome_completo ?? 'N/A';
 
-    $item->prezzo_unitario = $item->prezzo;
-    $item->canale = ucfirst($canale);
-    $item->luogo = $luogo;
-    $item->periodo_testo = $item->periodo;
-    $item->data_formattata = $item->data
-        ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
-        : null;
+            $item->prezzo_unitario = $item->prezzo;
+            $item->canale = ucfirst($canale);
+            $item->luogo = $luogo;
+            $item->periodo_testo = $item->periodo;
+            $item->data_formattata = $item->data
+                ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
+                : null;
 
-    $quantita = $item->quantita;
-    $prezzo_unitario = $item->prezzo;
-    $royalties_totali = 0;
+            $quantita = $item->quantita;
+            $prezzo_unitario = $item->prezzo;
+            $royalties_totali = 0;
 
-    if ($canale === 'vendite indirette') {
-        $iniziale = $quantita_cumulata + 1;
-        $finale = $quantita_cumulata + $quantita;
+            if ($canale === 'vendite indirette') {
+                $s1 = $contratto->royalties_vendite_indirette_soglia_1 ?? PHP_INT_MAX;
+                $s2 = $contratto->royalties_vendite_indirette_soglia_2 ?? PHP_INT_MAX;
 
-        $s1 = $contratto->royalties_vendite_indirette_soglia_1 ?? PHP_INT_MAX;
-        $s2 = $contratto->royalties_vendite_indirette_soglia_2 ?? PHP_INT_MAX;
+                $p1 = $contratto->royalties_vendite_indirette_percentuale_1 ?? $percentuali['indiretta'];
+                $p2 = $contratto->royalties_vendite_indirette_percentuale_2 ?? $percentuali['indiretta'];
+                $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
 
-        $p1 = $contratto->royalties_vendite_indirette_percentuale_1 ?? $percentuali['indiretta'];
-        $p2 = $contratto->royalties_vendite_indirette_percentuale_2 ?? $percentuali['indiretta'];
-        $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
+                if ($quantita > 0) {
+                    for ($i = $quantita_cumulata + 1; $i <= $quantita_cumulata + $quantita; $i++) {
+                        if ($i <= $s1) {
+                            $percentuale = $p1;
+                        } elseif ($i <= $s2) {
+                            $percentuale = $p2;
+                        } else {
+                            $percentuale = $p3;
+                        }
+                        $royalties_totali += round($prezzo_unitario * ($percentuale / 100), 2);
+                    }
+                } elseif ($quantita < 0) {
+                    for ($i = $quantita_cumulata; $i > $quantita_cumulata + $quantita; $i--) {
+                        if ($i <= $s1) {
+                            $percentuale = $p1;
+                        } elseif ($i <= $s2) {
+                            $percentuale = $p2;
+                        } else {
+                            $percentuale = $p3;
+                        }
+                        $royalties_totali -= round($prezzo_unitario * ($percentuale / 100), 2);
+                    }
+                }
 
-        $step = $quantita >= 0 ? 1 : -1;
+            } elseif ($canale === 'vendite dirette') {
+                $percentuale = $percentuali['diretta'];
+                $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
 
-        for ($i = $iniziale; $step > 0 ? $i <= $finale : $i >= $finale; $i += $step) {
-            $posizione = abs($i);
-            if ($posizione <= $s1) {
-                $percentuale = $p1;
-            } elseif ($posizione <= $s2) {
-                $percentuale = $p2;
-            } else {
-                $percentuale = $p3;
+            } elseif (in_array($canale, ['evento', 'eventi'])) {
+                $percentuale = $percentuali['evento'];
+                $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
             }
 
-            $royalties_totali += round($prezzo_unitario * ($percentuale / 100) * $step, 2);
-        }
+            $item->royalties = $royalties_totali;
+            $quantita_cumulata += $quantita;
 
-    } elseif ($canale === 'vendite dirette') {
-        $percentuale = $percentuali['diretta'];
-        $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
+            return $item;
+        });
 
-    } elseif (in_array($canale, ['evento', 'eventi'])) {
-        $percentuale = $percentuali['evento'];
-        $royalties_totali = round($item->valore_lordo * ($percentuale / 100), 2);
-    }
-
-    $item->royalties = $royalties_totali;
-    $quantita_cumulata += $quantita;
-
-    return $item;
-});
 
 
         $dettagli = $dettagli->sortByDesc(fn($item) => $item->data)->values();
@@ -145,24 +152,20 @@ $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &
         $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &$quantita_cumulata) {
             $canale = strtolower($item->registroVendite->canale_vendita ?? 'N/A');
             $luogo = $item->registroVendite->anagrafica->nome_completo ?? 'N/A';
-    
+
             $item->prezzo_unitario = $item->prezzo;
             $item->canale = ucfirst($canale);
             $item->luogo = $luogo;
             $item->periodo_testo = $item->periodo;
             $item->data_formattata = $item->data
-            ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
-            : null;        
-        
-    
+                ? \Carbon\Carbon::parse($item->data)->format('d/m/Y')
+                : null;
+
             $quantita = $item->quantita;
             $prezzo_unitario = $item->prezzo;
             $royalties_totali = 0;
-    
-            if ($canale === 'vendite indirette') {
-                $iniziale = $quantita_cumulata + 1;
-                $finale = $quantita_cumulata + $quantita;
 
+            if ($canale === 'vendite indirette') {
                 $s1 = $contratto->royalties_vendite_indirette_soglia_1 ?? PHP_INT_MAX;
                 $s2 = $contratto->royalties_vendite_indirette_soglia_2 ?? PHP_INT_MAX;
 
@@ -170,19 +173,28 @@ $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &
                 $p2 = $contratto->royalties_vendite_indirette_percentuale_2 ?? $percentuali['indiretta'];
                 $p3 = $contratto->royalties_vendite_indirette_percentuale_3 ?? $percentuali['indiretta'];
 
-                $step = $quantita >= 0 ? 1 : -1;
-
-                for ($i = $iniziale; $step > 0 ? $i <= $finale : $i >= $finale; $i += $step) {
-                    $posizione = abs($i);
-                    if ($posizione <= $s1) {
-                        $percentuale = $p1;
-                    } elseif ($posizione <= $s2) {
-                        $percentuale = $p2;
-                    } else {
-                        $percentuale = $p3;
+                if ($quantita > 0) {
+                    for ($i = $quantita_cumulata + 1; $i <= $quantita_cumulata + $quantita; $i++) {
+                        if ($i <= $s1) {
+                            $percentuale = $p1;
+                        } elseif ($i <= $s2) {
+                            $percentuale = $p2;
+                        } else {
+                            $percentuale = $p3;
+                        }
+                        $royalties_totali += round($prezzo_unitario * ($percentuale / 100), 2);
                     }
-
-                    $royalties_totali += round($prezzo_unitario * ($percentuale / 100) * $step, 2);
+                } elseif ($quantita < 0) {
+                    for ($i = $quantita_cumulata; $i > $quantita_cumulata + $quantita; $i--) {
+                        if ($i <= $s1) {
+                            $percentuale = $p1;
+                        } elseif ($i <= $s2) {
+                            $percentuale = $p2;
+                        } else {
+                            $percentuale = $p3;
+                        }
+                        $royalties_totali -= round($prezzo_unitario * ($percentuale / 100), 2);
+                    }
                 }
 
             } elseif ($canale === 'vendite dirette') {
@@ -198,7 +210,8 @@ $dettagli = $dettagli_raw->map(function ($item) use ($contratto, $percentuali, &
             $quantita_cumulata += $quantita;
 
             return $item;
-            });
+        });
+
 
         $totali = [
             'quantita' => $dettagli->sum('quantita'),
