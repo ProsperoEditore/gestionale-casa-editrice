@@ -81,6 +81,15 @@
                                 <i class="bi bi-eye fs-4"></i>
                             </a>
 
+                                @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                                    <form action="{{ route('ordini.inviaSollecito', $ordine->id) }}" method="POST" onsubmit="return confirm('Confermi l\'invio del sollecito?')">
+                                        @csrf
+                                        <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="Invia sollecito">
+                                            <i class="fas fa-envelope fs-4"></i>
+                                        </button>
+                                    </form>
+                                @endif
+
                             <a href="{{ route('ordini.stampa', $ordine->id) }}" class="text-dark" title="Stampa">
                                 <i class="bi bi-printer fs-4"></i>
                             </a>
@@ -140,6 +149,16 @@
                     <a href="{{ route('ordini.gestione_libri', $ordine->id) }}" class="btn btn-sm btn-info" title="Visualizza">
                         <i class="bi bi-eye"></i>
                     </a>
+
+                        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
+                            <form action="{{ route('ordini.inviaSollecito', $ordine->id) }}" method="POST" onsubmit="return confirm('Confermi l\'invio del sollecito?')">
+                                @csrf
+                                <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="Invia sollecito">
+                                    <i class="fas fa-envelope fs-4"></i>
+                                </button>
+                            </form>
+                        @endif
+
 
                     <a href="{{ route('ordini.stampa', $ordine->id) }}" class="btn btn-sm btn-dark" title="Stampa">
                         <i class="bi bi-printer"></i>

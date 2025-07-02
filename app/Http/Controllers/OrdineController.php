@@ -9,12 +9,14 @@ use App\Models\Anagrafica;
 use App\Models\MarchioEditoriale;
 use App\Models\Giacenza;
 use App\Models\Magazzino;
+use App\Models\SollecitoOrdineLog;
 use App\Imports\OrdineLibriImport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 
 
@@ -629,5 +631,45 @@ public function importLibri(Request $request, $id)
         ->header('Content-Disposition', 'attachment; filename="ordine_'.$ordine->codice.'.xml"');
     }
 
+
+
+    public function inviaSollecito($id)
+        {
+        $ordine = \App\Models\Ordine::with('anagrafica')->findOrFail($id);
+
+        // Limita ai soli tipi desiderati
+        if (!in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore'])) {
+            return back()->with('error', 'Sollecito disponibile solo per ordini di tipo acquisto o acquisto autore.');
+        }
+
+        $email = $ordine->anagrafica->email;
+        $nome = $ordine->anagrafica->nome_completo;
+
+        if (!$email) {
+            return back()->with('error', 'Nessuna email disponibile per questo cliente.');
+        }
+
+        $profilo = \App\Models\Profilo::first();
+        $mittenteEmail = $profilo->email ?? config('mail.from.address');
+        $mittenteNome = $profilo->denominazione ?? config('mail.from.name');
+
+        try {
+            Mail::send('emails.sollecito_ordine', [
+                'nome' => $nome,
+                'ordine' => $ordine,
+                'profilo' => $profilo,
+            ], function ($message) use ($email, $mittenteEmail, $mittenteNome) {
+                $message->to($email)
+                        ->from($mittenteEmail, $mittenteNome)
+                        ->subject('Sollecito pagamento ordine');
+            });
+
+            SollecitoOrdineLog::create(['ordine_id' => $ordine->id]);
+
+            return back()->with('success', 'Sollecito inviato con successo.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Errore durante l’invio: ' . $e->getMessage());
+        }
+    }
 
 }
