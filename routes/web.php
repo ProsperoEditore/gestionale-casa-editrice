@@ -136,6 +136,7 @@ Route::get('/api/libro-da-barcode', function (Request $request) {
 
 Route::get('/ordini/{id}/esporta-xml', [OrdineController::class, 'esportaXML'])->name('ordini.esportaXML');
 Route::post('/ordini/{id}/invia-sollecito', [OrdineController::class, 'inviaSollecito'])->name('ordini.inviaSollecito');
+Route::post('/ordini/{ordine}/invia-sollecito', [OrdineController::class, 'inviaSollecito'])->name('ordini.inviaSollecito');
 
 
 // Registro Tirature
