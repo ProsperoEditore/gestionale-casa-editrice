@@ -146,10 +146,12 @@ public function autocompleteOrdini(Request $request)
     $query = $request->get('query');
 
     $ordini = Ordine::with('anagrafica')
-        ->where('codice', 'like', "%{$query}%")
-        ->orWhereHas('anagrafica', function ($q) use ($query) {
-            $q->whereRaw("CONCAT(COALESCE(nome, ''), ' ', COALESCE(cognome, '')) LIKE ?", ["%{$query}%"])
-              ->orWhere('denominazione', 'like', "%{$query}%");
+        ->where(function ($q) use ($query) {
+            $q->where('codice', 'like', "%{$query}%")
+              ->orWhereHas('anagrafica', function ($qa) use ($query) {
+                  $qa->whereRaw("CONCAT(COALESCE(nome, ''), ' ', COALESCE(cognome, '')) LIKE ?", ["%{$query}%"])
+                     ->orWhere('denominazione', 'like', "%{$query}%");
+              });
         })
         ->limit(10)
         ->get();
@@ -157,9 +159,11 @@ public function autocompleteOrdini(Request $request)
     return response()->json($ordini->map(function ($ordine) {
         $anagrafica = $ordine->anagrafica;
 
-        $nome_cliente = $anagrafica
-            ? trim(($anagrafica->denominazione ?: $anagrafica->nome . ' ' . $anagrafica->cognome))
-            : '⚠️ Nessun nome';
+        $nome_cliente = '⚠️ Nessun nome';
+        if ($anagrafica) {
+            $nome_cliente = $anagrafica->denominazione
+                ?: trim(($anagrafica->nome ?? '') . ' ' . ($anagrafica->cognome ?? ''));
+        }
 
         return [
             'id' => $ordine->id,
@@ -169,6 +173,7 @@ public function autocompleteOrdini(Request $request)
         ];
     }));
 }
+
 
 
     public function updateStato(Request $request, $id)
