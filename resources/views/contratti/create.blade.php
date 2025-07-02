@@ -7,7 +7,7 @@
     <div class="card">
         <div class="card-body">
             <form action="{{ route('contratti.store') }}" method="POST">
-                @include('contratti._form')
+                @include('contratti._form', ['contratto' => null])
 
                 <div class="text-center mt-3">
                     <button type="submit" class="btn btn-primary">Salva</button>
