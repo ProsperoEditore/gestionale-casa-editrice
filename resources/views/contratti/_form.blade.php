@@ -20,24 +20,41 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Royalties Vendite Indirette (%) <span class="text-danger">*</span></label>
-    <input type="number" name="royalties_vendite_indirette" value="{{ old('royalties_vendite_indirette', $contratto->royalties_vendite_indirette ?? '') }}" class="form-control" required>
+    <label class="form-label">Royalties Vendite Indirette - Valori con soglie</label>
 </div>
 
 <div class="ms-4 border-start ps-3 mb-4">
-    @foreach([1, 2, 3] as $n)
-        <div class="form-group mb-2">
-            <label for="royalties_vendite_indirette_soglia_{{ $n }}">Soglia {{ $n }} (Quantità):</label>
-            <input type="number" name="royalties_vendite_indirette_soglia_{{ $n }}" class="form-control"
-                   value="{{ old("royalties_vendite_indirette_soglia_$n", $contratto->{'royalties_vendite_indirette_soglia_'.$n} ?? '') }}">
-        </div>
-        <div class="form-group mb-3">
-            <label for="royalties_vendite_indirette_percentuale_{{ $n }}">Percentuale Soglia {{ $n }} (%):</label>
-            <input type="number" step="0.01" name="royalties_vendite_indirette_percentuale_{{ $n }}" class="form-control"
-                   value="{{ old("royalties_vendite_indirette_percentuale_$n", $contratto->{'royalties_vendite_indirette_percentuale_'.$n} ?? '') }}">
-        </div>
-    @endforeach
+
+    <div class="form-group mb-2">
+        <label for="royalties_vendite_indirette_soglia_1">Soglia 1 (fino a questa quantità):</label>
+        <input type="number" name="royalties_vendite_indirette_soglia_1" class="form-control"
+               value="{{ old('royalties_vendite_indirette_soglia_1', $contratto->royalties_vendite_indirette_soglia_1 ?? '') }}">
+    </div>
+    <div class="form-group mb-3">
+        <label for="royalties_vendite_indirette_percentuale_1">Percentuale fino a Soglia 1 (%):</label>
+        <input type="number" step="0.01" name="royalties_vendite_indirette_percentuale_1" class="form-control"
+               value="{{ old('royalties_vendite_indirette_percentuale_1', $contratto->royalties_vendite_indirette_percentuale_1 ?? '') }}">
+    </div>
+
+    <div class="form-group mb-2">
+        <label for="royalties_vendite_indirette_soglia_2">Soglia 2 (fino a questa quantità):</label>
+        <input type="number" name="royalties_vendite_indirette_soglia_2" class="form-control"
+               value="{{ old('royalties_vendite_indirette_soglia_2', $contratto->royalties_vendite_indirette_soglia_2 ?? '') }}">
+    </div>
+    <div class="form-group mb-3">
+        <label for="royalties_vendite_indirette_percentuale_2">Percentuale tra Soglia 1 e Soglia 2 (%):</label>
+        <input type="number" step="0.01" name="royalties_vendite_indirette_percentuale_2" class="form-control"
+               value="{{ old('royalties_vendite_indirette_percentuale_2', $contratto->royalties_vendite_indirette_percentuale_2 ?? '') }}">
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="royalties_vendite_indirette_percentuale_3">Percentuale oltre Soglia 2 (%):</label>
+        <input type="number" step="0.01" name="royalties_vendite_indirette_percentuale_3" class="form-control"
+               value="{{ old('royalties_vendite_indirette_percentuale_3', $contratto->royalties_vendite_indirette_percentuale_3 ?? '') }}">
+    </div>
+
 </div>
+
 
 
 <div class="mb-3">
