@@ -81,8 +81,8 @@
                                 <i class="bi bi-eye fs-4"></i>
                             </a>
 
-                                @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-                                    <form action="{{ route('ordini.inviaSollecito', $ordine->id) }}" method="POST" onsubmit="return confirm('Confermi l\'invio del sollecito?')">
+                                @if(in_array(strtolower($ordine->tipo_ordine), ['acquisto', 'acquisto autore']))
+                                    <form action="{{ route('ordini.inviaSollecito', $ordine->id) }}" method="POST" onsubmit="return confirm('Confermi l\'invio del sollecito?')" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="Invia sollecito">
                                             <i class="fas fa-envelope fs-4"></i>
@@ -150,8 +150,8 @@
                         <i class="bi bi-eye"></i>
                     </a>
 
-                        @if(in_array($ordine->tipo_ordine, ['acquisto', 'acquisto autore']))
-                            <form action="{{ route('ordini.inviaSollecito', $ordine->id) }}" method="POST" onsubmit="return confirm('Confermi l\'invio del sollecito?')">
+                        @if(in_array(strtolower($ordine->tipo_ordine), ['acquisto', 'acquisto autore']))
+                            <form action="{{ route('ordini.inviaSollecito', $ordine->id) }}" method="POST" onsubmit="return confirm('Confermi l\'invio del sollecito?')" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn p-0 border-0 bg-transparent text-primary" title="Invia sollecito">
                                     <i class="fas fa-envelope fs-4"></i>
