@@ -22,7 +22,7 @@
         <p style="margin-top: 30px;">Grazie per la collaborazione.</p>
 
         <p>Cordiali saluti,<br>
-        <strong>{{ $profilo->denominazione ?? 'Prospero Editore' }}</strong></p>
+        <strong>{{'Prospero Editore'  }}</strong></p>
 
         <hr style="margin: 30px 0;">
 
