@@ -62,9 +62,27 @@ class OrdineController extends Controller
 
     $tutteAnagrafiche = Anagrafica::orderBy('nome')->get();
 
+
+    // Recupera date invii email
+    $inviati = [];
+
+    foreach ($ordini as $ordine) {
+        $ultimiInvii = \App\Models\SollecitoOrdineLog::where('ordine_id', $ordine->id)
+            ->orderByDesc('created_at')
+            ->take(2)
+            ->pluck('created_at')
+            ->map(fn($data) => $data->format('d-m-y'))
+            ->toArray();
+
+        if (!empty($ultimiInvii)) {
+            $inviati[$ordine->id] = implode(', ', $ultimiInvii);
+        }
+    }
+
     return view('ordini.index', [
         'ordini' => $paginatedOrdini,
-        'tutteAnagrafiche' => $tutteAnagrafiche
+        'tutteAnagrafiche' => $tutteAnagrafiche,
+        'inviati' => $inviati
     ]);
 }
     
