@@ -20,8 +20,16 @@
     </div>
 </div>
 
-<div class="mb-3">
+<div class="mb-2">
     <label class="form-label">Royalties Vendite Indirette - Valori con soglie</label>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">Royalties Indirette Fissa (se non si usano soglie) (%)</label>
+        <input type="number" step="0.01" name="royalties_indirette_fissa" class="form-control"
+               value="{{ old('royalties_indirette_fissa', $contratto->royalties_indirette_fissa ?? '') }}">
+    </div>
 </div>
 
 <div class="ms-4 border-start ps-3 mb-4">
@@ -69,4 +77,9 @@
         <label class="form-label">Royalties Eventi (%) <span class="text-danger">*</span></label>
         <input type="number" name="royalties_eventi" value="{{ old('royalties_eventi', $contratto->royalties_eventi ?? '') }}" class="form-control" required>
     </div>
+</div>
+
+<div class="text-end mt-3">
+    <button type="submit" class="btn btn-primary">Salva</button>
+    <a href="{{ route('contratti.index') }}" class="btn btn-secondary">Annulla</a>
 </div>
