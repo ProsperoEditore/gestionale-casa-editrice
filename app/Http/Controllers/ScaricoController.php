@@ -141,27 +141,35 @@ class ScaricoController extends Controller
     }
 
    
-    public function autocompleteOrdini(Request $request)
-    {
-        $query = $request->get('query');
-    
-        $ordini = Ordine::where('codice', 'like', "%{$query}%")
-            ->orWhereHas('anagrafica', function ($q) use ($query) {
-                $q->where('nome', 'like', "%{$query}%");
-            })
-            ->with('anagrafica')
-            ->limit(10)
-            ->get();
-    
-        return response()->json($ordini->map(function ($ordine) {
-            return [
-                'id' => $ordine->id,
-                'codice' => $ordine->codice,
-                'nome_cliente' => optional($ordine->anagrafica)->nome ?? '⚠️ Nessun nome',
-                'anagrafica_id' => optional($ordine->anagrafica)->id ?? null,
-            ];
-        }));
-    }
+public function autocompleteOrdini(Request $request)
+{
+    $query = $request->get('query');
+
+    $ordini = Ordine::with('anagrafica')
+        ->where('codice', 'like', "%{$query}%")
+        ->orWhereHas('anagrafica', function ($q) use ($query) {
+            $q->whereRaw("CONCAT(COALESCE(nome, ''), ' ', COALESCE(cognome, '')) LIKE ?", ["%{$query}%"])
+              ->orWhere('denominazione', 'like', "%{$query}%");
+        })
+        ->limit(10)
+        ->get();
+
+    return response()->json($ordini->map(function ($ordine) {
+        $anagrafica = $ordine->anagrafica;
+
+        $nome_cliente = $anagrafica
+            ? trim(($anagrafica->denominazione ?: $anagrafica->nome . ' ' . $anagrafica->cognome))
+            : '⚠️ Nessun nome';
+
+        return [
+            'id' => $ordine->id,
+            'codice' => $ordine->codice,
+            'nome_cliente' => $nome_cliente,
+            'anagrafica_id' => $anagrafica?->id,
+        ];
+    }));
+}
+
 
     public function updateStato(Request $request, $id)
 {
