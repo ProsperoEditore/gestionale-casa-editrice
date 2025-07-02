@@ -24,16 +24,21 @@
     <input type="number" name="royalties_vendite_indirette" value="{{ old('royalties_vendite_indirette', $contratto->royalties_vendite_indirette ?? '') }}" class="form-control" required>
 </div>
 
-@foreach([1, 2, 3] as $n)
-    <div class="form-group">
-        <label for="royalties_vendite_indirette_soglia_{{ $n }}">Soglia {{ $n }} (Quantità):</label>
-        <input type="number" name="royalties_vendite_indirette_soglia_{{ $n }}" value="{{ old("royalties_vendite_indirette_soglia_$n", $contratto->{'royalties_vendite_indirette_soglia_'.$n} ?? '') }}" class="form-control">
-    </div>
-    <div class="form-group">
-        <label for="royalties_vendite_indirette_percentuale_{{ $n }}">Percentuale Soglia {{ $n }} (%):</label>
-        <input type="number" step="0.01" name="royalties_vendite_indirette_percentuale_{{ $n }}" value="{{ old("royalties_vendite_indirette_percentuale_$n", $contratto->{'royalties_vendite_indirette_percentuale_'.$n} ?? '') }}" class="form-control">
-    </div>
-@endforeach
+<div class="ms-4 border-start ps-3 mb-4">
+    @foreach([1, 2, 3] as $n)
+        <div class="form-group mb-2">
+            <label for="royalties_vendite_indirette_soglia_{{ $n }}">Soglia {{ $n }} (Quantità):</label>
+            <input type="number" name="royalties_vendite_indirette_soglia_{{ $n }}" class="form-control"
+                   value="{{ old("royalties_vendite_indirette_soglia_$n", $contratto->{'royalties_vendite_indirette_soglia_'.$n} ?? '') }}">
+        </div>
+        <div class="form-group mb-3">
+            <label for="royalties_vendite_indirette_percentuale_{{ $n }}">Percentuale Soglia {{ $n }} (%):</label>
+            <input type="number" step="0.01" name="royalties_vendite_indirette_percentuale_{{ $n }}" class="form-control"
+                   value="{{ old("royalties_vendite_indirette_percentuale_$n", $contratto->{'royalties_vendite_indirette_percentuale_'.$n} ?? '') }}">
+        </div>
+    @endforeach
+</div>
+
 
 <div class="mb-3">
     <label class="form-label">Royalties Vendite Dirette (%) <span class="text-danger">*</span></label>
