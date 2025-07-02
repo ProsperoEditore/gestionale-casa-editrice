@@ -21,9 +21,18 @@ class MagazzinoController extends Controller
         if ($request->filled('search')) {
             $search = strtolower(str_replace(' ', '', $request->search));
             $query->whereHas('anagrafica', function ($q) use ($search) {
-                $q->whereRaw("LOWER(REPLACE(nome, ' ', '')) LIKE ?", ["%{$search}%"]);
+                $q->whereRaw("
+                    LOWER(REPLACE(
+                        CONCAT(
+                            COALESCE(denominazione, ''),
+                            COALESCE(nome, ''),
+                            COALESCE(cognome, '')
+                        ), ' ', '')
+                    ) LIKE ?
+                ", ["%{$search}%"]);
             });
         }
+
     
         // Filtro per categoria
         if ($request->filled('categoria')) {

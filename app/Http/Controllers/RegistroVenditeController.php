@@ -25,9 +25,10 @@ class RegistroVenditeController extends Controller
         if ($request->filled('search')) {
             $search = strtolower(str_replace(' ', '', $request->search));
             $query->whereHas('anagrafica', function ($q) use ($search) {
-                $q->whereRaw("LOWER(REPLACE(nome, ' ', '')) LIKE ?", ["%{$search}%"]);
+                $q->whereRaw("LOWER(REPLACE(CONCAT(COALESCE(denominazione, ''), COALESCE(nome, ''), COALESCE(cognome, '')), ' ', '')) LIKE ?", ["%{$search}%"]);
             });
         }
+
         
     
         $items = $query->orderBy('created_at', 'desc')->paginate(30)->appends($request->query());
