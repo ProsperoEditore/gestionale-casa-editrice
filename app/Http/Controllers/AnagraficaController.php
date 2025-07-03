@@ -164,16 +164,16 @@ class AnagraficaController extends Controller
         ->limit(10)
         ->get(['id', 'denominazione', 'nome', 'cognome']);
 
-        // Restituisce 'nome_completo' per ciascun risultato
         $results = $anagrafiche->map(function ($a) {
             return [
                 'id' => $a->id,
-                'nome' => $a->nome_completo,
+                'text' => $a->nome_completo,
             ];
         });
 
         return response()->json($results);
     }
+
 
 
 }
