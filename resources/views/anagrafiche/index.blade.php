@@ -10,7 +10,11 @@
         <form action="{{ route('anagrafiche.index') }}" method="GET" class="d-flex flex-wrap gap-2">
             <select id="anagrafica_search" name="search" class="form-control" style="min-width:300px">
                 <option value="">Cerca per nome, cognome o denominazione...</option>
-                @if(request('search') && $selected = \App\Models\Anagrafica::find(request('search')))
+                @php
+                    $search = request('search');
+                @endphp
+
+                @if(is_numeric($search) && $selected = \App\Models\Anagrafica::find($search))
                     <option value="{{ $selected->id }}" selected>{{ $selected->nome_completo }}</option>
                 @endif
             </select>
