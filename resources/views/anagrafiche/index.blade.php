@@ -106,31 +106,39 @@
 </div>
 
 
-<select id="anagrafica_id" style="width: 100%"></select>
+<!-- Select2 e jQuery -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        $('#anagrafica_id').select2({
-            placeholder: 'Cerca anagrafica...',
-            minimumInputLength: 1,
-            ajax: {
-                url: '/anagrafiche/autocomplete',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        term: params.term
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data
-                    };
-                }
-            }
-        });
+$(document).ready(function () {
+    $('#anagrafica_search').select2({
+        placeholder: "Cerca per nome, cognome o denominazione...",
+        allowClear: true,
+        ajax: {
+            url: "{{ route('anagrafiche.autocomplete') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { term: params.term };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return { id: item.id, text: item.text };
+                    })
+                };
+            },
+            cache: true
+        }
     });
-</script>
 
+    // submit form al cambio selezione
+    $('#anagrafica_search').on('change', function () {
+        $(this).closest('form').submit();
+    });
+});
+</script>
 
 @endsection
