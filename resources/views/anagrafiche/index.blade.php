@@ -126,7 +126,7 @@ $(document).ready(function () {
             processResults: function (data) {
                 return {
                     results: data.map(function (item) {
-                        return { id: item.id, text: item.nome };
+                        return { id: item.id, text: item.text };
                     })
                 };
             },
