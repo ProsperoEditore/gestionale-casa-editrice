@@ -53,7 +53,8 @@ Route::put('/utenti/{utente}', [UserController::class, 'update'])->name('utenti.
 
 // Anagrafiche
 Route::resource('anagrafiche', AnagraficaController::class);
-Route::get('/anagrafiche/autocomplete', [AnagraficaController::class, 'autocomplete'])->name('anagrafiche.autocomplete');
+Route::get('/anagrafiche/autocomplete', [App\Http\Controllers\AnagraficaController::class, 'autocomplete'])->name('anagrafiche.autocomplete');
+
 
 // Contratti
 Route::get('contratti', [ContrattoController::class, 'index'])->name('contratti.index');
