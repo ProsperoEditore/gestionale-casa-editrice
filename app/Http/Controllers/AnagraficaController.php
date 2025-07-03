@@ -7,25 +7,31 @@ use Illuminate\Http\Request;
 
 class AnagraficaController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Anagrafica::query();
+        public function index(Request $request)
+        {
+            $query = Anagrafica::query();
 
-        if ($request->filled('search')) {
-            $query->where('id', $request->search);
-        }
+            if ($request->filled('search')) {
+                $query->where('id', $request->search);
+            }
 
-        if ($request->filled('categoria')) {
-            $query->where('categoria', $request->categoria);
-        }
+            if ($request->filled('categoria')) {
+                $query->where('categoria', $request->categoria);
+            }
 
-        $items = $query
-            ->orderByRaw("COALESCE(NULLIF(denominazione, ''), '')")
-            ->orderByRaw("CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(cognome, '')) ELSE '' END")
-            ->orderByRaw("CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(nome, '')) ELSE '' END")
-            ->paginate(50);
+            $items = $query
+                ->orderByRaw("COALESCE(NULLIF(denominazione, ''), '')")
+                ->orderByRaw("CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(cognome, '')) ELSE '' END")
+                ->orderByRaw("CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(nome, '')) ELSE '' END")
+                ->paginate(50);
 
-        return view('anagrafiche.index', compact('items'));
+            $tutteAnagrafiche = Anagrafica::orderByRaw("
+                COALESCE(NULLIF(denominazione, ''), '') ASC,
+                CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(cognome, '')) ELSE '' END ASC,
+                CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(nome, '')) ELSE '' END ASC
+            ")->get();
+
+            return view('anagrafiche.index', compact('items', 'tutteAnagrafiche'));
     }
 
     
