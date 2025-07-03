@@ -8,15 +8,13 @@
         <a href="{{ route('anagrafiche.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
         <form action="{{ route('anagrafiche.index') }}" method="GET" class="d-flex flex-wrap gap-2">
-            <select id="anagrafica_search" name="search" class="form-control" style="min-width:300px">
-                <option value="">Cerca per nome, cognome o denominazione...</option>
-                @php
-                    $search = request('search');
-                @endphp
-
-                @if(is_numeric($search) && $selected = \App\Models\Anagrafica::find($search))
-                    <option value="{{ $selected->id }}" selected>{{ $selected->nome_completo }}</option>
-                @endif
+            <select name="search" id="anagrafica_search" class="form-control" style="min-width:300px" onchange="this.form.submit()">
+                <option value="">Cerca per anagrafica...</option>
+                @foreach($tutteAnagrafiche as $anagrafica)
+                    <option value="{{ $anagrafica->id }}" {{ request('search') == $anagrafica->id ? 'selected' : '' }}>
+                        {{ $anagrafica->nome_completo }}
+                    </option>
+                @endforeach
             </select>
 
             <select name="categoria" class="form-select">
@@ -104,41 +102,5 @@
         {{ $items->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
 </div>
-
-
-<!-- Select2 e jQuery -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-
-<script>
-$(document).ready(function () {
-    $('#anagrafica_search').select2({
-        placeholder: "Cerca per nome, cognome o denominazione...",
-        allowClear: true,
-        ajax: {
-            url: "{{ route('anagrafiche.autocomplete') }}",
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return { term: params.term };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(function (item) {
-                        return { id: item.id, text: item.text };
-                    })
-                };
-            },
-            cache: true
-        }
-    });
-
-    // submit form al cambio selezione
-    $('#anagrafica_search').on('change', function () {
-        $(this).closest('form').submit();
-    });
-});
-</script>
 
 @endsection

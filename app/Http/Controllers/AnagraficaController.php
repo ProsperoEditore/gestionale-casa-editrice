@@ -11,8 +11,7 @@ class AnagraficaController extends Controller
     {
         $query = Anagrafica::query();
 
-        if ($request->filled('search') && is_numeric($request->search)) {
-            // Cerca direttamente per ID (come fa il select2)
+        if ($request->filled('search')) {
             $query->where('id', $request->search);
         }
 
@@ -141,32 +140,5 @@ class AnagraficaController extends Controller
         Anagrafica::findOrFail($id)->delete();
         return redirect()->route('anagrafiche.index')->with('success', 'Anagrafica eliminata con successo.');
     }
-
-public function autocomplete(Request $request)
-{
-    $term = $request->input('term');
-
-    $anagrafiche = Anagrafica::whereRaw("
-        LOWER(CONCAT_WS(' ',
-            COALESCE(denominazione, ''),
-            COALESCE(nome, ''),
-            COALESCE(cognome, '')
-        )) LIKE ?
-    ", ["%" . strtolower($term) . "%"])
-    ->limit(10)
-    ->get(['id', 'denominazione', 'nome', 'cognome']);
-
-    $results = $anagrafiche->map(function ($a) {
-        $nome_completo = $a->denominazione ?: trim(($a->nome ?? '') . ' ' . ($a->cognome ?? ''));
-        return [
-            'id' => $a->id,
-            'text' => $nome_completo,
-        ];
-    });
-
-    return response()->json($results);
-}
-
-
 
 }
