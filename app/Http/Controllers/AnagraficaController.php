@@ -142,8 +142,9 @@ class AnagraficaController extends Controller
         return redirect()->route('anagrafiche.index')->with('success', 'Anagrafica eliminata con successo.');
     }
 
-    public function autocomplete(Request $request)
-    {
+public function autocomplete(Request $request)
+{
+    try {
         $query = $request->input('term');
 
         $anagrafiche = Anagrafica::whereRaw("
@@ -151,7 +152,7 @@ class AnagraficaController extends Controller
             LIKE ?
         ", ["%".strtolower($query)."%"])
         ->limit(10)
-        ->get();
+        ->get(['id', 'denominazione', 'nome', 'cognome']);
 
         $results = $anagrafiche->map(function ($a) {
             return [
@@ -161,7 +162,11 @@ class AnagraficaController extends Controller
         });
 
         return response()->json($results);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
 
 
 
