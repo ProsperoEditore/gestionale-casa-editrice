@@ -10,36 +10,25 @@ class AnagraficaController extends Controller
     public function index(Request $request)
     {
         $query = Anagrafica::query();
-    
-        if ($request->filled('search')) {
-            $search = strtolower(str_replace(' ', '', $request->search));
 
-            $query->where(function($q) use ($search) {
-                $q->whereRaw("LOWER(REPLACE(denominazione, ' ', '')) LIKE ?", ["%{$search}%"])
-                ->orWhereRaw("LOWER(CONCAT(REPLACE(nome, ' ', ''), REPLACE(cognome, ' ', ''))) LIKE ?", ["%{$search}%"])
-                ->orWhereRaw("LOWER(CONCAT(REPLACE(cognome, ' ', ''), REPLACE(nome, ' ', ''))) LIKE ?", ["%{$search}%"]);
-            });
+        if ($request->filled('search') && is_numeric($request->search)) {
+            // Cerca direttamente per ID (come fa il select2)
+            $query->where('id', $request->search);
         }
-    
+
         if ($request->filled('categoria')) {
             $query->where('categoria', $request->categoria);
         }
-    
-        $items = $query
-    ->orderByRaw("
-        COALESCE(NULLIF(denominazione, ''), '')
-    ")
-    ->orderByRaw("
-        CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(cognome, '')) ELSE '' END
-    ")
-    ->orderByRaw("
-        CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(nome, '')) ELSE '' END
-    ")
-    ->paginate(50);
 
-    
+        $items = $query
+            ->orderByRaw("COALESCE(NULLIF(denominazione, ''), '')")
+            ->orderByRaw("CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(cognome, '')) ELSE '' END")
+            ->orderByRaw("CASE WHEN denominazione IS NULL OR denominazione = '' THEN LOWER(COALESCE(nome, '')) ELSE '' END")
+            ->paginate(50);
+
         return view('anagrafiche.index', compact('items'));
     }
+
     
 
     public function create()
