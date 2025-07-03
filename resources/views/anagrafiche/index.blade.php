@@ -8,7 +8,12 @@
         <a href="{{ route('anagrafiche.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
         <form action="{{ route('anagrafiche.index') }}" method="GET" class="d-flex flex-wrap gap-2">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cerca per nome...">
+            <select id="anagrafica_search" name="search" class="form-control" style="min-width:300px">
+                <option value="">Cerca per nome, cognome o denominazione...</option>
+                @if(request('search') && $selected = \App\Models\Anagrafica::find(request('search')))
+                    <option value="{{ $selected->id }}" selected>{{ $selected->nome_completo }}</option>
+                @endif
+            </select>
 
             <select name="categoria" class="form-select">
                 <option value="">Cerca per categoria...</option>
@@ -95,4 +100,41 @@
         {{ $items->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
 </div>
+
+
+<!-- Select2 e jQuery -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#anagrafica_search').select2({
+        placeholder: "Cerca per nome, cognome o denominazione...",
+        allowClear: true,
+        ajax: {
+            url: "{{ route('anagrafiche.autocomplete') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { term: params.term };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return { id: item.id, text: item.nome };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
+    // submit form al cambio selezione
+    $('#anagrafica_search').on('change', function () {
+        $(this).closest('form').submit();
+    });
+});
+</script>
+
 @endsection

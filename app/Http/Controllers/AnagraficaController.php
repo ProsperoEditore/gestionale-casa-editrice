@@ -13,7 +13,12 @@ class AnagraficaController extends Controller
     
         if ($request->filled('search')) {
             $search = strtolower(str_replace(' ', '', $request->search));
-            $query->whereRaw("LOWER(REPLACE(nome, ' ', '')) LIKE ?", ["%{$search}%"]);
+
+            $query->where(function($q) use ($search) {
+                $q->whereRaw("LOWER(REPLACE(denominazione, ' ', '')) LIKE ?", ["%{$search}%"])
+                ->orWhereRaw("LOWER(CONCAT(REPLACE(nome, ' ', ''), REPLACE(cognome, ' ', ''))) LIKE ?", ["%{$search}%"])
+                ->orWhereRaw("LOWER(CONCAT(REPLACE(cognome, ' ', ''), REPLACE(nome, ' ', ''))) LIKE ?", ["%{$search}%"]);
+            });
         }
     
         if ($request->filled('categoria')) {
