@@ -151,7 +151,7 @@ class AnagraficaController extends Controller
             LIKE ?
         ", ["%".strtolower($query)."%"])
         ->limit(10)
-        ->get(['id', 'denominazione', 'nome', 'cognome']);
+        ->get();
 
         $results = $anagrafiche->map(function ($a) {
             return [
