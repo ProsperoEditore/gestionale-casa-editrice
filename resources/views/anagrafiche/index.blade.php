@@ -75,7 +75,7 @@
         @foreach($items as $item)
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ $item->nome }}</h5>
+                    <h5 class="card-title">{{ $item->nome_completo }}</h5>
                     <p class="mb-1"><strong>Categoria:</strong> {{ $item->categoria }}</p>
                     <p class="mb-1"><strong>Indirizzo:</strong> {{ $item->indirizzo_spedizione }}</p>
                     <p class="mb-1"><strong>Email:</strong> {{ $item->email }}</p>

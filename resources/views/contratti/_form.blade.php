@@ -1,7 +1,8 @@
 <form 
-    action="{{ isset($contratto) ? route('contratti.update', $contratto->id) : route('contratti.store') }}" 
+    action="{{ $contratto->exists ? route('contratti.update', $contratto->id) : route('contratti.store') }}" 
     method="POST"
 >
+
     @csrf
     @if(isset($contratto))
         @method('PUT')
