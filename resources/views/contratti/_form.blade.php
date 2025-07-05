@@ -3,8 +3,7 @@
     method="POST"
 >
 
-    @csrf
-    @if(isset($contratto))
+    @if($contratto->exists)
         @method('PUT')
     @endif
 
