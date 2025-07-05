@@ -2,7 +2,7 @@
     action="{{ $contratto->exists ? route('contratti.update', $contratto->id) : route('contratti.store') }}" 
     method="POST"
 >
-
+    @csrf
     @if($contratto->exists)
         @method('PUT')
     @endif
