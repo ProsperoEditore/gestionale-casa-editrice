@@ -55,7 +55,7 @@ class RegistroVenditeController extends Controller
         // 1. Crea il registro
         $registroVendita = new RegistroVendite();
         $registroVendita->anagrafica_id = $request->input('anagrafica_id');
-        $registroVendita->canale_vendita = $request->input('canale_vendita');
+        $registroVendita->canale_vendita = strtolower($request->input('canale_vendita'));
         $registroVendita->save();
     
         // 2. Crea i dettagli
