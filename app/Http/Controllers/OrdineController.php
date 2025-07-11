@@ -568,7 +568,7 @@ public function importLibri(Request $request, $id)
                     $registro->canale_vendita = 'Vendite dirette';
                     break;
                 case 'evento':
-                    $registro->canale_vendita = 'Evento';
+                    $registro->canale_vendita = 'Eventi';
                     break;
                 default:
                     $registro->canale_vendita = 'Altro';
