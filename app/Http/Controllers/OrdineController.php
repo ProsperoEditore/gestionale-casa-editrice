@@ -504,7 +504,6 @@ public function importLibri(Request $request, $id)
                         ->whereNotNull('anagrafica_id')
                         ->first();
 
-
                         if ($magazzinoEditore) {
                             \App\Models\ScaricoRichiesto::create([
                                 'ordine_id' => $ordine->id,
