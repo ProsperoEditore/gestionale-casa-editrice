@@ -494,15 +494,12 @@ public function importLibri(Request $request, $id)
                         }
                     }*/
                     
-                    if (
-                        $ordine->tipo_ordine === 'conto deposito' &&
-                        in_array($info_normalized, ['spedito da magazzino editore', 'consegna a mano'])
-                    ) {
-                        $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
-                            $query->where('categoria', 'magazzino editore');
-                        })
-                        ->whereNotNull('anagrafica_id')
-                        ->first();
+                if (in_array($info_normalized, ['spedito da magazzino editore', 'consegna a mano'])) {
+                    $magazzinoEditore = \App\Models\Magazzino::whereHas('anagrafica', function ($query) {
+                        $query->where('categoria', 'magazzino editore');
+                    })
+                    ->whereNotNull('anagrafica_id')
+                    ->first();
 
                         if ($magazzinoEditore) {
                             \App\Models\ScaricoRichiesto::create([
