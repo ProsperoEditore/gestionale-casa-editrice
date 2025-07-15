@@ -36,21 +36,18 @@ class OrdineController extends Controller
 
     // Ordinamento personalizzato
     $ordiniOrdinati = $ordini->sort(function ($a, $b) {
-        $aDate = $a->data ? \Carbon\Carbon::parse($a->data) : null;
-        $bDate = $b->data ? \Carbon\Carbon::parse($b->data) : null;
+    $aDate = $a->data ? \Carbon\Carbon::parse($a->data) : null;
+    $bDate = $b->data ? \Carbon\Carbon::parse($b->data) : null;
 
-        // Ordina per data decrescente (più recente prima)
-        if ($aDate && $bDate && $aDate->ne($bDate)) {
-            return $aDate->lt($bDate) ? 1 : -1;
-        }
+    // Ordina per data decrescente (più recente prima)
+    if ($aDate && $bDate && $aDate->ne($bDate)) {
+        return $aDate->lt($bDate) ? 1 : -1;
+    }
 
-        // Se stessa data, ordina per tipo ordine
-        $tipoCmp = strcmp($a->tipo_ordine ?? '', $b->tipo_ordine ?? '');
-        if ($tipoCmp !== 0) return $tipoCmp;
+    // Se la data è uguale, ordina per codice ordine decrescente (es. B080 sopra B078)
+    return strcmp($b->codice, $a->codice);
+});
 
-        // Se stesso tipo ordine, ordina per nome anagrafica
-        return strcmp($a->anagrafica->nome_completo ?? '', $b->anagrafica->nome_completo ?? '');
-    });
 
     // Paginazione manuale
     $perPage = 30;
