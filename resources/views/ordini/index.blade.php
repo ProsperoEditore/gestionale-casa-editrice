@@ -215,7 +215,7 @@ $(document).ready(function () {
 
     $('.salva-pagato').on('click', function () {
         const id = $(this).data('id');
-        const input = $('input.pagato-input[data-id="' + id + '"]');
+        const input = $(this).closest('.card-body, tr').find('input.pagato-input[data-id="' + id + '"]');
         const data = input.val();
 
         $.ajax({
