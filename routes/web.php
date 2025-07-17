@@ -185,6 +185,9 @@ Route::get('/report/{reportId}/dettagli', [ReportDettaglioController::class, 'in
 Route::get('/report/{reportId}/dettagli/pdf', [ReportDettaglioController::class, 'exportPdf'])->name('report.dettagli.pdf');
 Route::get('/report/autocomplete-libro', [App\Http\Controllers\ReportController::class, 'autocompleteLibro'])->name('report.autocomplete-libro');
 Route::post('report/{reportId}/dettagli/pdf', [ReportDettaglioController::class, 'exportPdf'])->name('report.dettagli.exportPdf');
+Route::patch('/report/{id}/nota', [ReportController::class, 'aggiornaNota'])->name('report.aggiornaNota');
+
+
 
 // Scarichi (spedizioni)
 Route::resource('scarichi', ScaricoController::class)->except(['show']);

@@ -97,6 +97,20 @@ class ReportController extends Controller
             ];
         }));
     }
+
+    public function aggiornaNota(Request $request, $id)
+{
+    $request->validate([
+        'note' => 'nullable|string|max:200',
+    ]);
+
+    $report = Report::findOrFail($id);
+    $report->note = $request->note;
+    $report->save();
+
+    return redirect()->back()->with('success', 'Nota salvata');
+}
+
     
     
         

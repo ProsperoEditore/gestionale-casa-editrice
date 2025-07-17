@@ -21,6 +21,7 @@
                     <th>Data Creazione</th>
                     <th>Titolo</th>
                     <th>Contratto</th>
+                    <th>Note</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
@@ -30,6 +31,16 @@
                         <td>{{ $item->data_creazione }}</td>
                         <td>{{ $item->libro->titolo }}</td>
                         <td>{{ $item->contratto->nome_contratto ?? '-' }}</td>
+                        <td>
+                            <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="d-flex align-items-center">
+                                @csrf
+                                @method('PATCH')
+                                <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm me-2" style="max-width: 250px;">
+                                <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                        </td>
                         <td>
                             <div class="d-flex justify-content-center gap-3">
                                 <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
@@ -58,7 +69,19 @@
                     <h5 class="card-title">{{ $item->libro->titolo }}</h5>
                     <p class="mb-1"><strong>Data:</strong> {{ $item->data_creazione }}</p>
                     <p class="mb-1"><strong>Contratto:</strong> {{ $item->contratto->nome_contratto ?? '-' }}</p>
-                    <div class="d-flex flex-wrap gap-3 mt-2">
+
+                    <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="mt-2">
+                        @csrf
+                        @method('PATCH')
+                        <div class="d-flex gap-2">
+                            <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm" placeholder="Aggiungi nota...">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="d-flex flex-wrap gap-3 mt-3">
                         <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
