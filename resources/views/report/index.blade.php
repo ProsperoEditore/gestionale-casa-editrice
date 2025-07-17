@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mt-5">
     <h3 class="text-center mb-4">Report</h3>
-    
+
     <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-2">
         <a href="{{ route('report.create') }}" class="btn btn-success">Aggiungi Nuovo</a>
 
@@ -29,20 +29,27 @@
                 @foreach($items as $item)
                     <tr>
                         <td>{{ $item->data_creazione }}</td>
-                        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $item->libro->titolo }}">
+
+                        <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $item->libro->titolo }}">
                             {{ $item->libro->titolo }}
                         </td>
-                        <td>{{ $item->contratto->nome_contratto ?? '-' }}</td>
-                        <td>
+
+                        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $item->contratto->nome_contratto ?? '-' }}">
+                            {{ $item->contratto->nome_contratto ?? '-' }}
+                        </td>
+
+                        <td style="width: 100%;">
                             <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="d-flex align-items-center">
                                 @csrf
                                 @method('PATCH')
-                                <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm me-2" style="min-width: 400px;">
+                                <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
+                                       class="form-control form-control-sm me-2" style="width: 100%;">
                                 <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
                                     <i class="bi bi-check-lg"></i>
                                 </button>
                             </form>
                         </td>
+
                         <td>
                             <div class="d-flex justify-content-center gap-3">
                                 <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
@@ -72,13 +79,16 @@
                         {{ $item->libro->titolo }}
                     </h5>
                     <p class="mb-1"><strong>Data:</strong> {{ $item->data_creazione }}</p>
-                    <p class="mb-1"><strong>Contratto:</strong> {{ $item->contratto->nome_contratto ?? '-' }}</p>
+                    <p class="mb-1" title="{{ $item->contratto->nome_contratto ?? '-' }}">
+                        <strong>Contratto:</strong> {{ $item->contratto->nome_contratto ?? '-' }}
+                    </p>
 
                     <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="mt-2">
                         @csrf
                         @method('PATCH')
                         <div class="d-flex gap-2">
-                            <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control" style="min-width: 100%;" placeholder="Aggiungi nota...">
+                            <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
+                                   class="form-control" style="min-width: 100%;" placeholder="Aggiungi nota...">
                             <button type="submit" class="btn btn-sm btn-primary">
                                 <i class="bi bi-check-lg"></i>
                             </button>
