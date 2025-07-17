@@ -87,11 +87,9 @@
                         @csrf
                         @method('PATCH')
 
-                        {{-- Campo note: campo singolo, senza bottone accanto --}}
                         <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
                             class="form-control mb-2" placeholder="Aggiungi nota...">
 
-                        {{-- Azioni: salva, elimina, visualizza --}}
                         <div class="d-flex flex-wrap gap-2">
                             <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
                                 <i class="bi bi-check-lg"></i>
@@ -110,19 +108,6 @@
                             </a>
                         </div>
                     </form>
-
-                    <div class="d-flex flex-wrap gap-3 mt-3">
-                        <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" title="Elimina">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                        <a href="{{ route('report.dettagli.index', $item->id) }}" class="btn btn-sm btn-info" title="Visualizza Report">
-                            <i class="bi bi-journal-text"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
         @endforeach
