@@ -29,13 +29,15 @@
                 @foreach($items as $item)
                     <tr>
                         <td>{{ $item->data_creazione }}</td>
-                        <td>{{ $item->libro->titolo }}</td>
+                        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $item->libro->titolo }}">
+                            {{ $item->libro->titolo }}
+                        </td>
                         <td>{{ $item->contratto->nome_contratto ?? '-' }}</td>
                         <td>
                             <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="d-flex align-items-center">
                                 @csrf
                                 @method('PATCH')
-                                <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm me-2" style="max-width: 250px;">
+                                <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm me-2" style="min-width: 400px;">
                                 <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
                                     <i class="bi bi-check-lg"></i>
                                 </button>
@@ -66,7 +68,9 @@
         @foreach($items as $item)
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ $item->libro->titolo }}</h5>
+                    <h5 class="card-title text-truncate" style="max-width: 90%;" title="{{ $item->libro->titolo }}">
+                        {{ $item->libro->titolo }}
+                    </h5>
                     <p class="mb-1"><strong>Data:</strong> {{ $item->data_creazione }}</p>
                     <p class="mb-1"><strong>Contratto:</strong> {{ $item->contratto->nome_contratto ?? '-' }}</p>
 
@@ -74,7 +78,7 @@
                         @csrf
                         @method('PATCH')
                         <div class="d-flex gap-2">
-                            <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm" placeholder="Aggiungi nota...">
+                            <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control" style="min-width: 100%;" placeholder="Aggiungi nota...">
                             <button type="submit" class="btn btn-sm btn-primary">
                                 <i class="bi bi-check-lg"></i>
                             </button>
