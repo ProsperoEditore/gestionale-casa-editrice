@@ -39,7 +39,7 @@
             <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td>{{ $item->data_creazione }}</td>
+                        <td>{{ \Carbon\Carbon::parse($item->data_creazione)->format('d-m-Y') }}</td>
                         <td class="titolo-col" title="{{ $item->libro->titolo }}">{{ $item->libro->titolo }}</td>
                         <td class="contratto-col" title="{{ $item->contratto->nome_contratto ?? '-' }}">{{ $item->contratto->nome_contratto ?? '-' }}</td>
 
