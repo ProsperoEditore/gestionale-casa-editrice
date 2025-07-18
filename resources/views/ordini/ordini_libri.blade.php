@@ -99,7 +99,8 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
     </div>
     <div class="mb-3">
         <label for="altre_specifiche_iva" class="form-label"><strong>Altre specifiche</strong></label>
-        <input type="text" name="altre_specifiche_iva" maxlength="500" class="form-control" value="{{ old('altre_specifiche_iva', $ordine->altre_specifiche_iva) }}">
+        <input type="text" name="altre_specifiche_iva" maxlength="500" class="form-control"
+            value="{{ old('altre_specifiche_iva', $ordine->altre_specifiche_iva ?? ($ordine->tipo_ordine === 'acquisto' ? 'Copia di cortesia. Documento non valido ai fini fiscali. Seguirà fattura elettronica.' : '')) }}">
     </div>
     <div class="mb-3">
         <label for="totale_netto_compilato" class="form-label"><strong>Totale netto da pagare (modificabile)</strong></label>
