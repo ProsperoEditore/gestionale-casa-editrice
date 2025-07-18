@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+@php use Illuminate\Support\Str; @endphp
+
 <div class="container mt-5">
     <h3 class="text-center mb-4">Report</h3>
 
@@ -13,7 +15,7 @@
         </form>
     </div>
 
-    <!-- DESKTOP -->
+    {{-- DESKTOP --}}
     <div class="d-none d-md-block table-responsive">
         <table class="table table-bordered text-center align-middle text-nowrap">
             <thead class="table-dark">
@@ -39,15 +41,37 @@
                         </td>
 
                         <td style="width: 100%;">
-                            <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="d-flex align-items-center">
-                                @csrf
-                                @method('PATCH')
-                                <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
-                                       class="form-control form-control-sm me-2" style="width: 100%;">
-                                <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
-                                    <i class="bi bi-check-lg"></i>
+                            <div class="d-flex align-items-center justify-content-between gap-2">
+                                <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="flex-grow-1 d-flex align-items-center">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="text" name="note" value="{{ $item->note }}" maxlength="200" class="form-control form-control-sm me-2">
+                                    <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#notaModal-{{ $item->id }}" title="Visualizza Nota">
+                                    <i class="bi bi-eye"></i>
                                 </button>
-                            </form>
+                            </div>
+
+                            <!-- MODALE -->
+                            <div class="modal fade" id="notaModal-{{ $item->id }}" tabindex="-1" aria-labelledby="notaModalLabel-{{ $item->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="notaModalLabel-{{ $item->id }}">Nota completa</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {{ $item->note ?: 'Nessuna nota.' }}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
 
                         <td>
@@ -70,7 +94,7 @@
         </table>
     </div>
 
-    <!-- MOBILE -->
+    {{-- MOBILE --}}
     <div class="d-md-none">
         @foreach($items as $item)
             <div class="card mb-3">
@@ -86,13 +110,16 @@
                     <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="mt-2">
                         @csrf
                         @method('PATCH')
-
                         <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
                             class="form-control mb-2" placeholder="Aggiungi nota...">
 
                         <div class="d-flex flex-wrap gap-2">
                             <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
                                 <i class="bi bi-check-lg"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#notaModalMobile-{{ $item->id }}" title="Visualizza Nota">
+                                <i class="bi bi-eye"></i>
                             </button>
 
                             <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
@@ -108,6 +135,25 @@
                             </a>
                         </div>
                     </form>
+
+                    <!-- MODALE MOBILE -->
+                    <div class="modal fade" id="notaModalMobile-{{ $item->id }}" tabindex="-1" aria-labelledby="notaModalMobileLabel-{{ $item->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="notaModalMobileLabel-{{ $item->id }}">Nota completa</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {{ $item->note ?: 'Nessuna nota.' }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         @endforeach
