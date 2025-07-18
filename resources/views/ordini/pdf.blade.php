@@ -192,7 +192,7 @@
 
     <h2 style="margin-top: 40px;">Dettagli Ordine #{{ $ordine->codice }}</h2>
     <p><strong>Tipo ordine:</strong> {{ ucfirst($ordine->tipo_ordine) }}</p>
-    <p><strong>Data:</strong> {{ $ordine->data }}</p>
+    <p><strong>Data:</strong> {{ \Carbon\Carbon::parse($ordine->data)->format('d-m-Y') }}</p>
         @if($ordine->tipo_ordine === 'acquisto')
         <p><em style="color: #444;">
             Copia di cortesia. Documento non valido ai fini fiscali. Seguirà fattura elettronica.
