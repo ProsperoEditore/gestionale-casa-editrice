@@ -97,12 +97,6 @@
         </table>
     </div>
 
-    {{-- PAGINAZIONE --}}
-    <div class="d-flex justify-content-center mt-4">
-        {{ $items->onEachSide(1)->appends(request()->query())->links('pagination::bootstrap-5') }}
-    </div>
-</div>
-
 
 {{-- MOBILE --}}
 <div class="d-md-none">
