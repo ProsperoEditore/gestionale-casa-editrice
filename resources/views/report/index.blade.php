@@ -21,9 +21,9 @@
             <thead class="table-dark">
                 <tr>
                     <th style="width: 15%;">Data Creazione</th>
-                    <th style="width: 35%;">Titolo</th>
-                    <th style="width: 25%;">Contratto</th>
-                    <th style="width: 15%;">Note</th>
+                    <th style="width: 25%;">Titolo</th>
+                    <th style="width: 20%;">Contratto</th>
+                    <th style="width: 30%;">Note</th>
                     <th style="width: 10%;">Azioni</th>
                 </tr>
             </thead>
