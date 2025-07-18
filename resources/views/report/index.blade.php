@@ -63,7 +63,7 @@
                                             <h5 class="modal-title" id="notaModalLabel-{{ $item->id }}">Nota completa</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body" style="white-space: pre-wrap; word-break: break-word;">
                                             {{ $item->note ?: 'Nessuna nota.' }}
                                         </div>
                                         <div class="modal-footer">
@@ -144,7 +144,7 @@
                                     <h5 class="modal-title" id="notaModalMobileLabel-{{ $item->id }}">Nota completa</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
                                 </div>
-                                <div class="modal-body">
+                                <div class="modal-body" style="white-space: pre-wrap; word-break: break-word;">
                                     {{ $item->note ?: 'Nessuna nota.' }}
                                 </div>
                                 <div class="modal-footer">
