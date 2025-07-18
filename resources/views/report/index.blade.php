@@ -94,73 +94,77 @@
         </table>
     </div>
 
-    {{-- MOBILE --}}
-    <div class="d-md-none">
-        @foreach($items as $item)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title text-truncate" style="max-width: 90%;" title="{{ $item->libro->titolo }}">
-                        {{ $item->libro->titolo }}
-                    </h5>
-                    <p class="mb-1"><strong>Data:</strong> {{ $item->data_creazione }}</p>
-                    <p class="mb-1" title="{{ $item->contratto->nome_contratto ?? '-' }}">
-                        <strong>Contratto:</strong> {{ $item->contratto->nome_contratto ?? '-' }}
-                    </p>
+{{-- MOBILE --}}
+<div class="d-md-none">
+    @foreach($items as $item)
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-truncate" style="max-width: 90%;" title="{{ $item->libro->titolo }}">
+                    {{ $item->libro->titolo }}
+                </h5>
+                <p class="mb-1"><strong>Data:</strong> {{ $item->data_creazione }}</p>
+                <p class="mb-1" title="{{ $item->contratto->nome_contratto ?? '-' }}">
+                    <strong>Contratto:</strong> {{ $item->contratto->nome_contratto ?? '-' }}
+                </p>
 
-                    <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="mt-2">
+                {{-- FORM aggiornamento nota --}}
+                <form action="{{ route('report.aggiornaNota', $item->id) }}" method="POST" class="mt-2">
+                    @csrf
+                    @method('PATCH')
+                    <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
+                        class="form-control mb-2" placeholder="Aggiungi nota...">
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#notaModalMobile-{{ $item->id }}" title="Visualizza Nota">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </form>
+
+                {{-- Altri pulsanti (fuori dal form precedente) --}}
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
                         @csrf
-                        @method('PATCH')
-                        <input type="text" name="note" value="{{ $item->note }}" maxlength="200"
-                            class="form-control mb-2" placeholder="Aggiungi nota...">
-
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="submit" class="btn btn-sm btn-primary" title="Salva Nota">
-                                <i class="bi bi-check-lg"></i>
-                            </button>
-
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#notaModalMobile-{{ $item->id }}" title="Visualizza Nota">
-                                <i class="bi bi-eye"></i>
-                            </button>
-
-                            <form action="{{ route('report.destroy', $item->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" title="Elimina">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-
-                            <a href="{{ route('report.dettagli.index', $item->id) }}" class="btn btn-sm btn-info" title="Visualizza Report">
-                                <i class="bi bi-journal-text"></i>
-                            </a>
-                        </div>
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger" title="Elimina">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </form>
 
-                    <!-- MODALE MOBILE -->
-                    <div class="modal fade" id="notaModalMobile-{{ $item->id }}" tabindex="-1" aria-labelledby="notaModalMobileLabel-{{ $item->id }}" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="notaModalMobileLabel-{{ $item->id }}">Nota completa</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
-                                </div>
-                                <div class="modal-body" style="white-space: pre-wrap; word-break: break-word;">
-                                    {{ $item->note ?: 'Nessuna nota.' }}
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                                </div>
+                    <a href="{{ route('report.dettagli.index', $item->id) }}" class="btn btn-sm btn-info" title="Visualizza Report">
+                        <i class="bi bi-journal-text"></i>
+                    </a>
+                </div>
+
+                {{-- MODALE MOBILE --}}
+                <div class="modal fade" id="notaModalMobile-{{ $item->id }}" tabindex="-1" aria-labelledby="notaModalMobileLabel-{{ $item->id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="notaModalMobileLabel-{{ $item->id }}">Nota completa</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                            </div>
+                            <div class="modal-body" style="white-space: pre-wrap; word-break: break-word;">
+                                {{ $item->note ?: 'Nessuna nota.' }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </div>
-        @endforeach
-    </div>
 
-    <div class="d-flex justify-content-center mt-4">
-        {{ $items->onEachSide(1)->appends(request()->query())->links('pagination::bootstrap-5') }}
-    </div>
+            </div>
+        </div>
+    @endforeach
 </div>
+
+<div class="d-flex justify-content-center mt-4">
+    {{ $items->onEachSide(1)->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
+
 @endsection
