@@ -49,7 +49,7 @@
                     <tr>
                         <td>{{ $item->categoria }}</td>
                         <td>{{ $item->nome_completo }}</td>
-                        <td>{{ $item->indirizzo_spedizione }}</td>
+                        <td>{{ $item->indirizzo_spedizione ?: $item->indirizzo_fatturazione }}</td>
                         <td>{{ $item->email }}</td>
                         <td>{{ $item->telefono }}</td>
                         <td>
