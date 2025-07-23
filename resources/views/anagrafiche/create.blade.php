@@ -94,7 +94,7 @@
                         </div>
 
                         <div class="form-check mb-4">
-                            <input type="checkbox" class="form-check-input" id="copiaIndirizzo" checked>
+                            <input type="checkbox" class="form-check-input" id="copiaIndirizzo" name="usa_fatturazione" value="1" checked>
                             <label class="form-check-label" for="copiaIndirizzo">
                                 L'indirizzo di spedizione è uguale a quello di fatturazione
                             </label>

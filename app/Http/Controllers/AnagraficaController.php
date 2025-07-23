@@ -66,6 +66,16 @@ class AnagraficaController extends Controller
 
         $data = $request->all();
 
+        if ($request->has('usa_fatturazione')) {
+            $data['via_spedizione'] = $data['via_fatturazione'] ?? '';
+            $data['civico_spedizione'] = $data['civico_fatturazione'] ?? '';
+            $data['cap_spedizione'] = $data['cap_fatturazione'] ?? '';
+            $data['comune_spedizione'] = $data['comune_fatturazione'] ?? '';
+            $data['provincia_spedizione'] = $data['provincia_fatturazione'] ?? '';
+            $data['nazione_spedizione'] = $data['nazione_fatturazione'] ?? '';
+        }
+
+
         // Compone indirizzo fatturazione
         $data['indirizzo_fatturazione'] = implode(', ', array_filter([
             $data['via_fatturazione'] ?? '',
@@ -118,6 +128,16 @@ class AnagraficaController extends Controller
         }
 
         $data = $request->all();
+
+        if ($request->has('usa_fatturazione')) {
+            $data['via_spedizione'] = $data['via_fatturazione'] ?? '';
+            $data['civico_spedizione'] = $data['civico_fatturazione'] ?? '';
+            $data['cap_spedizione'] = $data['cap_fatturazione'] ?? '';
+            $data['comune_spedizione'] = $data['comune_fatturazione'] ?? '';
+            $data['provincia_spedizione'] = $data['provincia_fatturazione'] ?? '';
+            $data['nazione_spedizione'] = $data['nazione_fatturazione'] ?? '';
+        }
+
 
         $data['indirizzo_fatturazione'] = implode(', ', array_filter([
             $data['via_fatturazione'] ?? '',
