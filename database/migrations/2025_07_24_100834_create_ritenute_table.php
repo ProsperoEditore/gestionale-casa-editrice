@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->text('indirizzo')->nullable();
 
             // Marchio (per logo)
-            $table->foreignId('marchio_id')->nullable()->constrained('marchio_editoriale');
+            $table->foreignId('marchio_id')->nullable()->constrained('marchio_editoriales');
 
             // Prestazioni e calcoli
             $table->json('prestazioni')->nullable(); // Descrizione + importo
