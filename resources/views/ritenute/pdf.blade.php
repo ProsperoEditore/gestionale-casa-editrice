@@ -56,17 +56,6 @@
     </style>
 </head>
 <body>
-    @php
-        $logo = 'logo-prospero.png'; // default
-    @endphp
-
-    <div class="header">
-        <div class="logo-container" style="position: absolute; top: 0; right: 0;">
-            <img src="{{ public_path('images/' . $logo) }}" class="logo" style="height: 60px;">
-        </div>
-    </div>
-
-
     <h3 style="text-align:center; margin-bottom:5px;">NOTA PER LA CESSIONE DI DIRITTI D’AUTORE</h3>
     <p style="text-align:center; font-style:italic;">La presente Cessione Diritti d’Autore è regolata dalle normative di leggi vigenti sul Diritto d’Autore</p>
 
@@ -81,7 +70,7 @@
 
     <div class="sezione" style="text-align:right">
         <strong>SOGGETTO EROGANTE</strong><br>
-        PROSPERO EDITORE di R. Burgazzi<br>
+        PROSPERO EDITORE di Burgazzi Riccardo<br>
         Via della Stampa 25 – 20026, Novate Milanese (MI)<br>
         C.F.: BRGRCR88B13F205Z / P. IVA: 08148530960
     </div>
