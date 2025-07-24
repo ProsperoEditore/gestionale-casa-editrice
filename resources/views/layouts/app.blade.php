@@ -181,6 +181,11 @@
                     <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Report</a>
                 </li>
             @endif
+            @if (auth()->user()->access_ritenute)
+                <li class="mb-2">
+                    <a href="{{ route('ritenute.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Ritenute DA</a>
+                </li>
+            @endif
             @if (auth()->user()->access_registro_tirature)
                 <li class="mb-2">
                     <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Registro tirature</a>
@@ -246,6 +251,9 @@
                 @endif
                 @if (auth()->user()->access_report)
                     <a href="{{ route('report.index') }}" class="btn btn-prospero-secondary">Report</a>
+                @endif
+                @if (auth()->user()->access_ritenute)
+                    <a href="{{ route('ritenute.index') }}" class="btn btn-prospero-secondary">Ritenute DA</a>
                 @endif
                 @if (auth()->user()->access_registro_tirature)
                     <a href="{{ route('registro-tirature.index') }}" class="btn btn-prospero-secondary">Registro tirature</a>

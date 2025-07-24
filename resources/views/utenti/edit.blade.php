@@ -45,6 +45,7 @@
         'access_registro_vendite' => 'Registro vendite',
         'access_registro_tirature' => 'Registro tirature',
         'access_report' => 'Report',
+        'access_ritenute' => 'Ritenute',
         'access_backup' => 'Backup',
     ];
 @endphp

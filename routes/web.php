@@ -17,6 +17,7 @@ use App\Http\Controllers\RegistroTiraturaDettaglioController;
 use App\Http\Controllers\RegistroVenditeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportDettaglioController;
+use App\Http\Controllers\RitenutaController;
 use App\Http\Controllers\ProfiloController;
 use App\Http\Controllers\ScaricoController;
 use App\Http\Controllers\ScaricoRichiestoController;
@@ -187,6 +188,25 @@ Route::get('/report/autocomplete-libro', [App\Http\Controllers\ReportController:
 Route::post('report/{reportId}/dettagli/pdf', [ReportDettaglioController::class, 'exportPdf'])->name('report.dettagli.exportPdf');
 Route::patch('/report/{id}/nota', [ReportController::class, 'aggiornaNota'])->name('report.aggiornaNota');
 
+// Ritenute
+Route::prefix('ritenute')->name('ritenute.')->group(function () {
+    Route::get('/', [RitenutaController::class, 'index'])->name('index');               // Elenco
+    Route::get('/create', [RitenutaController::class, 'create'])->name('create');       // Form creazione
+    Route::post('/', [RitenutaController::class, 'store'])->name('store');              // Salvataggio
+
+    Route::delete('/{ritenuta}', [RitenutaController::class, 'destroy'])->name('destroy'); // Elimina
+
+    Route::get('/{ritenuta}/pdf', [RitenutaController::class, 'pdf'])->name('pdf');     // Genera PDF
+
+    Route::put('/{id}/update-pagamento', [RitenutaController::class, 'updatePagamento'])->name('updatePagamento'); // Aggiorna date pagamento
+
+    Route::post('/importi-report', [RitenutaController::class, 'getImportiDaReport'])->name('importiReport'); // Carica importi da report
+
+    Route::get('/{ritenuta}/edit', [RitenutaController::class, 'edit'])->name('edit');
+    Route::put('/{ritenuta}', [RitenutaController::class, 'update'])->name('update');
+    Route::get('/ritenute/autocomplete-autori', [RitenutaController::class, 'autocompleteAutori'])->name('ritenute.autocomplete');
+
+});
 
 
 // Scarichi (spedizioni)
