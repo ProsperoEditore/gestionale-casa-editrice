@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ritenuta;
 use App\Models\MarchioEditoriale;
 use App\Models\Libro;
+use App\Models\Report;
 use App\Models\ReportDettaglio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -14,13 +15,16 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class RitenutaController extends Controller
 {
 
+
+
     public function create()
     {
-        $marchi = \App\Models\MarchioEditoriale::orderBy('nome')->get();
-        $reportDisponibili = \App\Models\Report::latest()->get(); // o aggiungi filtri se necessario
+        $marchi = MarchioEditoriale::all();
+        $reportDisponibili = Report::with('libro')->latest()->get();
 
         return view('ritenute.create', compact('marchi', 'reportDisponibili'));
     }
+
 
 
     public function store(Request $request)

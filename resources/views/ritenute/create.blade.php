@@ -65,21 +65,21 @@
         <div class="row mb-3 g-3">
             <div class="col-md-6 col-12">
                 <label>Seleziona titoli</label>
-                <select id="titoli" class="form-select" name="titoli[]" multiple>
-                    @foreach(\App\Models\Libro::orderBy('titolo')->get() as $libro)
-                        <option value="{{ $libro->id }}">{{ $libro->titolo }}</option>
-                    @endforeach
-                </select>
+                    <input type="text" id="autocomplete-titoli" class="form-control" placeholder="Cerca per titolo o ISBN">
+                    <ul id="lista-titoli" class="list-group mt-2"></ul>
+                    <input type="hidden" name="titoli[]" id="titoli-selezionati">
             </div>
 
             <div class="col-md-6 col-12">
                 <label>Oppure seleziona da report esistenti</label>
-                <select id="report_id" class="form-select">
-                    <option value="">-- Nessuno --</option>
-                    @foreach($reportDisponibili as $report)
-                        <option value="{{ $report->id }}">Report #{{ $report->id }} del {{ $report->created_at->format('d/m/Y') }}</option>
-                    @endforeach
-                </select>
+                    <div id="lista-report-selezionati"></div>
+
+                    <input type="text" id="autocomplete-report" class="form-control" placeholder="Cerca per titolo o ISBN">
+                    <ul id="suggerimenti-report" class="list-group mt-1"></ul>
+
+                    <!-- Campo nascosto -->
+                    <input type="hidden" name="report_ids[]" id="report_ids">
+
                 <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="caricaDaReport()">Carica da report</button>
                 <button type="button" class="btn btn-sm btn-outline-success mb-2" onclick="aggiungiPrestazione()">+ Aggiungi prestazione</button>
             </div>
@@ -197,6 +197,115 @@ function calcolaRitenuta() {
     document.getElementById('netto').value = netto.toFixed(2);
 }
 
-
 </script>
+
+<script>
+let titoli = @json(\App\Models\Libro::select('id', 'titolo', 'isbn')->get());
+
+const input = document.getElementById('autocomplete-titoli');
+const lista = document.getElementById('lista-titoli');
+const hidden = document.getElementById('titoli-selezionati');
+let selezionati = [];
+
+input.addEventListener('input', function () {
+    const valore = this.value.toLowerCase();
+    lista.innerHTML = '';
+
+    titoli.filter(libro =>
+        libro.titolo.toLowerCase().includes(valore) ||
+        (libro.isbn && libro.isbn.includes(valore))
+    ).forEach(libro => {
+        const voce = document.createElement('li');
+        voce.classList.add('list-group-item', 'list-group-item-action');
+        voce.textContent = `${libro.titolo} (${libro.isbn})`;
+
+        voce.onclick = () => {
+            if (!selezionati.includes(libro.id)) {
+                selezionati.push(libro.id);
+                aggiornaTitoliSelezionati();
+            }
+        };
+
+        lista.appendChild(voce);
+    });
+});
+
+function aggiornaTitoliSelezionati() {
+    const html = selezionati.map(id => {
+        const libro = titoli.find(l => l.id === id);
+        return `<li class="list-group-item d-flex justify-content-between align-items-center">
+            ${libro.titolo} (${libro.isbn})
+            <button type="button" class="btn-close" onclick="rimuoviTitolo(${id})"></button>
+        </li>`;
+    }).join('');
+    lista.innerHTML = html;
+    hidden.value = JSON.stringify(selezionati);
+}
+
+function rimuoviTitolo(id) {
+    selezionati = selezionati.filter(i => i !== id);
+    aggiornaTitoliSelezionati();
+}
+</script>
+
+
+<script>
+let reports = @json($reportDisponibili); // deve includere id, titolo, isbn, created_at
+let reportSelezionati = [];
+
+document.getElementById('autocomplete-report').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    const lista = document.getElementById('suggerimenti-report');
+    lista.innerHTML = '';
+
+    reports.filter(r =>
+        r.titolo.toLowerCase().includes(query) || (r.isbn && r.isbn.includes(query))
+    ).forEach(r => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item', 'list-group-item-action');
+        li.innerHTML = `<strong>${r.titolo}</strong> (${r.isbn}) – ${new Date(r.created_at).toLocaleDateString()}`;
+        li.onclick = () => aggiungiReport(r);
+        lista.appendChild(li);
+    });
+});
+
+function aggiungiReport(report) {
+    if (!reportSelezionati.some(r => r.id === report.id)) {
+        reportSelezionati.push(report);
+        aggiornaReportSelezionati();
+    }
+    document.getElementById('autocomplete-report').value = '';
+    document.getElementById('suggerimenti-report').innerHTML = '';
+}
+
+function aggiornaReportSelezionati() {
+    const div = document.getElementById('lista-report-selezionati');
+    div.innerHTML = reportSelezionati.map(r => `
+        <div class="border rounded p-2 mb-2">
+            <strong>${r.titolo}</strong> (${r.isbn}) – ${new Date(r.created_at).toLocaleDateString()}
+            <div class="row g-2 mt-2">
+                <div class="col-md-6 col-6">
+                    <label>Dal</label>
+                    <input type="date" class="form-control" name="report_intervalli[${r.id}][dal]">
+                </div>
+                <div class="col-md-6 col-6">
+                    <label>Al</label>
+                    <input type="date" class="form-control" name="report_intervalli[${r.id}][al]">
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger mt-2" onclick="rimuoviReport(${r.id})">Rimuovi</button>
+        </div>
+    `).join('');
+
+    // Aggiorna hidden con gli ID
+    document.getElementById('report_ids').value = JSON.stringify(reportSelezionati.map(r => r.id));
+}
+
+function rimuoviReport(id) {
+    reportSelezionati = reportSelezionati.filter(r => r.id !== id);
+    aggiornaReportSelezionati();
+}
+</script>
+
+
 @endsection
