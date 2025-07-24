@@ -166,8 +166,8 @@ public function update(Request $request, Ritenuta $ritenuta)
     $totale = collect($request->prestazioni)->sum('importo');
     $quota_esente = round($totale * ($under35 ? 0.40 : 0.25), 2);
     $imponibile = round($totale - $quota_esente, 2);
-    $ritenuta = round($imponibile * 0.20, 2);
-    $netto = round($totale - $ritenuta, 2);
+    $ritenuta_calcolata = round($imponibile * 0.20, 2);
+    $netto = round($totale - $ritenuta_calcolata, 2);
 
     $ritenuta->update([
         'numero' => $request->numero_nota,
@@ -184,7 +184,7 @@ public function update(Request $request, Ritenuta $ritenuta)
         'totale' => $totale,
         'quota_esente' => $quota_esente,
         'imponibile' => $imponibile,
-        'ritenuta' => $ritenuta,
+        'ritenuta' => $ritenuta_calcolata,
         'netto_pagare' => $netto,
         'nota_iva' => $request->nota_iva,
         'marca_bollo' => $request->marca_bollo ?? '€ 2,00 (per importi superiori a 77,47)',
@@ -192,6 +192,7 @@ public function update(Request $request, Ritenuta $ritenuta)
 
     return redirect()->route('ritenute.index')->with('success', 'Ritenuta aggiornata con successo.');
 }
+
 
 
 public function index(Request $request)
