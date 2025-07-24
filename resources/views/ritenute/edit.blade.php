@@ -96,6 +96,22 @@
             <button type="button" class="btn btn-sm btn-outline-success mt-2" onclick="aggiungiPrestazione()">+ Aggiungi prestazione</button>
         </div>
 
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="manuale" onchange="calcolaRitenuta()">
+            <label class="form-check-label" for="manuale">Disattiva calcolo automatico (inserimento manuale)</label>
+        </div>
+
+        <div class="row g-3 mb-3" id="manual-fields" style="display: none;">
+            <div class="col-md-3">
+                <label>% Imponibile</label>
+                <input type="number" step="0.01" class="form-control" id="perc_imponibile" value="75">
+            </div>
+            <div class="col-md-3">
+                <label>% R.A.</label>
+                <input type="number" step="0.01" class="form-control" id="perc_ra" value="20">
+            </div>
+        </div>
+
         <div class="row mt-3 g-3">
             <div class="col-md-3 col-6">
                 <label>Totale</label>
@@ -110,7 +126,7 @@
                 <input type="text" id="imponibile" class="form-control" readonly>
             </div>
             <div class="col-md-3 col-6">
-                <label>R.A. 20%</label>
+                <label>R.A.</label>
                 <input type="text" id="ra" class="form-control" readonly>
             </div>
             <div class="col-md-3 col-6">
@@ -183,28 +199,35 @@ function calcolaRitenuta() {
         if (!isNaN(val)) totale += val;
     });
 
-    const nascita = document.getElementById('data_nascita').value;
-    const emissione = document.getElementById('data_emissione').value;
-    let quotaPercent = 0.25;
-    let fascia = 'Over 35';
+    const auto = !document.getElementById('manuale').checked;
+    let percQuotaEsente = 0.25;
+    let percRA = 0.20;
 
-    if (nascita && emissione) {
-        const n = new Date(nascita);
-        const e = new Date(emissione);
-        let anni = e.getFullYear() - n.getFullYear();
-        if (e.getMonth() < n.getMonth() || (e.getMonth() === n.getMonth() && e.getDate() < n.getDate())) anni--;
-        if (anni < 35) {
-            quotaPercent = 0.40;
-            fascia = 'Under 35';
+    if (auto) {
+        let fascia = 'Over 35';
+        const nascita = document.getElementById('data_nascita').value;
+        const emissione = document.getElementById('data_emissione').value;
+        if (nascita && emissione) {
+            const n = new Date(nascita);
+            const e = new Date(emissione);
+            let anni = e.getFullYear() - n.getFullYear();
+            if (e.getMonth() < n.getMonth() || (e.getMonth() === n.getMonth() && e.getDate() < n.getDate())) anni--;
+            if (anni < 35) {
+                percQuotaEsente = 0.40;
+                fascia = 'Under 35';
+            }
         }
+        document.getElementById('etichetta_eta').textContent = fascia;
+    } else {
+        percQuotaEsente = 1 - parseFloat(document.getElementById('perc_imponibile').value) / 100;
+        percRA = parseFloat(document.getElementById('perc_ra').value) / 100;
     }
 
-    document.getElementById('etichetta_eta').textContent = fascia;
+    document.getElementById('manual-fields').style.display = auto ? 'none' : 'flex';
 
-    let imponibilePercent = 1 - quotaPercent;
-    let quota_esente = totale * quotaPercent;
-    let imponibile = totale * imponibilePercent;
-    let ra = imponibile * 0.20;
+    let quota_esente = totale * percQuotaEsente;
+    let imponibile = totale - quota_esente;
+    let ra = imponibile * percRA;
     let netto = totale - ra;
 
     document.getElementById('totale').value = totale.toFixed(2);
@@ -216,7 +239,7 @@ function calcolaRitenuta() {
 
 document.getElementById('data_emissione').addEventListener('change', calcolaRitenuta);
 document.getElementById('data_nascita').addEventListener('change', calcolaRitenuta);
-
+document.getElementById('manuale').addEventListener('change', calcolaRitenuta);
 window.addEventListener('load', calcolaRitenuta);
 </script>
 

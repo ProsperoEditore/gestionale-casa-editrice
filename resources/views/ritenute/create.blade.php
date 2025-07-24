@@ -69,6 +69,24 @@
             </div>
         </div>
 
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="modificaManuale" onchange="toggleManuale()">
+            <label class="form-check-label" for="modificaManuale">
+                Modifica manuale percentuali
+            </label>
+        </div>
+
+        <div id="percentualiManuali" class="row g-3 mb-3 d-none">
+            <div class="col-md-4 col-12">
+                <label>Quota esente (%)</label>
+                <input type="number" id="percentuale_quota_esente" name="percentuale_quota_esente" step="0.01" class="form-control" placeholder="Es. 40" oninput="calcolaRitenuta()">
+            </div>
+            <div class="col-md-4 col-12">
+                <label>Ritenuta su imponibile (%)</label>
+                <input type="number" id="percentuale_ritenuta" name="percentuale_ritenuta" step="0.01" class="form-control" placeholder="Es. 20" oninput="calcolaRitenuta()">
+            </div>
+        </div>
+
         <div class="mb-4">
             <h5>Prestazioni</h5>
             <div class="table-responsive">
@@ -159,6 +177,12 @@ function suggestTitolo(input) {
     list.classList.remove('d-none');
 }
 
+function toggleManuale() {
+    const box = document.getElementById('percentualiManuali');
+    box.classList.toggle('d-none');
+    calcolaRitenuta();
+}
+
 function calcolaRitenuta() {
     let importi = document.querySelectorAll('.importo-prestazione');
     let totale = 0;
@@ -183,12 +207,26 @@ function calcolaRitenuta() {
         }
     }
 
+    const manuale = document.getElementById('modificaManuale').checked;
+
+    if (manuale) {
+        const pQuota = parseFloat(document.getElementById('percentuale_quota_esente').value);
+        if (!isNaN(pQuota)) quotaPercent = pQuota / 100;
+    }
+
     document.getElementById('etichetta_eta').textContent = fascia;
 
     let imponibilePercent = 1 - quotaPercent;
     let quota_esente = totale * quotaPercent;
     let imponibile = totale * imponibilePercent;
-    let ra = imponibile * 0.20;
+
+    let raPercent = 0.20;
+    if (manuale) {
+        const pRa = parseFloat(document.getElementById('percentuale_ritenuta').value);
+        if (!isNaN(pRa)) raPercent = pRa / 100;
+    }
+
+    let ra = imponibile * raPercent;
     let netto = totale - ra;
 
     document.getElementById('totale').value = totale.toFixed(2);
