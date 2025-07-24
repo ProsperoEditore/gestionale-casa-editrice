@@ -43,7 +43,7 @@
         </div>
 
         <div class="row mb-3 g-3">
-            <div class="col-md-6 col-12">
+            <div class="col-md-4 col-12">
                 <label>Marchio editoriale</label>
                 <select name="marchio_id" class="form-select">
                     <option value="">-- Seleziona --</option>
@@ -52,9 +52,13 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-6 col-12">
+            <div class="col-md-4 col-12">
                 <label>Luogo</label>
                 <input type="text" name="luogo" class="form-control">
+            </div>
+            <div class="col-md-4 col-12">
+                <label>Data emissione</label>
+                <input type="date" name="data_emissione" id="data_emissione" class="form-control" required>
             </div>
         </div>
 
@@ -62,7 +66,7 @@
             <h5>Prestazioni</h5>
             <div class="table-responsive">
                 <table class="table" id="tabella-prestazioni">
-                    <thead><tr><th>Descrizione</th><th>Importo</th></tr></thead>
+                    <thead><tr><th>Descrizione / Titolo</th><th>Importo</th><th></th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -101,10 +105,6 @@
                 <label>Marca da bollo</label>
                 <input type="text" name="marca_bollo" class="form-control" value="€ 2,00 (per importi superiori a 77,47)">
             </div>
-            <div class="col-md-4 col-12">
-                <label>Data emissione</label>
-                <input type="date" name="data_emissione" id="data_emissione" class="form-control" required>
-            </div>
         </div>
 
         <button type="submit" class="btn btn-success">Salva</button>
@@ -112,13 +112,44 @@
 </div>
 
 <script>
+let titoli = @json(\App\Models\Libro::select('id', 'titolo', 'isbn')->get());
+
 function aggiungiPrestazione() {
     let tbody = document.querySelector('#tabella-prestazioni tbody');
+    let index = tbody.children.length;
     let row = `<tr>
-        <td><input name="prestazioni[][descrizione]" class="form-control" value=""></td>
-        <td><input name="prestazioni[][importo]" class="form-control importo-prestazione" value="" oninput="calcolaRitenuta()"></td>
+        <td>
+            <input name="prestazioni[${index}][descrizione]" class="form-control titolo-input" placeholder="Scrivi titolo o descrizione" oninput="suggestTitolo(this)">
+            <ul class="list-group mt-1 shadow-sm titolo-suggerimenti d-none"></ul>
+        </td>
+        <td><input name="prestazioni[${index}][importo]" class="form-control importo-prestazione" oninput="calcolaRitenuta()"></td>
+        <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calcolaRitenuta()">✕</button></td>
     </tr>`;
     tbody.insertAdjacentHTML('beforeend', row);
+}
+
+function suggestTitolo(input) {
+    const query = input.value.toLowerCase();
+    const list = input.nextElementSibling;
+    list.innerHTML = '';
+    if (!query) {
+        list.classList.add('d-none');
+        return;
+    }
+
+    titoli.filter(l => l.titolo.toLowerCase().includes(query) || l.isbn.includes(query))
+          .forEach(libro => {
+              const li = document.createElement('li');
+              li.className = 'list-group-item list-group-item-action';
+              li.textContent = `${libro.titolo} (${libro.isbn})`;
+              li.onclick = () => {
+                  input.value = `${libro.titolo} (${libro.isbn})`;
+                  list.classList.add('d-none');
+              };
+              list.appendChild(li);
+          });
+
+    list.classList.remove('d-none');
 }
 
 function calcolaRitenuta() {
@@ -129,23 +160,19 @@ function calcolaRitenuta() {
         if (!isNaN(val)) totale += val;
     });
 
-    // Calcola età
     const nascita = document.getElementById('data_nascita').value;
     const emissione = document.getElementById('data_emissione').value;
-    let anni = 40; // default
+    let quotaPercent = 0.25;
 
     if (nascita && emissione) {
         const n = new Date(nascita);
         const e = new Date(emissione);
-        anni = e.getFullYear() - n.getFullYear();
-        if (e.getMonth() < n.getMonth() || (e.getMonth() === n.getMonth() && e.getDate() < n.getDate())) {
-            anni--;
-        }
+        let anni = e.getFullYear() - n.getFullYear();
+        if (e.getMonth() < n.getMonth() || (e.getMonth() === n.getMonth() && e.getDate() < n.getDate())) anni--;
+        quotaPercent = anni < 35 ? 0.40 : 0.25;
     }
 
-    let quotaPercent = anni < 35 ? 0.40 : 0.25;
     let imponibilePercent = 1 - quotaPercent;
-
     let quota_esente = totale * quotaPercent;
     let imponibile = totale * imponibilePercent;
     let ra = imponibile * 0.20;
@@ -161,4 +188,12 @@ function calcolaRitenuta() {
 document.getElementById('data_emissione').addEventListener('change', calcolaRitenuta);
 document.getElementById('data_nascita').addEventListener('change', calcolaRitenuta);
 </script>
+
+<style>
+.titolo-suggerimenti {
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+}
+</style>
 @endsection
