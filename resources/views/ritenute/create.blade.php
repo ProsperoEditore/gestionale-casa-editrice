@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Nuova Ritenuta d'Autore</h3>
+    <h3 class="text-center mb-4">Nuova ritenuta d'acconto per Diritti d'Autore</h3>
 
     <form action="{{ route('ritenute.store') }}" method="POST">
         @csrf
@@ -29,7 +29,10 @@
             </div>
             <div class="col-md-4 col-12">
                 <label>Data di nascita</label>
-                <input type="date" name="data_nascita" id="data_nascita" class="form-control" required>
+                <div class="input-group">
+                    <input type="date" name="data_nascita" id="data_nascita" class="form-control" required>
+                    <span class="input-group-text" id="etichetta_eta">—</span>
+                </div>
             </div>
             <div class="col-md-4 col-12">
                 <label>IBAN</label>
@@ -58,7 +61,7 @@
             </div>
             <div class="col-md-4 col-12">
                 <label>Data emissione</label>
-                <input type="date" name="data_emissione" id="data_emissione" class="form-control" required>
+                <input type="date" name="data_emissione" id="data_emissione" class="form-control" required value="{{ now()->format('Y-m-d') }}">
             </div>
         </div>
 
@@ -163,14 +166,20 @@ function calcolaRitenuta() {
     const nascita = document.getElementById('data_nascita').value;
     const emissione = document.getElementById('data_emissione').value;
     let quotaPercent = 0.25;
+    let fascia = 'Over 35';
 
     if (nascita && emissione) {
         const n = new Date(nascita);
         const e = new Date(emissione);
         let anni = e.getFullYear() - n.getFullYear();
         if (e.getMonth() < n.getMonth() || (e.getMonth() === n.getMonth() && e.getDate() < n.getDate())) anni--;
-        quotaPercent = anni < 35 ? 0.40 : 0.25;
+        if (anni < 35) {
+            quotaPercent = 0.40;
+            fascia = 'Under 35';
+        }
     }
+
+    document.getElementById('etichetta_eta').textContent = fascia;
 
     let imponibilePercent = 1 - quotaPercent;
     let quota_esente = totale * quotaPercent;
