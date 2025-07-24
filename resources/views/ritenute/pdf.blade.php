@@ -56,14 +56,33 @@
     </style>
 </head>
 <body>
+    @php
+        $marchio = $ritenuta->marchio;
+        $logo = 'logo-prospero.png'; // default
+
+        if ($marchio) {
+            $nome = strtolower($marchio->nome);
+            if (in_array($nome, ['prospero', 'calibano', 'miranda'])) {
+                $logo = 'logo-' . $nome . '.png';
+            }
+        }
+    @endphp
+
     <div class="header">
-        <div class="logo">
-            @php
-                $logo = strtolower($ritenuta->marchio?->nome ?? 'prospero');
-            @endphp
-            <img src="{{ public_path('images/logo-' . $logo . '.png') }}" alt="Logo">
+        <div class="marchio-info">
+            @if($marchio)
+            <strong>{{ $marchio->nome }}</strong><br>
+            Indirizzo legale: {{ $marchio->indirizzo_sede_legale }}<br>
+            P.IVA: {{ $marchio->partita_iva }}<br>
+            Email: {{ $marchio->email }}<br>
+            @endif
+        </div>
+
+        <div class="logo-container" style="position: absolute; top: 0; right: 0;">
+            <img src="{{ public_path('images/' . $logo) }}" class="logo" style="height: 60px;">
         </div>
     </div>
+
 
     <h3 style="text-align:center; margin-bottom:5px;">NOTA PER LA CESSIONE DI DIRITTI D’AUTORE</h3>
     <p style="text-align:center; font-style:italic;">La presente Cessione Diritti d’Autore è regolata dalle normative di leggi vigenti sul Diritto d’Autore</p>
