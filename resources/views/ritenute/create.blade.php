@@ -56,6 +56,10 @@
                 </select>
             </div>
             <div class="col-md-4 col-12">
+                <label>Numero nota</label>
+                <input type="text" name="numero_nota" class="form-control" required>
+            </div>
+            <div class="col-md-4 col-12">
                 <label>Luogo</label>
                 <input type="text" name="luogo" class="form-control">
             </div>

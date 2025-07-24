@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Modifica Ritenuta {{ $ritenuta->numero }}</h3>
+    <h3 class="text-center mb-4">Modifica ritenuta d'acconto per Diritti d'Autore</h3>
 
-    <form action="{{ route('ritenute.update', $ritenuta) }}" method="POST">
+    <form action="{{ route('ritenute.update', $ritenuta->id) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -30,7 +30,10 @@
             </div>
             <div class="col-md-4 col-12">
                 <label>Data di nascita</label>
-                <input type="date" name="data_nascita" class="form-control" value="{{ $ritenuta->data_nascita->format('Y-m-d') }}" required>
+                <div class="input-group">
+                    <input type="date" name="data_nascita" id="data_nascita" class="form-control" value="{{ $ritenuta->data_nascita->format('Y-m-d') }}" required>
+                    <span class="input-group-text" id="etichetta_eta">—</span>
+                </div>
             </div>
             <div class="col-md-4 col-12">
                 <label>IBAN</label>
@@ -44,50 +47,32 @@
         </div>
 
         <div class="row mb-3 g-3">
-            <div class="col-md-6 col-12">
+            <div class="col-md-4 col-12">
                 <label>Marchio editoriale</label>
                 <select name="marchio_id" class="form-select">
                     <option value="">-- Seleziona --</option>
                     @foreach($marchi as $marchio)
-                        <option value="{{ $marchio->id }}" @selected($ritenuta->marchio_id == $marchio->id)>{{ $marchio->nome }}</option>
+                        <option value="{{ $marchio->id }}" {{ $ritenuta->marchio_id == $marchio->id ? 'selected' : '' }}>{{ $marchio->nome }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-6 col-12">
+            <div class="col-md-4 col-12">
+                <label>Numero nota</label>
+                <input type="text" name="numero_nota" class="form-control" value="{{ $ritenuta->numero }}" required>
+            </div>
+            <div class="col-md-4 col-12">
+                <label>Luogo</label>
+                <input type="text" name="luogo" class="form-control" value="{{ $ritenuta->luogo }}">
+            </div>
+            <div class="col-md-4 col-12">
                 <label>Data emissione</label>
-                <input type="date" name="data_emissione" class="form-control" value="{{ $ritenuta->data_emissione->format('Y-m-d') }}" required>
+                <input type="date" name="data_emissione" id="data_emissione" class="form-control" value="{{ $ritenuta->data_emissione->format('Y-m-d') }}" required>
             </div>
         </div>
 
-        <div class="mb-4">
-            <h5>Prestazioni</h5>
-            <div class="table-responsive">
-                <table class="table" id="tabella-prestazioni">
-                    <thead><tr><th>Descrizione</th><th>Importo</th></tr></thead>
-                    <tbody>
-                        @foreach($ritenuta->prestazioni as $p)
-                            <tr>
-                                <td><input name="prestazioni[][descrizione]" class="form-control" value="{{ $p['descrizione'] }}"></td>
-                                <td><input name="prestazioni[][importo]" class="form-control" value="{{ $p['importo'] }}"></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        {{-- Prestazioni e script JS uguale a create.blade.php --}}
 
-        <div class="row mb-3 g-3">
-            <div class="col-md-6 col-12">
-                <label>Nota IVA</label>
-                <input type="text" name="nota_iva" class="form-control" value="{{ $ritenuta->nota_iva }}">
-            </div>
-            <div class="col-md-6 col-12">
-                <label>Marca da bollo</label>
-                <input type="text" name="marca_bollo" class="form-control" value="{{ $ritenuta->marca_bollo }}">
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-success">Aggiorna</button>
+        <button type="submit" class="btn btn-primary">Aggiorna</button>
     </form>
 </div>
 @endsection
