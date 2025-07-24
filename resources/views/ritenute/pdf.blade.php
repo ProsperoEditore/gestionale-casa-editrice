@@ -57,27 +57,10 @@
 </head>
 <body>
     @php
-        $marchio = $ritenuta->marchio;
         $logo = 'logo-prospero.png'; // default
-
-        if ($marchio) {
-            $nome = strtolower($marchio->nome);
-            if (in_array($nome, ['prospero', 'calibano', 'miranda'])) {
-                $logo = 'logo-' . $nome . '.png';
-            }
-        }
     @endphp
 
     <div class="header">
-        <div class="marchio-info">
-            @if($marchio)
-            <strong>{{ $marchio->nome }}</strong><br>
-            Indirizzo legale: {{ $marchio->indirizzo_sede_legale }}<br>
-            P.IVA: {{ $marchio->partita_iva }}<br>
-            Email: {{ $marchio->email }}<br>
-            @endif
-        </div>
-
         <div class="logo-container" style="position: absolute; top: 0; right: 0;">
             <img src="{{ public_path('images/' . $logo) }}" class="logo" style="height: 60px;">
         </div>
