@@ -44,6 +44,7 @@
             padding: 10px;
             width: 200px;
             font-size: 11px;
+            white-space: pre-line;
         }
         .pagamenti {
             position: absolute;
@@ -58,15 +59,14 @@
     <div class="header">
         <div class="logo">
             @php
-                $logo = $ritenuta->marchio?->nome ?? 'prospero';
-                $logo = strtolower($logo);
+                $logo = strtolower($ritenuta->marchio?->nome ?? 'prospero');
             @endphp
             <img src="{{ public_path('images/logo-' . $logo . '.png') }}" alt="Logo">
         </div>
     </div>
 
     <h3 style="text-align:center; margin-bottom:5px;">NOTA PER LA CESSIONE DI DIRITTI D’AUTORE</h3>
-    <p style="text-align:center; font-style:italic;">La presente Cessione Diritti d’Autore è regolata dalle normative di legge vigenti sul Diritto d’Autore</p>
+    <p style="text-align:center; font-style:italic;">La presente Cessione Diritti d’Autore è regolata dalle normative di leggi vigenti sul Diritto d’Autore</p>
 
     <div class="sezione">
         <strong>SOGGETTO PERCIPIENTE</strong><br>
@@ -84,10 +84,7 @@
         C.F.: BRGRCR88B13F205Z / P. IVA: 08148530960
     </div>
 
-    <p>
-        <strong>Nota n. {{ $ritenuta->numero }}</strong> &nbsp;&nbsp;&nbsp;
-        {{ $ritenuta->data_emissione->format('d/m/Y') }}
-    </p>
+    <p>Nota numero: {{ $ritenuta->numero }} &nbsp;&nbsp;&nbsp;&nbsp;{{ $ritenuta->data_emissione->format('d/m/Y') }}</p>
 
     <table>
         <thead>
@@ -106,7 +103,8 @@
         </tbody>
     </table>
 
-    <div class="sezione mt-3">
+    <div class="sezione">
+        <p><strong>Totale:</strong> € {{ number_format($ritenuta->totale, 2, ',', '.') }}</p>
         <p><strong>Quota esente:</strong> € {{ number_format($ritenuta->quota_esente, 2, ',', '.') }}</p>
         <p><strong>Imponibile:</strong> € {{ number_format($ritenuta->imponibile, 2, ',', '.') }}</p>
         <p><strong>R.A. (20% su imponibile):</strong> € {{ number_format($ritenuta->ritenuta, 2, ',', '.') }}</p>
@@ -121,7 +119,8 @@
     </div>
 
     <div class="marca">
-        {{ $ritenuta->marca_bollo }}
+        marca da bollo da € 2,00
+        (per importi superiori a 77,47)
     </div>
 
     @if($ritenuta->data_pagamento_netto || $ritenuta->data_pagamento_ritenuta)

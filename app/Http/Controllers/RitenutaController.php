@@ -130,14 +130,15 @@ public function updatePagamento(Request $request, $id)
 
 public function pdf(Ritenuta $ritenuta)
 {
-
-    $nomeFile = 'Ritenuta_' . str_replace(['/', '\\'], '-', $ritenuta->numero) . '.pdf';
+    $nomeFile = 'Ritenuta_' . str_replace(['/', '\\'], '-', $ritenuta->numero)
+        . '_' . Str::slug($ritenuta->cognome_autore, '_')
+        . '_' . Str::slug($ritenuta->nome_autore, '_') . '.pdf';
 
     return Pdf::loadView('ritenute.pdf', compact('ritenuta'))
-            ->setPaper('A4')
-            ->stream($nomeFile);
-
+        ->setPaper('A4')
+        ->stream($nomeFile);
 }
+
 
 public function edit(Ritenuta $ritenuta)
 {
@@ -169,6 +170,7 @@ public function update(Request $request, Ritenuta $ritenuta)
     $netto = round($totale - $ritenuta, 2);
 
     $ritenuta->update([
+        'numero' => $request->numero_nota,
         'data_emissione' => $request->data_emissione,
         'nome_autore' => $request->nome_autore,
         'cognome_autore' => $request->cognome_autore,
