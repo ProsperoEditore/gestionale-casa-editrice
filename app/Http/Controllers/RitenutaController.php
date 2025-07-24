@@ -80,31 +80,6 @@ class RitenutaController extends Controller
         return redirect()->route('ritenute.index')->with('success', 'Ritenuta creata correttamente.');
     }
 
-    // Opzionale: metodo per ricavare gli importi da ReportDettaglio
-    public function getImportiDaReport(Request $request)
-    {
-        $request->validate([
-            'titoli' => 'required|array',
-            'dal' => 'required|date',
-            'al' => 'required|date',
-        ]);
-
-        $righe = ReportDettaglio::whereIn('libro_id', $request->titoli)
-            ->whereBetween('data', [$request->dal, $request->al])
-            ->get();
-
-        $prestazioni = $righe->groupBy('libro_id')->map(function ($r, $id) {
-            $titolo = optional($r->first()->libro)->titolo ?? 'Titolo sconosciuto';
-            $totale = $r->sum('royalties');
-            return [
-                'descrizione' => "Report \"{$titolo}\" dal " . $r->min('data')->format('d/m/Y') . " al " . $r->max('data')->format('d/m/Y'),
-                'importo' => round($totale, 2),
-            ];
-        })->values();
-
-        return response()->json($prestazioni);
-    }
-
 
 public function updatePagamento(Request $request, $id)
 {
@@ -214,18 +189,14 @@ public function index(Request $request)
     return view('ritenute.index', compact('ritenute'));
 }
 
-public function autocompleteAutori(Request $request)
+public function destroy($id)
 {
-    $term = $request->term;
+    $ritenuta = Ritenuta::findOrFail($id);
+    $ritenuta->delete();
 
-    $autori = Ritenuta::selectRaw("CONCAT(nome_autore, ' ', cognome_autore) AS label")
-        ->whereRaw("CONCAT(nome_autore, ' ', cognome_autore) ILIKE ?", ["%{$term}%"])
-        ->distinct()
-        ->limit(10)
-        ->get();
-
-    return response()->json($autori);
+    return redirect()->route('ritenute.index')->with('success', 'Ritenuta eliminata con successo.');
 }
+
 
 
 }
