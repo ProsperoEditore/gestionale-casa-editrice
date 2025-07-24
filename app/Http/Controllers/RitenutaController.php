@@ -16,9 +16,12 @@ class RitenutaController extends Controller
 
     public function create()
     {
-        $marchi = MarchioEditoriale::all();
-        return view('ritenute.create', compact('marchi'));
+        $marchi = \App\Models\MarchioEditoriale::orderBy('nome')->get();
+        $reportDisponibili = \App\Models\Report::latest()->get(); // o aggiungi filtri se necessario
+
+        return view('ritenute.create', compact('marchi', 'reportDisponibili'));
     }
+
 
     public function store(Request $request)
     {
