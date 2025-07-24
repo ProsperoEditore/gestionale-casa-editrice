@@ -194,19 +194,17 @@ Route::prefix('ritenute')->name('ritenute.')->group(function () {
     Route::get('/create', [RitenutaController::class, 'create'])->name('create');       // Form creazione
     Route::post('/', [RitenutaController::class, 'store'])->name('store');              // Salvataggio
 
+    Route::get('/{ritenuta}/edit', [RitenutaController::class, 'edit'])->name('edit');  // Modifica
+    Route::put('/{ritenuta}', [RitenutaController::class, 'update'])->name('update');   // Aggiorna
     Route::delete('/{ritenuta}', [RitenutaController::class, 'destroy'])->name('destroy'); // Elimina
 
     Route::get('/{ritenuta}/pdf', [RitenutaController::class, 'pdf'])->name('pdf');     // Genera PDF
-
     Route::put('/{id}/update-pagamento', [RitenutaController::class, 'updatePagamento'])->name('updatePagamento'); // Aggiorna date pagamento
 
-    Route::post('/importi-report', [RitenutaController::class, 'getImportiDaReport'])->name('importiReport'); // Carica importi da report
-
-    Route::get('/{ritenuta}/edit', [RitenutaController::class, 'edit'])->name('edit');
-    Route::put('/{ritenuta}', [RitenutaController::class, 'update'])->name('update');
-    Route::get('/ritenute/autocomplete-autori', [RitenutaController::class, 'autocompleteAutori'])->name('ritenute.autocomplete');
-
+    Route::post('/importi-report', [RitenutaController::class, 'getImportiDaReport'])->name('importiReport'); // Carica da report
 });
+Route::get('/ritenute/autocomplete-autori', [RitenutaController::class, 'autocompleteAutori'])->name('ritenute.autocomplete');
+
 
 
 // Scarichi (spedizioni)
