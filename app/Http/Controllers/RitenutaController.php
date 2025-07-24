@@ -130,9 +130,13 @@ public function updatePagamento(Request $request, $id)
 
 public function pdf(Ritenuta $ritenuta)
 {
+
+    $nomeFile = 'Ritenuta_' . str_replace(['/', '\\'], '-', $ritenuta->numero) . '.pdf';
+
     return Pdf::loadView('ritenute.pdf', compact('ritenuta'))
-        ->setPaper('A4')
-        ->stream('Ritenuta_'.$ritenuta->numero.'.pdf');
+            ->setPaper('A4')
+            ->stream($nomeFile);
+
 }
 
 public function edit(Ritenuta $ritenuta)

@@ -39,7 +39,7 @@
                         <td>{{ $r->data_emissione->format('d/m/Y') }}</td>
                         <td>{{ $r->nome_autore }} {{ $r->cognome_autore }}</td>
                         <td>€ {{ number_format($r->netto_pagare, 2, ',', '.') }}</td>
-                        <td>€ {{ number_format($r->ra_20, 2, ',', '.') }}</td>
+                        <td>€ {{ number_format($r->ritenuta, 2, ',', '.') }}</td>
 
                         <td class="{{ $r->data_pagamento_netto ? 'bg-success text-white' : 'bg-warning' }}">
                             <input type="date" value="{{ $r->data_pagamento_netto ? $r->data_pagamento_netto->format('Y-m-d') : '' }}" class="form-control" onchange="salvaPagamento(this, {{ $r->id }}, 'netto')">
@@ -51,7 +51,7 @@
 
                         <td>
                             <a href="{{ route('ritenute.pdf', $r->id) }}" class="btn btn-sm btn-primary" target="_blank">PDF</a>
-                            <a href="#" class="btn btn-sm btn-warning">Modifica</a>
+                            <a href="{{ route('ritenute.edit', $r) }}" class="btn btn-sm btn-warning">Modifica</a>
                             <form action="{{ route('ritenute.destroy', $r) }}" method="POST" style="display:inline-block">
                                 @csrf
                                 @method('DELETE')
@@ -85,7 +85,7 @@
                 </div>
 
                 <a href="{{ route('ritenute.pdf', $r->id) }}" class="btn btn-sm btn-primary" target="_blank">PDF</a>
-                <a href="#" class="btn btn-sm btn-warning">Modifica</a>
+                <a href="{{ route('ritenute.edit', $r) }}" class="btn btn-sm btn-warning">Modifica</a>
                 <form action="{{ route('ritenute.destroy', $r) }}" method="POST" style="display:inline-block">
                     @csrf
                     @method('DELETE')
