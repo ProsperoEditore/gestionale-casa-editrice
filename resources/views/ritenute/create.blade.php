@@ -62,11 +62,29 @@
             </div>
         </div>
 
-        <div class="mb-3">
-            <label>Seleziona titoli</label>
-            <select id="titoli" class="form-select" multiple></select>
-            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="caricaDaReport()">Carica da report</button>
+        <div class="row mb-3 g-3">
+            <div class="col-md-6 col-12">
+                <label>Seleziona titoli</label>
+                <select id="titoli" class="form-select" name="titoli[]" multiple>
+                    @foreach(\App\Models\Libro::orderBy('titolo')->get() as $libro)
+                        <option value="{{ $libro->id }}">{{ $libro->titolo }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-6 col-12">
+                <label>Oppure seleziona da report esistenti</label>
+                <select id="report_id" class="form-select">
+                    <option value="">-- Nessuno --</option>
+                    @foreach($reportDisponibili as $report)
+                        <option value="{{ $report->id }}">Report #{{ $report->id }} del {{ $report->created_at->format('d/m/Y') }}</option>
+                    @endforeach
+                </select>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="caricaDaReport()">Carica da report</button>
+                <button type="button" class="btn btn-sm btn-outline-success mb-2" onclick="aggiungiPrestazione()">+ Aggiungi prestazione</button>
+            </div>
         </div>
+
 
         <div class="mb-4">
             <h5>Prestazioni</h5>
@@ -78,7 +96,31 @@
             </div>
         </div>
 
-        <input type="hidden" name="prestazioni[]" id="json-prestazioni">
+
+        <div class="row mt-3 g-3">
+            <div class="col-md-3 col-6">
+                <label>Totale</label>
+                <input type="text" id="totale" class="form-control" readonly>
+            </div>
+            <div class="col-md-3 col-6">
+                <label>Quota esente (€ 100,00)</label>
+                <input type="text" id="quota_esente" class="form-control" value="100" readonly>
+            </div>
+            <div class="col-md-3 col-6">
+                <label>Imponibile</label>
+                <input type="text" id="imponibile" class="form-control" readonly>
+            </div>
+            <div class="col-md-3 col-6">
+                <label>R.A. 20%</label>
+                <input type="text" id="ra" class="form-control" readonly>
+            </div>
+            <div class="col-md-3 col-6">
+                <label>Netto da pagare</label>
+                <input type="text" id="netto" class="form-control" readonly>
+            </div>
+        </div>
+
+
 
         <div class="row mb-3 g-3">
             <div class="col-md-4 col-12">
@@ -116,10 +158,45 @@ function caricaDaReport() {
         let tbody = document.querySelector('#tabella-prestazioni tbody');
         tbody.innerHTML = '';
         data.forEach(item => {
-            let row = `<tr><td><input name="prestazioni[][descrizione]" class="form-control" value="${item.descrizione}"></td><td><input name="prestazioni[][importo]" class="form-control" value="${item.importo}"></td></tr>`;
+            let row = `<tr>
+                <td><input name="prestazioni[][descrizione]" class="form-control" value="${item.descrizione}"></td>
+                <td><input name="prestazioni[][importo]" class="form-control importo-prestazione" value="${item.importo}" oninput="calcolaRitenuta()"></td>
+            </tr>`;
             tbody.insertAdjacentHTML('beforeend', row);
         });
+        calcolaRitenuta();
     });
 }
+
+function aggiungiPrestazione() {
+    let tbody = document.querySelector('#tabella-prestazioni tbody');
+    let row = `<tr>
+        <td><input name="prestazioni[][descrizione]" class="form-control" value=""></td>
+        <td><input name="prestazioni[][importo]" class="form-control importo-prestazione" value="" oninput="calcolaRitenuta()"></td>
+    </tr>`;
+    tbody.insertAdjacentHTML('beforeend', row);
+}
+
+
+function calcolaRitenuta() {
+    let importi = document.querySelectorAll('.importo-prestazione');
+    let totale = 0;
+    importi.forEach(input => {
+        let val = parseFloat(input.value.replace(',', '.'));
+        if (!isNaN(val)) totale += val;
+    });
+
+    let quota_esente = 100;
+    let imponibile = Math.max(totale - quota_esente, 0);
+    let ra = imponibile * 0.20;
+    let netto = totale - ra;
+
+    document.getElementById('totale').value = totale.toFixed(2);
+    document.getElementById('imponibile').value = imponibile.toFixed(2);
+    document.getElementById('ra').value = ra.toFixed(2);
+    document.getElementById('netto').value = netto.toFixed(2);
+}
+
+
 </script>
 @endsection
