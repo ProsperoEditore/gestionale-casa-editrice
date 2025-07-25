@@ -54,6 +54,7 @@ class ReportDettaglioController extends Controller
 
             $quantita = $item->quantita;
             $prezzo_unitario = $item->prezzo;
+            $item->valore_lordo = $quantita * $prezzo_unitario;
             $royalties_totali = 0;
 
             if ($canale === 'vendite indirette') {
@@ -163,6 +164,7 @@ class ReportDettaglioController extends Controller
 
             $quantita = $item->quantita;
             $prezzo_unitario = $item->prezzo;
+            $item->valore_lordo = $quantita * $prezzo_unitario;
             $royalties_totali = 0;
 
             if ($canale === 'vendite indirette') {
