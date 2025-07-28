@@ -190,7 +190,11 @@ public function index(Request $request)
         });
     }
 
-    $ritenute = $query->orderByDesc('data_emissione')->get();
+    $ritenute = $query
+    ->orderByDesc('data_emissione')
+    ->orderByRaw("CAST(SPLIT_PART(numero, '/', 1) AS INTEGER) DESC")
+    ->paginate(30);
+
     return view('ritenute.index', compact('ritenute'));
 }
 

@@ -62,6 +62,9 @@
                 @endforeach
             </tbody>
         </table>
+            <div class="mt-3">
+                {{ $ritenute->links() }}
+            </div>
     </div>
 
     {{-- MOBILE --}}
@@ -94,6 +97,8 @@
             </div>
         </div>
         @endforeach
+            <div class="mt-3">
+        {{ $ritenute->links() }}
     </div>
 </div>
 
