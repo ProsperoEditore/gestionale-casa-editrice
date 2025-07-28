@@ -75,7 +75,7 @@
                 <h5 class="card-title">Nota {{ $r->numero }} - {{ $r->nome_autore }} {{ $r->cognome_autore }}</h5>
                 <p><strong>Data:</strong> {{ $r->data_emissione->format('d/m/Y') }}</p>
                 <p><strong>Netto:</strong> € {{ number_format($r->netto_pagare, 2, ',', '.') }}</p>
-                <p><strong>R.A.:</strong> € {{ number_format($r->ra_20, 2, ',', '.') }}</p>
+                <p><strong>R.A.:</strong> € {{ number_format($r->ritenuta, 2, ',', '.') }}</p>
 
                 <div class="mb-2">
                     <label class="form-label">Pagamento netto</label>
