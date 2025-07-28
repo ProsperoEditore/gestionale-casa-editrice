@@ -41,9 +41,14 @@ class RitenutaController extends Controller
             'prestazioni.*.importo' => 'required|numeric|min:0',
         ]);
 
-        $anno = Carbon::parse($request->data_emissione)->year;
-        $numeroProgressivo = Ritenuta::whereYear('data_emissione', $anno)->count() + 1;
-        $numero = str_pad($numeroProgressivo, 2, '0', STR_PAD_LEFT) . '/' . $anno;
+        $numero = $request->numero_nota;
+
+        if (!$numero) {
+            $anno = Carbon::parse($request->data_emissione)->year;
+            $numeroProgressivo = Ritenuta::whereYear('data_emissione', $anno)->count() + 1;
+            $numero = str_pad($numeroProgressivo, 2, '0', STR_PAD_LEFT) . '/' . $anno;
+        }
+
 
         $dataNascita = Carbon::parse($request->data_nascita);
         $eta = $dataNascita->age;
