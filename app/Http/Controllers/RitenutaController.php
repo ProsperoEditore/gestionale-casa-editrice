@@ -110,7 +110,7 @@ public function updatePagamento(Request $request, $id)
 
 public function pdf(Ritenuta $ritenuta)
 {
-    $nomeFile = 'Ritenuta_' . str_replace(['/', '\\'], '-', $ritenuta->numero)
+    $nomeFile = 'DA_' . str_replace(['/', '\\'], '-', $ritenuta->numero)
         . '_' . Str::slug($ritenuta->cognome_autore, '_')
         . '_' . Str::slug($ritenuta->nome_autore, '_') . '.pdf';
 
