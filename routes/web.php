@@ -6,6 +6,7 @@ use App\Models\Libro;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AnagraficaController;
+use App\Http\Controllers\AutoreController;
 use App\Http\Controllers\ContrattoController;
 use App\Http\Controllers\GiacenzaController;
 use App\Http\Controllers\LibroController;
@@ -54,6 +55,19 @@ Route::put('/utenti/{utente}', [UserController::class, 'update'])->name('utenti.
 
 // Anagrafiche
 Route::resource('anagrafiche', AnagraficaController::class);
+
+
+// Autori
+Route::prefix('autori')->name('autori.')->group(function () {
+    
+    Route::get('/', [AutoreController::class, 'index'])->name('index');
+    Route::get('/create', [AutoreController::class, 'create'])->name('create');
+    Route::post('/', [AutoreController::class, 'store'])->name('store');
+    Route::get('/{autore}/edit', [AutoreController::class, 'edit'])->name('edit');
+    Route::put('/{autore}', [AutoreController::class, 'update'])->name('update');
+    Route::delete('/{autore}', [AutoreController::class, 'destroy'])->name('destroy');
+});
+
 
 // Contratti
 Route::get('contratti', [ContrattoController::class, 'index'])->name('contratti.index');
