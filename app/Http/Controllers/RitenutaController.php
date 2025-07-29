@@ -209,19 +209,24 @@ public function destroy($id)
 
 public function autocompleteAutore(Request $request)
 {
-    $term = $request->input('term');
+    $term = strtolower($request->input('term'));
 
-    $autori = Autore::where('nome', 'ilike', "%$term%")
-        ->orWhere('cognome', 'ilike', "%$term%")
-        ->orWhere('pseudonimo', 'ilike', "%$term%")
-        ->orWhere('denominazione', 'ilike', "%$term%")
+    $autori = Autore::whereRaw("LOWER(nome) LIKE ?", ["%{$term}%"])
+        ->orWhereRaw("LOWER(cognome) LIKE ?", ["%{$term}%"])
+        ->orWhereRaw("LOWER(pseudonimo) LIKE ?", ["%{$term}%"])
+        ->orWhereRaw("LOWER(denominazione) LIKE ?", ["%{$term}%"])
         ->limit(10)
         ->get();
 
     return response()->json($autori->map(function ($a) {
         return [
-            'label' => trim($a->nome . ' ' . $a->cognome . ' ' . $a->pseudonimo . ' ' . $a->denominazione),
-            'value' => trim($a->nome . ' ' . $a->cognome),
+            'label' => trim(implode(' ', array_filter([
+                $a->nome,
+                $a->cognome,
+                $a->pseudonimo,
+                $a->denominazione,
+            ]))),
+            'value' => trim("{$a->nome} {$a->cognome}"),
             'nome' => $a->nome,
             'cognome' => $a->cognome,
             'codice_fiscale' => $a->codice_fiscale,
@@ -232,5 +237,6 @@ public function autocompleteAutore(Request $request)
         ];
     }));
 }
+
 
 }
