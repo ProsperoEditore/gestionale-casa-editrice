@@ -2,6 +2,12 @@
 
 @section('content')
 
+<form action="{{ isset($autore) ? route('autori.update', $autore) : route('autori.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    @if(isset($autore))
+        @method('PUT')
+    @endif
+    
 <div class="row mb-3">
     <div class="col-md-6">
         <label class="form-label">Nome</label>
@@ -95,6 +101,7 @@
 </div>
 
 <button type="submit" class="btn btn-primary">Salva</button>
+</form>
 @endsection
 
 @push('scripts')
