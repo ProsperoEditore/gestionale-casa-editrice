@@ -141,6 +141,11 @@
                     <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Libri</a>
                 </li>
             @endif
+            @if (auth()->user()->access_autori)
+                <li class="mb-2">
+                    <a href="{{ route('autori.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Autori</a>
+                </li>
+            @endif
 
             {{--
                 @if (auth()->user()->access_schede_libro)
