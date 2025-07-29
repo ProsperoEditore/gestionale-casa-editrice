@@ -10,7 +10,7 @@
 
         <div class="mb-3">
             <label for="autore_search">Cerca autore</label>
-            <input type="text" id="autore_search" class="form-control" placeholder="Digita nome o pseudonimo">
+            <input type="text" id="autore_search" name="autore_search" class="form-control" placeholder="Digita nome o pseudonimo">
         </div>
 
 

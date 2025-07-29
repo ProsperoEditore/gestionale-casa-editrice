@@ -211,12 +211,12 @@ public function autocompleteAutore(Request $request)
 {
     $term = strtolower($request->input('term'));
 
-    $autori = Autore::whereRaw("LOWER(nome) LIKE ?", ["%{$term}%"])
-        ->orWhereRaw("LOWER(cognome) LIKE ?", ["%{$term}%"])
+    $autori = Autore::whereRaw("LOWER(CONCAT(nome, ' ', cognome)) LIKE ?", ["%{$term}%"])
         ->orWhereRaw("LOWER(pseudonimo) LIKE ?", ["%{$term}%"])
         ->orWhereRaw("LOWER(denominazione) LIKE ?", ["%{$term}%"])
         ->limit(10)
         ->get();
+
 
     return response()->json($autori->map(function ($a) {
         return [
