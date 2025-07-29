@@ -220,7 +220,7 @@ Route::prefix('ritenute')->name('ritenute.')->group(function () {
     Route::post('/importi-report', [RitenutaController::class, 'getImportiDaReport'])->name('importiReport'); // Carica da report
 });
 Route::get('/ritenute/autocomplete-autori', [RitenutaController::class, 'autocompleteAutori'])->name('ritenute.autocomplete');
-
+Route::get('/ritenute/autocomplete-autore', [RitenutaController::class, 'autocompleteAutore'])->name('ritenute.autocomplete-autore');
 
 
 // Scarichi (spedizioni)
