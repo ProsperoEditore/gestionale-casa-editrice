@@ -50,6 +50,7 @@
                                 'access_contratti' => 'Contratti',
                                 'access_marchi' => 'Marchi Editoriali',
                                 'access_libri' => 'Libri',
+                                'access_autori' => 'Autori',
                                 'access_schede_libro' => 'Schede libro',
                                 'access_magazzini' => 'Magazzini e Depositi',
                                 'access_ordini' => 'Ordini',
