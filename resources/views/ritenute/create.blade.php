@@ -245,6 +245,9 @@ document.getElementById('data_emissione').addEventListener('change', calcolaRite
 document.getElementById('data_nascita').addEventListener('change', calcolaRitenuta);
 </script>
 
+<!-- CSS jQuery UI -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 $(function() {
