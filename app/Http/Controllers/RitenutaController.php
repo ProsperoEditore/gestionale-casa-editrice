@@ -7,6 +7,7 @@ use App\Models\MarchioEditoriale;
 use App\Models\Libro;
 use App\Models\Report;
 use App\Models\ReportDettaglio;
+use App\Models\Autore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -206,6 +207,30 @@ public function destroy($id)
     return redirect()->route('ritenute.index')->with('success', 'Ritenuta eliminata con successo.');
 }
 
+public function autocompleteAutore(Request $request)
+{
+    $term = $request->input('term');
 
+    $autori = Autore::where('nome', 'ilike', "%$term%")
+        ->orWhere('cognome', 'ilike', "%$term%")
+        ->orWhere('pseudonimo', 'ilike', "%$term%")
+        ->orWhere('denominazione', 'ilike', "%$term%")
+        ->limit(10)
+        ->get();
+
+    return response()->json($autori->map(function ($a) {
+        return [
+            'label' => trim($a->nome . ' ' . $a->cognome . ' ' . $a->pseudonimo . ' ' . $a->denominazione),
+            'value' => trim($a->nome . ' ' . $a->cognome),
+            'nome' => $a->nome,
+            'cognome' => $a->cognome,
+            'codice_fiscale' => $a->codice_fiscale,
+            'data_nascita' => $a->data_nascita,
+            'luogo_nascita' => $a->luogo_nascita,
+            'iban' => $a->iban,
+            'indirizzo' => $a->indirizzo,
+        ];
+    }));
+}
 
 }

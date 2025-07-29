@@ -66,6 +66,8 @@ Route::prefix('autori')->name('autori.')->group(function () {
     Route::get('/{autore}/edit', [AutoreController::class, 'edit'])->name('edit');
     Route::put('/{autore}', [AutoreController::class, 'update'])->name('update');
     Route::delete('/{autore}', [AutoreController::class, 'destroy'])->name('destroy');
+    Route::get('/ritenute/autocomplete-autore', [RitenutaController::class, 'autocompleteAutore'])->name('ritenute.autocomplete-autore');
+
 });
 
 

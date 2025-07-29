@@ -8,6 +8,12 @@
         @csrf
         @method('PUT')
 
+        <div class="mb-3">
+            <label for="autore_search">Cerca autore</label>
+            <input type="text" id="autore_search" class="form-control" placeholder="Digita nome o pseudonimo">
+        </div>
+
+
         <div class="row mb-3 g-3">
             <div class="col-md-4 col-12">
                 <label>Nome</label>
@@ -242,6 +248,28 @@ document.getElementById('data_nascita').addEventListener('change', calcolaRitenu
 document.getElementById('manuale').addEventListener('change', calcolaRitenuta);
 window.addEventListener('load', calcolaRitenuta);
 </script>
+
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+$(function() {
+    $("#autore_search").autocomplete({
+        source: "{{ route('ritenute.autocomplete-autore') }}",
+        minLength: 2,
+        select: function(event, ui) {
+            select: function(event, ui) {
+                $('input[name="nome_autore"]').val(ui.item.nome).prop('readonly', true);
+                $('input[name="cognome_autore"]').val(ui.item.cognome).prop('readonly', true);
+                $('input[name="codice_fiscale"]').val(ui.item.codice_fiscale).prop('readonly', true);
+                $('input[name="data_nascita"]').val(ui.item.data_nascita).prop('readonly', true);
+                $('input[name="luogo_nascita"]').val(ui.item.luogo_nascita).prop('readonly', true);
+                $('input[name="iban"]').val(ui.item.iban).prop('readonly', true);
+                $('input[name="indirizzo"]').val(ui.item.indirizzo).prop('readonly', true);
+                calcolaRitenuta(); // aggiorna i calcoli
+            }
+    });
+});
+</script>
+
 
 <style>
 .titolo-suggerimenti {
