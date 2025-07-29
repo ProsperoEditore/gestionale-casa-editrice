@@ -226,6 +226,9 @@
                 @if (auth()->user()->access_libri)
                     <a href="{{ route('libri.index') }}" class="btn btn-prospero-secondary">Libri</a>
                 @endif
+                @if (auth()->user()->access_autori)
+                    <a href="{{ route('autori.index') }}" class="btn btn-prospero-secondary">Autori</a>
+                @endif
 
                 {{-- 
                     @if (auth()->user()->access_schede_libro)

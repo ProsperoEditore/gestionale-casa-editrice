@@ -20,6 +20,8 @@ class Autore extends Model
         'foto',
     ];
 
+    protected $table = 'autori';
+
     protected $casts = [
         'data_nascita' => 'date',
     ];
