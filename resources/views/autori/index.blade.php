@@ -10,25 +10,26 @@
         <table class="table table-bordered table-hover align-middle text-center">
             <thead class="table-dark">
                 <tr>
-                    <th>Foto</th>
                     <th>Nome</th>
-                    <th>Pseudonimo / Denominazione</th>
-                    <th>Libri Associati</th>
+                    <th>Libri</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($autori as $a)
                 <tr>
-                    <td>
-                        @if($a->foto)
-                            <img src="{{ asset('storage/' . $a->foto) }}" class="img-thumbnail" style="width: 60px; height: auto;">
+                    {{-- NOME --}}
+                    <td class="text-start">
+                        @if($a->pseudonimo)
+                            <strong>{{ $a->pseudonimo }}</strong>
+                        @elseif($a->denominazione)
+                            <strong>{{ $a->denominazione }}</strong>
                         @else
-                            <span class="text-muted">—</span>
+                            {{ $a->nome }} {{ $a->cognome }}
                         @endif
                     </td>
-                    <td>{{ $a->nome }} {{ $a->cognome }}</td>
-                    <td>{{ $a->pseudonimo ?? $a->denominazione ?? '—' }}</td>
+
+                    {{-- LIBRI --}}
                     <td class="text-start">
                         @if($a->libri->isEmpty())
                             <em class="text-muted">Nessun libro</em>
@@ -40,6 +41,8 @@
                             </ul>
                         @endif
                     </td>
+
+                    {{-- AZIONI --}}
                     <td>
                         <a href="{{ route('autori.edit', $a) }}" class="btn btn-warning btn-sm">Modifica</a>
                         <form action="{{ route('autori.destroy', $a) }}" method="POST" style="display:inline-block">

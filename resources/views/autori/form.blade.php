@@ -1,3 +1,7 @@
+@extends('layouts.app')
+
+@section('content')
+
 <div class="row mb-3">
     <div class="col-md-6">
         <label class="form-label">Nome</label>
@@ -53,13 +57,31 @@
 
 <div class="mb-3">
     <label class="form-label">Libri associati</label>
-    <select name="libri[]" class="form-control" multiple>
-        @foreach($libri as $libro)
-            <option value="{{ $libro->id }}" {{ isset($autore) && $autore->libri->contains($libro->id) ? 'selected' : '' }}>
-                {{ $libro->titolo }}
-            </option>
-        @endforeach
-    </select>
+    <input type="text" id="autocomplete-libro" class="form-control" placeholder="Scrivi titolo del libro">
+    <button type="button" class="btn btn-outline-primary mt-2" onclick="aggiungiLibro()">+ Aggiungi libro</button>
+
+    <ul id="libriSelezionati" class="mt-3 list-group">
+        @if(old('libri'))
+            @foreach(old('libri') as $id)
+                @php $libro = \App\Models\Libro::find($id); @endphp
+                @if($libro)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ $libro->titolo }}
+                        <input type="hidden" name="libri[]" value="{{ $libro->id }}">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button>
+                    </li>
+                @endif
+            @endforeach
+        @elseif(isset($autore))
+            @foreach($autore->libri as $libro)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ $libro->titolo }}
+                    <input type="hidden" name="libri[]" value="{{ $libro->id }}">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button>
+                </li>
+            @endforeach
+        @endif
+    </ul>
 </div>
 
 <div class="mb-3">
@@ -73,3 +95,36 @@
 </div>
 
 <button type="submit" class="btn btn-primary">Salva</button>
+@endsection
+
+@push('scripts')
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+    const libri = @json($libri->map(fn($l) => ['label' => $l->titolo, 'value' => $l->id]));
+
+    $('#autocomplete-libro').autocomplete({
+        source: libri,
+        select: function(event, ui) {
+            $('#autocomplete-libro').val(ui.item.label);
+            $('#autocomplete-libro').data('selected-id', ui.item.value);
+            return false;
+        }
+    });
+
+    function aggiungiLibro() {
+        const titolo = $('#autocomplete-libro').val();
+        const id = $('#autocomplete-libro').data('selected-id');
+
+        if (!id || !$('input[value="'+id+'"][name="libri[]"]').length) {
+            const li = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                ${titolo}
+                <input type="hidden" name="libri[]" value="${id}">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button>
+            </li>`;
+            $('#libriSelezionati').append(li);
+        }
+
+        $('#autocomplete-libro').val('').removeData('selected-id');
+    }
+</script>
+@endpush
