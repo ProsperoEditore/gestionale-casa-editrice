@@ -34,14 +34,24 @@ Log::info('RICHIESTA CREAZIONE RITENUTA', $request->all());
 Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
 
         // Converte il formato gg-mm-aaaa in Y-m-d
-        if ($request->filled('data_nascita')) {
-            $parts = explode('-', $request->data_nascita);
-            if (count($parts) === 3 && strlen($parts[2]) === 4) {
-                $request->merge([
-                    'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
-                ]);
-            }
-        }
+                if ($request->filled('data_nascita')) {
+                    $parts = explode('-', $request->data_nascita);
+                    if (count($parts) === 3 && strlen($parts[2]) === 4) {
+                        $request->merge([
+                            'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
+                        ]);
+                    }
+                }
+
+        // 🔁 Converte le virgole in punti nei campi importo
+                if ($request->has('prestazioni')) {
+                    $prestazioniSanificate = collect($request->prestazioni)->map(function ($item) {
+                        $item['importo'] = str_replace(',', '.', $item['importo']);
+                        return $item;
+                    });
+                    $request->merge(['prestazioni' => $prestazioniSanificate->toArray()]);
+                }
+
 
         $request->validate([
             'nome_autore' => 'required|string',
