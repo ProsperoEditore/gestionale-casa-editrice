@@ -28,8 +28,13 @@ class RitenutaController extends Controller
 
 
 
-    public function store(Request $request)
-    {
+public function store(Request $request)
+{
+    \Log::info('RICHIESTA CREAZIONE RITENUTA', $request->all());
+    \Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
+
+    // Converte il formato gg-mm-aaaa in Y-m-d
+
 
         // Converte il formato gg-mm-aaaa in Y-m-d
         if ($request->filled('data_nascita')) {

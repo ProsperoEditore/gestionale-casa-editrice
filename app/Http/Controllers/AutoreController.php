@@ -44,7 +44,7 @@ class AutoreController extends Controller
         }
 
         $autore = Autore::create($data);
-        $autore->libri()->sync($request->libri);
+        $autore->libri()->sync($request->input('libri', []));
 
         return redirect()->route('autori.index')->with('success', 'Autore creato con successo.');
     }
@@ -79,7 +79,7 @@ class AutoreController extends Controller
         }
 
         $autore->update($data);
-        $autore->libri()->sync($request->libri);
+        $autore->libri()->sync($request->input('libri', []));
 
         return redirect()->route('autori.index')->with('success', 'Autore aggiornato con successo.');
     }

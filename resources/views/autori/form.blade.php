@@ -107,47 +107,37 @@
 @push('scripts')
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
-    const libri = @json($libri->map(fn($l) => ['label' => $l->titolo, 'value' => $l->id]));
+const libri = @json($libri->map(fn($l) => ['label' => $l->titolo, 'value' => $l->id]));
+console.log("Libri caricati:", libri);
 
 let selectedLibroId = null;
 
-        $('#autocomplete-libro').autocomplete({
-            source: libri,
-            select: function(event, ui) {
-                $('#autocomplete-libro').val(ui.item.label);
-                selectedLibroId = ui.item.value;
-                return false;
-            }
-        });
-
-        function aggiungiLibro() {
-            const titolo = $('#autocomplete-libro').val();
-            const id = selectedLibroId;
-
-            if (!id || !$(`input[name="libri[]"][value="${id}"]`).length) {
-                const li = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                    ${titolo}
-                    <input type="hidden" name="libri[]" value="${id}">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button>
-                </li>`;
-                $('#libriSelezionati').append(li);
-            }
-
-            $('#autocomplete-libro').val('');
-            selectedLibroId = null;
-        }
-
-
-        if (!id || !$('input[value="'+id+'"][name="libri[]"]').length) {
-            const li = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                ${titolo}
-                <input type="hidden" name="libri[]" value="${id}">
-                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button>
-            </li>`;
-            $('#libriSelezionati').append(li);
-        }
-
-        $('#autocomplete-libro').val('').removeData('selected-id');
+$('#autocomplete-libro').autocomplete({
+    source: libri,
+    minLength: 2,
+    select: function(event, ui) {
+        $('#autocomplete-libro').val(ui.item.label);
+        selectedLibroId = ui.item.value;
+        return false;
     }
+});
+
+function aggiungiLibro() {
+    const titolo = $('#autocomplete-libro').val();
+    const id = selectedLibroId;
+
+    if (!id || !$(`input[name="libri[]"][value="${id}"]`).length) {
+        const li = `<li class="list-group-item d-flex justify-content-between align-items-center">
+            ${titolo}
+            <input type="hidden" name="libri[]" value="${id}">
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button>
+        </li>`;
+        $('#libriSelezionati').append(li);
+    }
+
+    $('#autocomplete-libro').val('');
+    selectedLibroId = null;
+}
 </script>
 @endpush
+
