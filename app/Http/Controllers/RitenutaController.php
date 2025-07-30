@@ -11,6 +11,7 @@ use App\Models\Autore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class RitenutaController extends Controller
@@ -30,6 +31,8 @@ class RitenutaController extends Controller
 
 public function store(Request $request)
 {
+Log::info('RICHIESTA CREAZIONE RITENUTA', $request->all());
+Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
 
         // Converte il formato gg-mm-aaaa in Y-m-d
         if ($request->filled('data_nascita')) {
