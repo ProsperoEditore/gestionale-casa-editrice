@@ -8,8 +8,9 @@
     <strong>Nota:</strong> per ottenere un <strong>Netto da pagare</strong> specifico, inserire nel campo <strong>Importo</strong> il valore risultante da:
     <ul class="mb-0 mt-2">
         <li><strong>Netto : 95%</strong> per autori extracomunitari</li>
-        <li><strong>Netto : 85%</strong> per autori under 35</li>
-        <li><strong>Netto : 88%</strong> per autori over 35</li>
+        <li><strong>Netto : 88%</strong> per autori under 35</li>
+        <li><strong>Netto : 85%</strong> per autori over 35</li>
+        
     </ul>
 </div>
 
