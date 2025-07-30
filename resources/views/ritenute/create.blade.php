@@ -278,14 +278,16 @@ $(function () {
             $('input[name="codice_fiscale"]').val(ui.item.codice_fiscale).prop('readonly', true);
             let data = ui.item.data_nascita;
 
-                if (data && data.includes('T')) {
-                    data = data.split('T')[0]; // rimuove l'ora se presente
-                }
+            if (data && data.includes('T')) {
+                data = data.split('T')[0]; // rimuove tempo
+            }
 
-                if (data) {
-                    const [yyyy, mm, dd] = data.split('-');
-                    data = `${dd}-${mm}-${yyyy}`; // converte da yyyy-mm-dd a gg-mm-aaaa
-                }
+            // Se formato yyyy-mm-dd, converto in gg-mm-aaaa
+            if (data && /^\d{4}-\d{2}-\d{2}$/.test(data)) {
+                const [yyyy, mm, dd] = data.split('-');
+                data = `${dd}-${mm}-${yyyy}`;
+            }
+
 
                 $('input[name="data_nascita"]').val(data).prop('readonly', true);
 
