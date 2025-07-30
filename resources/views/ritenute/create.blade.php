@@ -35,7 +35,7 @@
             <div class="col-md-4 col-12">
                 <label>Data di nascita</label>
                 <div class="input-group">
-                    <input type="date" name="data_nascita" id="data_nascita" class="form-control" required>
+                    <input type="text" name="data_nascita" id="data_nascita" class="form-control" placeholder="gg-mm-aaaa" required>
                     <span class="input-group-text" id="etichetta_eta">—</span>
                 </div>
             </div>
@@ -51,15 +51,6 @@
         </div>
 
         <div class="row mb-3 g-3">
-            <div class="col-md-4 col-12">
-                <label>Marchio editoriale</label>
-                <select name="marchio_id" class="form-select">
-                    <option value="">-- Seleziona --</option>
-                    @foreach($marchi as $marchio)
-                        <option value="{{ $marchio->id }}">{{ $marchio->nome }}</option>
-                    @endforeach
-                </select>
-            </div>
             <div class="col-md-4 col-12">
                 <label>Numero nota</label>
                 <input type="text" name="numero_nota" class="form-control" required>
