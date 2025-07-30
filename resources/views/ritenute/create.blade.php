@@ -187,7 +187,14 @@ function calcolaRitenuta() {
         if (!isNaN(val)) totale += val;
     });
 
-    const nascita = document.getElementById('data_nascita').value;
+    let nascita = document.getElementById('data_nascita').value;
+        if (nascita.includes('-')) {
+            const parts = nascita.split('-');
+            if (parts[2].length === 4) {  // gg-mm-aaaa
+                nascita = `${parts[2]}-${parts[1]}-${parts[0]}`; // aaaa-mm-gg
+            }
+        }
+
     const emissione = document.getElementById('data_emissione').value;
     let quotaPercent = 0.25;
     let fascia = 'Over 35';
@@ -268,7 +275,19 @@ $(function () {
             $('input[name="nome_autore"]').val(ui.item.nome).prop('readonly', true);
             $('input[name="cognome_autore"]').val(ui.item.cognome).prop('readonly', true);
             $('input[name="codice_fiscale"]').val(ui.item.codice_fiscale).prop('readonly', true);
-            $('input[name="data_nascita"]').val(ui.item.data_nascita).prop('readonly', true);
+            let data = ui.item.data_nascita;
+
+                if (data && data.includes('T')) {
+                    data = data.split('T')[0]; // rimuove l'ora se presente
+                }
+
+                if (data) {
+                    const [yyyy, mm, dd] = data.split('-');
+                    data = `${dd}-${mm}-${yyyy}`; // converte da yyyy-mm-dd a gg-mm-aaaa
+                }
+
+                $('input[name="data_nascita"]').val(data).prop('readonly', true);
+
             $('input[name="luogo_nascita"]').val(ui.item.luogo_nascita).prop('readonly', true);
             $('input[name="iban"]').val(ui.item.iban).prop('readonly', true);
             $('input[name="indirizzo"]').val(ui.item.indirizzo).prop('readonly', true);
