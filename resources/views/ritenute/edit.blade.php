@@ -66,7 +66,7 @@
         <div class="row mb-3 g-3">
             <div class="col-md-4 col-12">
                 <label>Numero nota</label>
-                <input type="text" name="numero_nota" class="form-control" value="{{ $ritenuta->numero }}" required>
+                <input type="text" name="numero_nota" class="form-control" value="{{ $ritenuta->numero }}">
             </div>
             <div class="col-md-4 col-12">
                 <label>Luogo</label>
@@ -74,7 +74,7 @@
             </div>
             <div class="col-md-4 col-12">
                 <label>Data emissione</label>
-                <input type="date" name="data_emissione" id="data_emissione" class="form-control" value="{{ $ritenuta->data_emissione->format('Y-m-d') }}" required>
+                <input type="date" name="data_emissione" id="data_emissione" class="form-control" value="{{ $ritenuta->data_emissione->format('Y-m-d') }}">
             </div>
         </div>
 

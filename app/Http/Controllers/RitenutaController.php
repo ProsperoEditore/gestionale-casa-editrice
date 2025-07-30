@@ -17,10 +17,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class RitenutaController extends Controller
 {
 
-
-
-    public function create()
+public function create()
     {
+
         $marchi = MarchioEditoriale::all();
         $reportDisponibili = Report::with('libro')->latest()->get();
 
@@ -58,6 +57,11 @@ Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
 
         $numero = $request->numero_nota;
 
+        // ⛔ Verifica se il numero esiste già nel database
+        if ($numero && Ritenuta::where('numero', $numero)->exists()) {
+            return back()->withErrors(['numero_nota' => 'Il numero è già stato usato.'])->withInput();
+        }
+
         if (!$numero) {
             $anno = Carbon::parse($request->data_emissione)->year;
             $numeroProgressivo = Ritenuta::whereYear('data_emissione', $anno)->count() + 1;
@@ -76,6 +80,7 @@ Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
         $ritenuta = round($imponibile * 0.20, 2);
         $netto = round($totale - $ritenuta, 2);
 
+        try {
         $ritenuta = Ritenuta::create([
             'numero' => $numero,
             'data_emissione' => $request->data_emissione,
@@ -96,6 +101,10 @@ Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
             'nota_iva' => $request->nota_iva,
             'marca_bollo' => $request->marca_bollo ?? '€ 2,00 (per importi superiori a 77,47)',
         ]);
+        } catch (\Exception $e) {
+            Log::error('Errore salvataggio ritenuta: ' . $e->getMessage());
+            return back()->withErrors(['errore' => 'Errore durante il salvataggio.'])->withInput();
+        }
 
         return redirect()->route('ritenute.index')->with('success', 'Ritenuta creata correttamente.');
     }

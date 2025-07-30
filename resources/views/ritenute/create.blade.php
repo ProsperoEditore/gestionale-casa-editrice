@@ -63,7 +63,7 @@
         <div class="row mb-3 g-3">
             <div class="col-md-4 col-12">
                 <label>Numero nota</label>
-                <input type="text" name="numero_nota" class="form-control" required>
+                <input type="text" name="numero_nota" class="form-control">
             </div>
             <div class="col-md-4 col-12">
                 <label>Luogo</label>
