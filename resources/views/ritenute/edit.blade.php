@@ -203,16 +203,17 @@ function calcolaRitenuta() {
     if (auto) {
         let fascia = 'Over 35';
         let nascita = document.getElementById('data_nascita').value;
-            if (nascita.includes('-')) {
-                const parts = nascita.split('-');
-                if (parts[2].length === 4) {  // gg-mm-aaaa
-                    nascita = `${parts[2]}-${parts[1]}-${parts[0]}`; // aaaa-mm-gg
-                }
-            }
+        let nascitaFormattata = nascita;
+
+        if (nascita && nascita.match(/^\d{2}-\d{2}-\d{4}$/)) {
+            const [gg, mm, aaaa] = nascita.split("-");
+            nascitaFormattata = `${aaaa}-${mm}-${gg}`; // formato compatibile con new Date()
+        }
+
 
         const emissione = document.getElementById('data_emissione').value;
         if (nascita && emissione) {
-            const n = new Date(nascita);
+            const n = new Date(nascitaFormattata);
             const e = new Date(emissione);
             let anni = e.getFullYear() - n.getFullYear();
             if (e.getMonth() < n.getMonth() || (e.getMonth() === n.getMonth() && e.getDate() < n.getDate())) anni--;
