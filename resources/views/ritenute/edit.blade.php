@@ -255,24 +255,41 @@ window.addEventListener('load', calcolaRitenuta);
 
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
-$(function() {
+$(function () {
     $("#autore_search").autocomplete({
-        source: "{{ route('ritenute.autocomplete-autore') }}",
+        source: function (request, response) {
+            $.ajax({
+                url: "{{ route('ritenute.autocomplete-autore') }}",
+                dataType: "json",
+                data: { term: request.term },
+                success: function (data) {
+                    response(data);
+                }
+            });
+        },
         minLength: 2,
-        select: function(event, ui) {
-            select: function(event, ui) {
-                $('input[name="nome_autore"]').val(ui.item.nome).prop('readonly', true);
-                $('input[name="cognome_autore"]').val(ui.item.cognome).prop('readonly', true);
-                $('input[name="codice_fiscale"]').val(ui.item.codice_fiscale).prop('readonly', true);
-                $('input[name="data_nascita"]').val(ui.item.data_nascita).prop('readonly', true);
-                $('input[name="luogo_nascita"]').val(ui.item.luogo_nascita).prop('readonly', true);
-                $('input[name="iban"]').val(ui.item.iban).prop('readonly', true);
-                $('input[name="indirizzo"]').val(ui.item.indirizzo).prop('readonly', true);
-                calcolaRitenuta(); // aggiorna i calcoli
-            }
+        focus: function (event, ui) {
+            $("#autore_search").val(ui.item.label);
+            return false;
+        },
+        select: function (event, ui) {
+            $("#autore_search").val(ui.item.label);
+
+            $('input[name="nome_autore"]').val(ui.item.nome).prop('readonly', true);
+            $('input[name="cognome_autore"]').val(ui.item.cognome).prop('readonly', true);
+            $('input[name="codice_fiscale"]').val(ui.item.codice_fiscale).prop('readonly', true);
+            $('input[name="data_nascita"]').val(ui.item.data_nascita).prop('readonly', true);
+            $('input[name="luogo_nascita"]').val(ui.item.luogo_nascita).prop('readonly', true);
+            $('input[name="iban"]').val(ui.item.iban).prop('readonly', true);
+            $('input[name="indirizzo"]').val(ui.item.indirizzo).prop('readonly', true);
+
+            calcolaRitenuta();
+            return false;
+        }
     });
 });
 </script>
+
 
 
 <style>
