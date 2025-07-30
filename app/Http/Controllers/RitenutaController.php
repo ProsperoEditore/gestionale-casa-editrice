@@ -30,6 +30,17 @@ class RitenutaController extends Controller
 
     public function store(Request $request)
     {
+
+        // Converte il formato gg-mm-aaaa in Y-m-d
+        if ($request->filled('data_nascita')) {
+            $parts = explode('-', $request->data_nascita);
+            if (count($parts) === 3 && strlen($parts[2]) === 4) {
+                $request->merge([
+                    'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
+                ]);
+            }
+        }
+
         $request->validate([
             'nome_autore' => 'required|string',
             'cognome_autore' => 'required|string',
@@ -129,6 +140,16 @@ public function edit(Ritenuta $ritenuta)
 
 public function update(Request $request, Ritenuta $ritenuta)
 {
+
+    if ($request->filled('data_nascita')) {
+        $parts = explode('-', $request->data_nascita);
+        if (count($parts) === 3 && strlen($parts[2]) === 4) {
+            $request->merge([
+                'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
+            ]);
+        }
+    }
+
     $request->validate([
         'nome_autore' => 'required|string',
         'cognome_autore' => 'required|string',
