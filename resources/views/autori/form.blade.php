@@ -105,15 +105,23 @@
 @endsection
 
 @push('scripts')
+<!-- jQuery UI se non già incluso altrove -->
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script>
-const libri = @json($libri->map(fn($l) => ['label' => $l->titolo, 'value' => $l->id]));
-console.log("Libri caricati:", libri);
 
+<script>
 let selectedLibroId = null;
 
 $('#autocomplete-libro').autocomplete({
-    source: libri,
+    source: function(request, response) {
+        $.ajax({
+            url: "{{ route('autori.autocomplete-libro') }}",
+            dataType: "json",
+            data: { term: request.term },
+            success: function(data) {
+                response(data);
+            }
+        });
+    },
     minLength: 2,
     select: function(event, ui) {
         $('#autocomplete-libro').val(ui.item.label);
@@ -145,4 +153,3 @@ function aggiungiLibro() {
 }
 </script>
 @endpush
-

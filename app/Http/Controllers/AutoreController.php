@@ -92,4 +92,22 @@ class AutoreController extends Controller
 
         return redirect()->route('autori.index')->with('success', 'Autore eliminato con successo.');
     }
+
+    public function autocompleteLibro(Request $request)
+{
+    $term = strtolower($request->input('term'));
+
+    $libri = \App\Models\Libro::whereRaw('LOWER(titolo) LIKE ?', ["%{$term}%"])
+        ->orWhere('isbn', 'like', "%{$term}%")
+        ->limit(10)
+        ->get();
+
+    return response()->json($libri->map(function ($l) {
+        return [
+            'label' => "{$l->titolo} ({$l->isbn})",
+            'value' => $l->id,
+        ];
+    }));
+}
+
 }
