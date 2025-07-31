@@ -115,7 +115,7 @@
             <div class="box">
                 <p><strong>Prezzo:</strong> €{{ number_format($scheda->libro->prezzo, 2, ',', '.') }}</p>
                 <p><strong>Data pubblicazione:</strong> {{ optional($scheda->libro->data_pubblicazione)->format('d/m/Y') }}</p>
-                <p><strong>Marchio editoriale:</strong> {{ $scheda->libro->marchio_editoriale }}</p>
+                <p><strong>Marchio editoriale:</strong> {{ $scheda->libro->marchio->nome ?? '-' }}</p>
                 <p><strong>Collana:</strong> {{ $scheda->libro->collana ?? '-' }}</p>
                 <p><strong>Formato:</strong> {{ $scheda->formato ?? '-' }}</p>
                 <p><strong>Pagine:</strong> {{ $scheda->numero_pagine ?? '-' }}</p>
