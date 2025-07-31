@@ -126,7 +126,12 @@ function aggiungiLibro() {
     const titolo = $('#autocomplete-libro').val();
     const id = selectedLibroId;
 
-    if (!id || !$(`input[name="libri[]"][value="${id}"]`).length) {
+    if (!id) {
+        alert("⚠️ Seleziona un libro dal menu a tendina prima di aggiungere.");
+        return;
+    }
+
+    if (!$(`input[name="libri[]"][value="${id}"]`).length) {
         const li = `<li class="list-group-item d-flex justify-content-between align-items-center">
             ${titolo}
             <input type="hidden" name="libri[]" value="${id}">
