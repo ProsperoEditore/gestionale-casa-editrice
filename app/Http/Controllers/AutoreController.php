@@ -104,10 +104,11 @@ class AutoreController extends Controller
 
     return response()->json($libri->map(function ($l) {
         return [
-            'label' => "{$l->titolo} ({$l->isbn})",
+            'label' => "<strong>{$l->titolo}</strong><br><small>{$l->isbn}</small>",
             'value' => $l->id,
         ];
     }));
+
 }
 
 }

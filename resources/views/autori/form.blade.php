@@ -111,7 +111,7 @@
 <script>
 let selectedLibroId = null;
 
-$('#autocomplete-libro').autocomplete({
+$("#autocomplete-libro").autocomplete({
     source: function(request, response) {
         $.ajax({
             url: "{{ route('autori.autocomplete-libro') }}",
@@ -123,12 +123,20 @@ $('#autocomplete-libro').autocomplete({
         });
     },
     minLength: 2,
+    focus: function(event, ui) {
+        $("#autocomplete-libro").val($(ui.item.label).text());
+        return false;
+    },
     select: function(event, ui) {
-        $('#autocomplete-libro').val(ui.item.label);
+        $("#autocomplete-libro").val($(ui.item.label).text());
         selectedLibroId = ui.item.value;
         return false;
     }
-});
+}).autocomplete("instance")._renderItem = function(ul, item) {
+    return $("<li>")
+        .append("<div class='ui-menu-item-wrapper'>" + item.label + "</div>")
+        .appendTo(ul);
+};
 
 function aggiungiLibro() {
     const titolo = $('#autocomplete-libro').val();
@@ -153,3 +161,36 @@ function aggiungiLibro() {
 }
 </script>
 @endpush
+
+
+@push('styles')
+<style>
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1050 !important;
+    font-size: 14px;
+}
+
+.ui-menu-item-wrapper {
+    padding: 8px 12px;
+    line-height: 1.4;
+    white-space: normal;
+    font-family: system-ui, sans-serif;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ui-menu-item-wrapper strong {
+    display: block;
+    font-weight: 600;
+    color: #212529;
+}
+
+.ui-menu-item-wrapper small {
+    color: #6c757d;
+    font-size: 12px;
+}
+</style>
+@endpush
+
