@@ -92,11 +92,23 @@ $(function () {
                 }
             });
         },
-        select: function (event, ui) {
-            $("#libro_autocomplete").val(ui.item.label);
-            $("#libro_id").val(ui.item.id);
-            return false;
-        }
+            select: function (event, ui) {
+                $("#libro_autocomplete").val(ui.item.label);
+                $("#libro_id").val(ui.item.id);
+
+                // Chiamata AJAX per ottenere dati del libro
+                $.ajax({
+                    url: "/schede-libro/dati-libro/" + ui.item.id,
+                    success: function (data) {
+                        $("textarea[name='sinossi']").val(data.sinossi);
+                        $("textarea[name='biografia_autore']").val(data.biografia_autore);
+                        $("input[name='formato']").val(data.formato);
+                        $("input[name='numero_pagine']").val(data.numero_pagine);
+                    }
+                });
+
+                return false;
+            }
     });
 });
 </script>

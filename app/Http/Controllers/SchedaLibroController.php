@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Milon\Barcode\Facades\DNS1DFacade;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Milon\Barcode\DNS1DFacade as DNS1D;
+
 
 class SchedaLibroController extends Controller
 {
@@ -147,6 +149,19 @@ public function autocompleteLibro(Request $request)
 
     return response()->json($libri);
 }
+
+public function datiLibro($id)
+{
+    $libro = \App\Models\Libro::with('autori')->findOrFail($id);
+
+    return response()->json([
+        'formato' => $libro->formato ?? '',
+        'numero_pagine' => $libro->numero_pagine ?? '',
+        'sinossi' => $libro->sinossi ?? '',
+        'biografia_autore' => $libro->autori->pluck('biografia')->filter()->first() ?? '', // prima biografia trovata
+    ]);
+}
+
 
 
 }

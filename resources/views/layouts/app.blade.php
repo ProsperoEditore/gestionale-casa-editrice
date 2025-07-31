@@ -147,15 +147,20 @@
                 </li>
             @endif
 
-            {{--
+
+
+
                 @if (auth()->user()->access_schede_libro)
                     <li class="mb-2">
                         <a href="{{ route('schede-libro.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Schede libro</a>
                     </li>
                 @endif
-            --}}
+
             {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
 
+
+
+            
             @if (auth()->user()->access_magazzini)
                 <li class="mb-2">
                     <a href="{{ route('magazzini.index') }}" class="btn btn-prospero-secondary w-100 text-start"> Magazzini e Depositi</a>
