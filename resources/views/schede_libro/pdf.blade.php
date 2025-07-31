@@ -2,123 +2,128 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Scheda Libro</title>
+    <title>{{ $scheda->libro->titolo }}</title>
     <style>
         @page { margin: 40px; }
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
             color: #222;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .logo {
             height: 60px;
-            margin-bottom: 10px;
         }
         .header {
-            text-align: left;
-            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
         }
         .titolo {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
         }
         .strillo {
             font-size: 14px;
-            color: #d40000;
+            color: #b30000;
             font-style: italic;
             margin-bottom: 15px;
         }
         .row {
             display: flex;
-            gap: 25px;
-            margin-bottom: 25px;
+            gap: 30px;
         }
-        .col {
-            flex: 1;
+        .col-left {
+            width: 35%;
+        }
+        .col-right {
+            width: 65%;
         }
         .copertina {
-            max-width: 100%;
-            max-height: 300px;
+            width: 100%;
             border: 1px solid #ccc;
-        }
-        .meta p {
-            margin: 2px 0;
-        }
-        .sezione {
-            margin-top: 18px;
-        }
-        .sezione h2 {
-            font-size: 13px;
-            margin-bottom: 5px;
-            border-bottom: 1px solid #aaa;
-            padding-bottom: 2px;
         }
         .barcode {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         .barcode p {
             font-size: 10px;
-            margin-top: 3px;
+            margin-top: 5px;
         }
-        .copertina-stesa {
-            text-align: center;
-            margin-top: 40px;
-        }
-        .copertina-stesa img {
-            max-width: 100%;
+        .box {
+            background: #f8f8f8;
             border: 1px solid #ccc;
+            padding: 10px 12px;
+            margin-top: 15px;
         }
-        .dati-tecnici {
-            margin-top: 10px;
+        .box p {
+            margin: 4px 0;
         }
-        .dati-tecnici table {
-            width: 100%;
-            border-collapse: collapse;
+        h2 {
+            font-size: 14px;
+            border-bottom: 1px solid #aaa;
+            margin-top: 25px;
+            margin-bottom: 5px;
         }
-        .dati-tecnici td {
-            padding: 4px 6px;
-        }
-        .dati-tecnici tr:nth-child(odd) {
-            background-color: #f9f9f9;
+        .sezione {
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    {{-- LOGO MARCHIO EDITORIALE --}}
-    @php
-        $marchio = strtolower($scheda->libro->marchio_editoriale ?? 'prospero');
-        $logoPath = public_path("images/marchi/logo-$marchio.png");
-    @endphp
-    @if (file_exists($logoPath))
-        <div class="header">
+    {{-- Header con logo e marchio --}}
+    <div class="header">
+        @php
+            $marchio = strtolower($scheda->libro->marchio_editoriale ?? 'prospero');
+            $logoPath = public_path("images/marchi/logo-$marchio.png");
+        @endphp
+        @if (file_exists($logoPath))
             <img src="{{ $logoPath }}" class="logo" alt="Logo marchio">
-        </div>
-    @endif
+        @endif
+    </div>
 
-    {{-- TITOLO + STRILLO --}}
+    {{-- Titolo e strillo --}}
     <div class="titolo">{{ $scheda->libro->titolo }}</div>
     @if ($scheda->strillo)
         <div class="strillo">«{{ $scheda->strillo }}»</div>
     @endif
 
-    {{-- COPERTINA + DATI --}}
+    {{-- Corpo principale --}}
     <div class="row">
-        <div class="col" style="max-width: 220px;">
+        <div class="col-left">
             @if ($scheda->copertina_path)
-                <img src="{{ public_path('storage/' . $scheda->copertina_path) }}" alt="Copertina" class="copertina">
+                <img src="{{ public_path('storage/' . $scheda->copertina_path) }}" class="copertina" alt="Copertina">
+            @endif
+
+            @if ($scheda->libro->isbn)
+                <div class="barcode">
+                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($scheda->libro->isbn, 'EAN13') }}" alt="Codice a barre ISBN">
+                    <p>ISBN {{ $scheda->libro->isbn }}</p>
+                </div>
             @endif
         </div>
-        <div class="col">
+
+        <div class="col-right">
             <h2>Sinossi</h2>
-            <p>{{ $scheda->sinossi }}</p>
+            <p>{!! nl2br(e($scheda->sinossi)) !!}</p>
+
+            {{-- Dettagli tecnici --}}
+            <div class="box">
+                <p><strong>Prezzo:</strong> €{{ number_format($scheda->libro->prezzo, 2, ',', '.') }}</p>
+                <p><strong>Data pubblicazione:</strong> {{ optional($scheda->libro->data_pubblicazione)->format('d/m/Y') }}</p>
+                <p><strong>Marchio editoriale:</strong> {{ $scheda->libro->marchio_editoriale }}</p>
+                <p><strong>Collana:</strong> {{ $scheda->libro->collana ?? '-' }}</p>
+                <p><strong>Formato:</strong> {{ $scheda->formato ?? '-' }}</p>
+                <p><strong>Pagine:</strong> {{ $scheda->numero_pagine ?? '-' }}</p>
+            </div>
         </div>
     </div>
 
-    {{-- SEZIONI EXTRA --}}
+    {{-- Altre sezioni facoltative --}}
     @foreach ([
         'Descrizione breve' => $scheda->descrizione_breve,
         'Biografia autore' => $scheda->biografia_autore,
@@ -132,54 +137,11 @@
         @endif
     @endforeach
 
-    {{-- DETTAGLI TECNICI --}}
-    <div class="sezione dati-tecnici">
-        <h2>Dettagli tecnici</h2>
-        <table>
-            <tr>
-                <td><strong>ISBN:</strong></td>
-                <td>{{ $scheda->libro->isbn }}</td>
-            </tr>
-            <tr>
-                <td><strong>Prezzo:</strong></td>
-                <td>€{{ number_format($scheda->libro->prezzo, 2, ',', '.') }}</td>
-            </tr>
-            <tr>
-                <td><strong>Data pubblicazione:</strong></td>
-                <td>{{ optional($scheda->libro->data_pubblicazione)->format('d/m/Y') }}</td>
-            </tr>
-            <tr>
-                <td><strong>Marchio:</strong></td>
-                <td>{{ $scheda->libro->marchio_editoriale }}</td>
-            </tr>
-            <tr>
-                <td><strong>Collana:</strong></td>
-                <td>{{ $scheda->libro->collana }}</td>
-            </tr>
-            <tr>
-                <td><strong>Formato:</strong></td>
-                <td>{{ $scheda->formato ?? '-' }}</td>
-            </tr>
-            <tr>
-                <td><strong>Numero pagine:</strong></td>
-                <td>{{ $scheda->numero_pagine ?? '-' }}</td>
-            </tr>
-        </table>
-    </div>
-
-    {{-- CODICE A BARRE --}}
-    @if ($scheda->libro->isbn)
-        <div class="barcode">
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($scheda->libro->isbn, 'EAN13') }}" alt="Codice a barre ISBN">
-            <p>ISBN: {{ $scheda->libro->isbn }}</p>
-        </div>
-    @endif
-
-    {{-- COPERTINA STESA --}}
+    {{-- Copertina stesa --}}
     @if ($scheda->copertina_stesa_path)
-        <div class="copertina-stesa">
+        <div class="sezione">
             <h2>Copertina completa</h2>
-            <img src="{{ public_path('storage/' . $scheda->copertina_stesa_path) }}" alt="Copertina stesa">
+            <img src="{{ public_path('storage/' . $scheda->copertina_stesa_path) }}" alt="Copertina stesa" style="width: 100%; border: 1px solid #ccc;">
         </div>
     @endif
 
