@@ -38,7 +38,12 @@
 <div class="row mb-3">
     <div class="col-md-6">
         <label class="form-label">Data di nascita</label>
-        <input type="date" name="data_nascita" class="form-control" value="{{ old('data_nascita', $autore->data_nascita ?? '') }}">
+       <input type="date"
+       name="data_nascita"
+       class="form-control"
+       max="{{ now()->format('Y-m-d') }}"
+       value="{{ old('data_nascita', isset($autore->data_nascita) ? $autore->data_nascita->format('Y-m-d') : '') }}">
+
     </div>
     <div class="col-md-6">
         <label class="form-label">Luogo di nascita</label>

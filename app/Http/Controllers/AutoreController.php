@@ -55,34 +55,46 @@ class AutoreController extends Controller
         return view('autori.form', compact('autore', 'libri'));
     }
 
-    public function update(Request $request, Autore $autore)
-    {
-        $data = $request->validate([
-            'nome' => 'nullable|string',
-            'cognome' => 'nullable|string',
-            'pseudonimo' => 'nullable|string',
-            'denominazione' => 'nullable|string',
-            'codice_fiscale' => 'nullable|string',
-            'data_nascita' => 'nullable|date',
-            'luogo_nascita' => 'nullable|string',
-            'iban' => 'nullable|string',
-            'indirizzo' => 'nullable|string',
-            'biografia' => 'nullable|string',
-            'foto' => 'nullable|image',
-            'libri' => 'nullable|array',
-            'libri.*' => 'exists:libri,id',
-        ]);
-
-        if ($request->hasFile('foto')) {
-            if ($autore->foto) Storage::disk('public')->delete($autore->foto);
-            $data['foto'] = $request->file('foto')->store('autori', 'public');
+public function update(Request $request, Autore $autore)
+{
+    // ✅ CONVERSIONE formato gg/mm/aaaa o gg-mm-aaaa in Y-m-d
+    if ($request->filled('data_nascita')) {
+        $data_raw = str_replace('/', '-', $request->data_nascita);
+        $parts = explode('-', $data_raw);
+        if (count($parts) === 3 && strlen($parts[2]) === 4) {
+            $request->merge([
+                'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
+            ]);
         }
-
-        $autore->update($data);
-        $autore->libri()->sync($request->input('libri', []));
-
-        return redirect()->route('autori.index')->with('success', 'Autore aggiornato con successo.');
     }
+
+    $data = $request->validate([
+        'nome' => 'nullable|string',
+        'cognome' => 'nullable|string',
+        'pseudonimo' => 'nullable|string',
+        'denominazione' => 'nullable|string',
+        'codice_fiscale' => 'nullable|string',
+        'data_nascita' => 'nullable|date',
+        'luogo_nascita' => 'nullable|string',
+        'iban' => 'nullable|string',
+        'indirizzo' => 'nullable|string',
+        'biografia' => 'nullable|string',
+        'foto' => 'nullable|image',
+        'libri' => 'nullable|array',
+        'libri.*' => 'exists:libri,id',
+    ]);
+
+    if ($request->hasFile('foto')) {
+        if ($autore->foto) Storage::disk('public')->delete($autore->foto);
+        $data['foto'] = $request->file('foto')->store('autori', 'public');
+    }
+
+    $autore->update($data);
+    $autore->libri()->sync($request->input('libri', []));
+
+    return redirect()->route('autori.index')->with('success', 'Autore aggiornato con successo.');
+}
+
 
     public function destroy(Autore $autore)
     {
