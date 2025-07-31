@@ -156,9 +156,9 @@
                     </li>
                 @endif
 
+--}}
             {{-- [VOCE NASCOSTA TEMPORANEAMENTE] Per riattivare il link alle Schede Libro, rimuovi il commento sopra e assicurati che l'utente abbia access_schede_libro abilitato. --}}
 
---}}
 
 
             @if (auth()->user()->access_magazzini)
