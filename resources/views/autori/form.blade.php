@@ -175,7 +175,8 @@ function aggiungiLibro() {
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 1050 !important;
-    font-size: 14px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
 }
 
 .ui-menu-item-wrapper {
@@ -184,7 +185,10 @@ function aggiungiLibro() {
     white-space: normal;
     font-family: system-ui, sans-serif;
     border-bottom: 1px solid #e9ecef;
+    background-color: #fff !important;
+    color: #212529;
 }
+
 
 .ui-menu-item-wrapper strong {
     display: block;

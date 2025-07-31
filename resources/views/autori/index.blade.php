@@ -35,9 +35,16 @@
                             <em class="text-muted">Nessun libro</em>
                         @else
                             <ul class="mb-0 ps-3">
-                                @foreach($a->libri as $libro)
-                                    <li>{{ $libro->titolo }}</li>
-                                @endforeach
+                        @foreach($a->libri as $libro)
+                            <li>
+                                <strong>{{ $libro->titolo }}</strong><br>
+                                <small class="text-muted">
+                                    ISBN: {{ $libro->isbn }} |
+                                    Prezzo: € {{ number_format($libro->prezzo_copertina, 2, ',', '.') }}
+                                </small>
+                            </li>
+                        @endforeach
+
                             </ul>
                         @endif
                     </td>
