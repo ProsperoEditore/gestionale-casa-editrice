@@ -34,14 +34,16 @@ Log::info('RICHIESTA CREAZIONE RITENUTA', $request->all());
 Log::info('Prestazioni ricevute:', $request->prestazioni ?? []);
 
         // Converte il formato gg-mm-aaaa in Y-m-d
-                if ($request->filled('data_nascita')) {
-                    $parts = explode('-', $request->data_nascita);
-                    if (count($parts) === 3 && strlen($parts[2]) === 4) {
-                        $request->merge([
-                            'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
-                        ]);
-                    }
+            if ($request->filled('data_nascita')) {
+                // Accetta sia "gg-mm-aaaa" che "gg/mm/aaaa"
+                $data_raw = str_replace('/', '-', $request->data_nascita);
+                $parts = explode('-', $data_raw);
+                if (count($parts) === 3 && strlen($parts[2]) === 4) {
+                    $request->merge([
+                        'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
+                    ]);
                 }
+            }
 
         // 🔁 Converte le virgole in punti nei campi importo
                 if ($request->has('prestazioni')) {
@@ -164,7 +166,9 @@ public function update(Request $request, Ritenuta $ritenuta)
 {
 
     if ($request->filled('data_nascita')) {
-        $parts = explode('-', $request->data_nascita);
+        // Accetta sia "gg-mm-aaaa" che "gg/mm/aaaa"
+        $data_raw = str_replace('/', '-', $request->data_nascita);
+        $parts = explode('-', $data_raw);
         if (count($parts) === 3 && strlen($parts[2]) === 4) {
             $request->merge([
                 'data_nascita' => $parts[2] . '-' . $parts[1] . '-' . $parts[0],
