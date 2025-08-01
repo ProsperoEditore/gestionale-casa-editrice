@@ -46,7 +46,26 @@
                     <td data-label="Marchio Editoriale">{{ $item->marchio_editoriale->nome ?? 'N/D' }}</td>
                     <td data-label="Prezzo">{{ number_format($item->prezzo, 2, ',', '.') }} €</td>
                     <td data-label="Anno Pubblicazione">{{ $item->anno_pubblicazione }}</td>
-                    <td data-label="Stato">{{ $item->stato }}</td>
+                    <td data-label="Stato">
+                        <form action="{{ route('libri.update', $item->id) }}" method="POST" class="d-flex flex-column align-items-center stato-form" style="min-width: 120px;">
+                            @csrf
+                            @method('PUT')
+
+                            <select name="stato" class="form-select stato-select" data-libro-id="{{ $item->id }}">
+                                <option value="C" {{ $item->stato == 'C' ? 'selected' : '' }}>Commerciale</option>
+                                <option value="A" {{ $item->stato == 'A' ? 'selected' : '' }}>Accantonato</option>
+                                <option value="FC" {{ $item->stato == 'FC' ? 'selected' : '' }}>Fuori Catalogo</option>
+                            </select>
+
+                            <input type="date" name="data_cessazione_commercio"
+                                class="form-control mt-2 data-cessazione"
+                                style="display: {{ $item->stato == 'FC' ? 'block' : 'none' }};"
+                                value="{{ $item->data_cessazione_commercio }}">
+                            
+                            <button type="submit" class="btn btn-sm btn-primary mt-2">Salva</button>
+                        </form>
+                    </td>
+
                     <td data-label="Azioni" class="align-middle">
                         <a href="{{ route('libri.edit', $item->id) }}" class="text-warning me-1" title="Modifica">
                             <i class="bi bi-pencil fs-5"></i>
@@ -127,5 +146,24 @@ $(document).ready(function () {
     });
 });
 </script>
+
+<script>
+$(document).ready(function () {
+    $('.stato-select').on('change', function () {
+        const selected = $(this).val();
+        const form = $(this).closest('.stato-form');
+        const dataInput = form.find('.data-cessazione');
+
+        if (selected === 'FC') {
+            dataInput.show();
+        } else {
+            dataInput.hide();
+            dataInput.val('');
+        }
+    });
+});
+</script>
+
+
 
 @endsection

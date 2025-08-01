@@ -104,7 +104,17 @@ class LibroController extends Controller
             }
         }
     
-        $libro->update($request->all());
+        $libro->update([
+            'isbn' => $request->isbn ?? $libro->isbn,
+            'titolo' => $request->titolo ?? $libro->titolo,
+            'marchio_editoriale_id' => $request->marchio_editoriale_id ?? $libro->marchio_editoriale_id,
+            'anno_pubblicazione' => $request->anno_pubblicazione ?? $libro->anno_pubblicazione,
+            'prezzo' => $request->prezzo ?? $libro->prezzo,
+            'costo_produzione' => $request->costo_produzione ?? $libro->costo_produzione,
+            'stato' => $request->stato,
+            'data_cessazione_commercio' => $request->stato === 'FC' ? $request->data_cessazione_commercio : null,
+        ]);
+
     
         return redirect()->route('libri.index')->with('success', 'Libro aggiornato con successo.');
     }
