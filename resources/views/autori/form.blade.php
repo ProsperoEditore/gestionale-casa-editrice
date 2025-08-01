@@ -175,7 +175,7 @@ function aggiungiLibro() {
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 1050 !important;
-    background-color: #fff;
+    background-color: #fff !important;
     border: 1px solid #dee2e6;
 }
 

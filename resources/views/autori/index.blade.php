@@ -40,7 +40,7 @@
                                 <strong>{{ $libro->titolo }}</strong><br>
                                 <small class="text-muted">
                                     ISBN: {{ $libro->isbn }} |
-                                    Prezzo: € {{ number_format($libro->prezzo_copertina, 2, ',', '.') }}
+                                    Prezzo: € {{ number_format($libro->prezzo, 2, ',', '.') }}
                                 </small>
                             </li>
                         @endforeach
