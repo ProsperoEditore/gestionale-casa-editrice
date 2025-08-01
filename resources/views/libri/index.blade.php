@@ -52,7 +52,7 @@
                             @method('PUT')
 
                             <select name="stato" class="form-select stato-select" data-libro-id="{{ $item->id }}">
-                                <option value="C" {{ $item->stato == 'C' ? 'selected' : '' }}>Commerciale</option>
+                                <option value="C" {{ $item->stato == 'C' ? 'selected' : '' }}>In commercio</option>
                                 <option value="A" {{ $item->stato == 'A' ? 'selected' : '' }}>Accantonato</option>
                                 <option value="FC" {{ $item->stato == 'FC' ? 'selected' : '' }}>Fuori Catalogo</option>
                             </select>

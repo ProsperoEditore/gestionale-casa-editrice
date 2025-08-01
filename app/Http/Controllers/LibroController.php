@@ -59,13 +59,8 @@ class LibroController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'isbn' => 'required|unique:libri,isbn,' . $id,
-            'titolo' => 'required',
-            'marchio_editoriale_id' => 'required|exists:marchio_editoriales,id',
-            'anno_pubblicazione' => 'required|integer',
-            'prezzo' => 'required|numeric|min:0',
-            'costo_produzione' => 'nullable|numeric|min:0',
             'stato' => 'nullable|in:C,FC,A',
+            'data_cessazione_commercio' => 'nullable|date',
         ]);
     
         $libro = Libro::findOrFail($id);
@@ -104,16 +99,14 @@ class LibroController extends Controller
             }
         }
     
-        $libro->update([
-            'isbn' => $request->isbn ?? $libro->isbn,
-            'titolo' => $request->titolo ?? $libro->titolo,
-            'marchio_editoriale_id' => $request->marchio_editoriale_id ?? $libro->marchio_editoriale_id,
-            'anno_pubblicazione' => $request->anno_pubblicazione ?? $libro->anno_pubblicazione,
-            'prezzo' => $request->prezzo ?? $libro->prezzo,
-            'costo_produzione' => $request->costo_produzione ?? $libro->costo_produzione,
-            'stato' => $request->stato,
-            'data_cessazione_commercio' => $request->stato === 'FC' ? $request->data_cessazione_commercio : null,
-        ]);
+            $libro->stato = $request->stato;
+
+            $libro->data_cessazione_commercio = $request->stato === 'FC'
+                ? $request->data_cessazione_commercio
+                : null;
+
+            $libro->save();
+
 
     
         return redirect()->route('libri.index')->with('success', 'Libro aggiornato con successo.');
