@@ -127,6 +127,8 @@ class OrdineController extends Controller
             'data' => 'required|date',
             'anagrafica_id' => 'required|exists:anagraficas,id',
             'tipo_ordine' => 'required|string',
+            'aliquota_iva_ordine' => 'nullable|numeric',
+            'natura_iva_ordine'   => 'nullable|string|max:5',
         ];
     
         if ($tipo === 'acquisto') {
@@ -137,8 +139,14 @@ class OrdineController extends Controller
 
         $validatedData['data'] = $request->input('data');
 
-        $validatedData['pagato'] = $request->input('pagato'); 
+        $validatedData['pagato'] = $request->input('pagato');
+        $validatedData['aliquota_iva_ordine'] = $request->input('aliquota_iva_ordine', 0.00);
+        $validatedData['natura_iva_ordine']   = $request->input('natura_iva_ordine', 'N2.2');
     
+        if (!empty($validatedData['natura_iva_ordine'])) {
+            $validatedData['aliquota_iva_ordine'] = 0.00;
+        }
+
         // ✅ Se non è acquisto, metti un valore valido placeholder per evitare errori di constraint
         if ($tipo !== 'acquisto') {
             $validatedData['canale'] = 'evento';
@@ -198,6 +206,11 @@ class OrdineController extends Controller
             return [$libro->id => (int) $libro->pivot->quantita];
         });
 
+            $aliq = (float) $request->input('aliquota_iva_ordine', 0.00);
+            $nat  = $request->input('natura_iva_ordine', 'N2.2');
+            if (!empty($nat)) {
+            $aliq = 0.00;
+        }
 
         // ✏️ Aggiorna dati ordine
         $ordine->update([
@@ -210,6 +223,8 @@ class OrdineController extends Controller
             'tempi_pagamento' => $request->input('tempi_pagamento'),
             'modalita_pagamento' => $request->input('modalita_pagamento'),
             'pagato' => $request->input('pagato'),
+            'aliquota_iva_ordine' => $aliq,
+            'natura_iva_ordine'   => $nat,
         ]);
 
         // 🔄 Sincronizza libri
@@ -430,6 +445,12 @@ public function importLibri(Request $request, $id)
     {
         $ordine = Ordine::select('id', 'anagrafica_id', 'data', 'canale', 'codice', 'tipo_ordine')->findOrFail($id);
     
+            $aliq = (float) $request->input('aliquota_iva_ordine', 0.00);
+            $nat  = $request->input('natura_iva_ordine', 'N2.2');
+            if (!empty($nat)) {
+                $aliq = 0.00; // se c’è Natura, Aliquota deve essere 0.00
+            }
+
         $ordine->update([
             'pagato' => $request->input('pagato'),
             'causale' => $request->input('causale'),
@@ -440,6 +461,8 @@ public function importLibri(Request $request, $id)
             'specifiche_iva' => $request->input('specifiche_iva'),
             'costo_spedizione' => $request->input('costo_spedizione'),
             'altre_specifiche_iva' => $request->input('altre_specifiche_iva'),
+            'aliquota_iva_ordine' => $aliq,
+            'natura_iva_ordine'   => $nat,
         ]);
     
         $ordine->refresh();

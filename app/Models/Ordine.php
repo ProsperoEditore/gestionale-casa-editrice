@@ -27,6 +27,8 @@ class Ordine extends Model
         'modalita_pagamento',
         'totale_netto_compilato',
         'specifiche_iva',
+        'aliquota_iva_ordine',
+        'natura_iva_ordine',
         'costo_spedizione',
         'altre_specifiche_iva',
         'pagato'

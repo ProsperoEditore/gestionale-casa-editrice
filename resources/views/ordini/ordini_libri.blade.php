@@ -102,6 +102,37 @@ $righeAmbigue = session()->pull('righe_ambigue_ordini', []);
         <input type="text" name="altre_specifiche_iva" maxlength="500" class="form-control"
             value="{{ old('altre_specifiche_iva', $ordine->altre_specifiche_iva ?? ($ordine->tipo_ordine === 'acquisto' ? 'Copia di cortesia. Documento non valido ai fini fiscali. Seguirà fattura elettronica.' : '')) }}">
     </div>
+
+
+<div class="row g-2">
+  <div class="col-md-4">
+    <label class="form-label"><strong>Aliquota IVA (ordine)</strong></label>
+    <select name="aliquota_iva_ordine" class="form-control">
+      @php $aliq = old('aliquota_iva_ordine', $ordine->aliquota_iva_ordine ?? 0.00); @endphp
+      @foreach([0,4,5,10,22] as $opt)
+        <option value="{{ number_format($opt,2,'.','') }}"
+          {{ number_format($aliq,2,'.','') == number_format($opt,2,'.','') ? 'selected' : '' }}>
+          {{ number_format($opt,2,',','') }} %
+        </option>
+      @endforeach
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label"><strong>Natura IVA (ordine)</strong></label>
+    @php $nat = old('natura_iva_ordine', $ordine->natura_iva_ordine ?? 'N2.2'); @endphp
+    <select name="natura_iva_ordine" class="form-control">
+      @foreach(['','N1','N2.1','N2.2','N3.2','N4','N5','N6','N7'] as $opt)
+        <option value="{{ $opt }}" {{ ($nat===$opt)?'selected':'' }}>
+          {{ $opt === '' ? '—' : $opt }}
+        </option>
+      @endforeach
+    </select>
+    <small class="text-muted">Default attuale: N2.2 (editoria, art. 74). Lasciala vuota se usi aliquota IVA &gt; 0 senza natura.</small>
+  </div>
+</div>
+
+
+
     <div class="mb-3">
         <label for="totale_netto_compilato" class="form-label"><strong>Totale netto da pagare (modificabile)</strong></label>
         <input type="number" step="0.01" name="totale_netto_compilato" id="totale_netto_compilato" class="form-control" value="{{ old('totale_netto_compilato', $ordine->totale_netto_compilato) }}">
@@ -515,5 +546,27 @@ function aggiornaTotaliOrdine() {
 }
 
 </script>
+
+<script>
+$(function(){
+  const $aliq = $('select[name="aliquota_iva_ordine"]');
+  const $nat  = $('select[name="natura_iva_ordine"]');
+
+  function syncIva() {
+    if ($nat.val()) {
+      // se c'è Natura, azzera aliquota e disabilitala (opzionale)
+      $aliq.val('0.00');
+      // opzionale: $aliq.prop('disabled', true);
+    } else {
+      // opzionale: $aliq.prop('disabled', false);
+    }
+  }
+
+  $nat.on('change', syncIva);
+  // run all'avvio per allineare lo stato iniziale
+  syncIva();
+});
+</script>
+
 
 @endsection
