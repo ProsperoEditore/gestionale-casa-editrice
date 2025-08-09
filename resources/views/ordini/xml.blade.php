@@ -3,44 +3,64 @@
 @php
     /** @var \App\Models\Ordine $ordine */
 
-    // Dati soggetti
+    // ---- Funzioni di supporto ------------------------------------------------
+    $toIso2 = function (?string $name, string $fallback = 'IT') {
+        $name = strtoupper(trim((string)$name));
+        if ($name === '') return $fallback;
+
+        // Se già ISO-2 valido, usa quello
+        if (preg_match('/^[A-Z]{2}$/', $name)) return $name;
+
+        // Mappa veloce nomi -> ISO2 (aggiungi qui se ti servono altri casi)
+        $map = [
+            'ITALIA' => 'IT', 'ITALY' => 'IT',
+            'VATICANO' => 'VA', 'STATO DELLA CITTÀ DEL VATICANO' => 'VA', 'VATICAN CITY' => 'VA',
+            'SAN MARINO' => 'SM',
+            'SVIZZERA' => 'CH',
+            'FRANCIA' => 'FR',
+            'GERMANIA' => 'DE',
+            'SPAGNA' => 'ES',
+        ];
+        return $map[$name] ?? $fallback;
+    };
+
+    $fmt = fn($n) => number_format((float)$n, 2, '.', '');
+
+    // ---- Dati soggetti -------------------------------------------------------
     $cliente = $ordine->anagrafica;
     $profilo = \App\Models\Profilo::first();
     if (!$profilo) {
         die('⚠️ Nessun profilo configurato per l’esportazione XML.');
     }
 
+    // Controlli minimi obbligatori lato cliente (Sede)
     if (empty($cliente->via_fatturazione) || empty($cliente->comune_fatturazione)) {
-    die('⚠️ Dati cliente incompleti: Indirizzo e Comune sono obbligatori per lo SdI.');
+        die('⚠️ Dati cliente incompleti: Indirizzo e Comune sono obbligatori per lo SdI.');
     }
 
-    // Riferimento normativo (fallback)
+    // ---- Parametri documento --------------------------------------------------
+    $progressivo      = str_pad($ordine->id, 5, '0', STR_PAD_LEFT);
+    $numeroDocumento  = str_replace('/', '-', (string) $ordine->codice);
+    $dataDoc          = \Carbon\Carbon::parse($ordine->data)->toDateString();
+    $dataScad         = \Carbon\Carbon::parse($ordine->data)->addDays(30)->toDateString();
+
+    // ---- IVA a livello d'ordine ----------------------------------------------
+    $aliqOrd   = (float)($ordine->aliquota_iva_ordine ?? 0.00);
+    $natOrd    = $ordine->natura_iva_ordine ?? 'N2.2';
+    $usaNatura = !empty($natOrd);
+    $aliqEff   = $usaNatura ? 0.00 : $aliqOrd;
+
+    // ---- Indirizzi / nazioni / CAP -------------------------------------------
+    $capCed  = $profilo->cap_amministrativa ?: '00000';
+    $capCess = $cliente->cap_fatturazione ?: '00000';
+    $nazCed  = $toIso2($profilo->nazione_amministrativa, 'IT');
+    $nazCess = $toIso2($cliente->nazione_fatturazione, 'IT');
+
+    // ---- Riferimento normativo ------------------------------------------------
     $rifNorm = $ordine->specifiche_iva
         ?? "IVA assolta all'origine dall'editore, ai sensi dell'art.74 co. 1 lett. c del DPR 633/72";
 
-    // Parametri documento
-    $progressivo = str_pad($ordine->id, 5, '0', STR_PAD_LEFT);
-    $dataDoc = \Carbon\Carbon::parse($ordine->data)->toDateString();
-    $dataScad = \Carbon\Carbon::parse($ordine->data)->addDays(30)->toDateString();
-
-    // IVA a livello d'ordine (default 0% + N2.2)
-    $aliqOrd = (float)($ordine->aliquota_iva_ordine ?? 0.00);
-    $natOrd  = $ordine->natura_iva_ordine ?? 'N2.2';
-    $usaNatura = !empty($natOrd);
-
-    // Aliquota effettiva da esporre (se c'è Natura deve essere 0.00)
-    $aliqEff = $usaNatura ? 0.00 : $aliqOrd;
-
-    // Helper numerico
-    $fmt = fn($n) => number_format((float)$n, 2, '.', '');
-
-    // Sanitizzazioni minime indirizzi
-    $capCed  = $profilo->cap_amministrativa ?: '00000';
-    $capCess = $cliente->cap_fatturazione ?: '00000';
-    $nazCed  = $profilo->nazione_amministrativa ?: 'IT';
-    $nazCess = $cliente->nazione_fatturazione ?: 'IT';
-
-    // Costruzione linee (prezzo netto di riga = listino * (1 - sconto%))
+    // ---- Righe ----------------------------------------------------------------
     $righe = [];
     $totImponibile = 0.0;
 
@@ -67,11 +87,9 @@
         $totImponibile += $totRiga;
     }
 
-    // Imposta e totale documento
-    $imposta = $usaNatura ? 0.0 : $totImponibile * ($aliqEff / 100);
-    $totDocumento = $totImponibile + $imposta;
-
-    // Importo pagamento: se presente "totale_netto_compilato" lo rispettiamo, altrimenti totale documento
+    // ---- Totali ---------------------------------------------------------------
+    $imposta       = $usaNatura ? 0.0 : $totImponibile * ($aliqEff / 100);
+    $totDocumento  = $totImponibile + $imposta;
     $importoPagamento = is_null($ordine->totale_netto_compilato)
         ? $totDocumento
         : (float) $ordine->totale_netto_compilato;
@@ -171,7 +189,7 @@
         <p:TipoDocumento>TD01</p:TipoDocumento>
         <p:Divisa>EUR</p:Divisa>
         <p:Data>{{ $dataDoc }}</p:Data>
-        <p:Numero>{{ $ordine->codice }}</p:Numero>
+        <p:Numero>{{ $numeroDocumento }}</p:Numero>
         <p:Causale>{{ $rifNorm }}</p:Causale>
       </p:DatiGeneraliDocumento>
     </p:DatiGenerali>
