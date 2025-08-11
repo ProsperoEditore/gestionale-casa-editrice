@@ -9,9 +9,10 @@
         die('⚠️ Nessun profilo configurato per l’esportazione XML.');
     }
 
-    // Validazioni minime per evitare errori "campi vuoti"
-    if (empty($profilo->denominazione)) die('⚠️ Denominazione Cedente mancante.');
-    if (empty($profilo->partita_iva))  die('⚠️ Partita IVA Cedente mancante.');
+    // Controlli minimi (aiutano a evitare errori "campi vuoti" nei validatori)
+    if (empty($profilo->denominazione) || empty($profilo->partita_iva)) {
+        die('⚠️ Denominazione/Partita IVA del Cedente mancanti.');
+    }
     if (empty($profilo->indirizzo_amministrativa) || empty($profilo->comune_amministrativa)) {
         die('⚠️ Indirizzo/Comune sede Cedente mancanti.');
     }
@@ -19,7 +20,7 @@
         die('⚠️ Dati cliente incompleti: Indirizzo e Comune sono obbligatori per lo SdI.');
     }
 
-    // Se invii ATTRAVERSO Unimatica come terzo intermediario, metti true e compila i dati
+    // Se invii tramite Unimatica come intermediario
     $usaIntermediarioUnimatica = true;
     $intermPaese  = 'IT';
     $intermPiva   = '02098391200';
@@ -33,15 +34,13 @@
     $progressivo = str_pad($ordine->id, 5, '0', STR_PAD_LEFT);
     $dataDoc = \Carbon\Carbon::parse($ordine->data)->toDateString();
     $dataScad = \Carbon\Carbon::parse($ordine->data)->addDays(30)->toDateString();
+    $numeroDoc = str_replace('/', '-', (string) $ordine->codice); // es. 79-2025
 
-    // Numero documento senza "/"
-    $numeroDoc = str_replace('/', '-', (string) $ordine->codice);
-
-    // Destinatario: uso codice univoco se presente, altrimenti PEC, altrimenti 0000000
+    // Destinatario (codice o PEC)
     $codiceDest = trim($cliente->codice_univoco ?? '') !== '' ? strtoupper(trim($cliente->codice_univoco)) : '0000000';
     $pecDest    = trim($cliente->pec ?? '');
 
-    // IVA a livello d'ordine (default 0% + N2.2)
+    // IVA a livello d'ordine
     $aliqOrd = (float)($ordine->aliquota_iva_ordine ?? 0.00);
     $natOrd  = $ordine->natura_iva_ordine ?? 'N2.2';
     $usaNatura = !empty($natOrd);
@@ -50,16 +49,16 @@
     // Helper numerico
     $fmt = fn($n) => number_format((float)$n, 2, '.', '');
 
-    // Sanitizzazioni minime indirizzi/codici
+    // Indirizzi
     $capCed  = str_pad(preg_replace('/\D/', '', (string)($profilo->cap_amministrativa ?? '')), 5, '0', STR_PAD_LEFT) ?: '00000';
     $capCess = str_pad(preg_replace('/\D/', '', (string)($cliente->cap_fatturazione ?? '')), 5, '0', STR_PAD_LEFT) ?: '00000';
     $nazCed  = 'IT';
     $nazCess = 'IT';
 
-    // Cedente: regime fiscale
-    $regimeFiscale = $profilo->regime_fiscale ?: 'RF07'; // imposta quello corretto del profilo
+    // Regime fiscale
+    $regimeFiscale = $profilo->regime_fiscale ?: 'RF07';
 
-    // Costruzione linee (prezzo netto di riga = listino * (1 - sconto%))
+    // Righe
     $righe = [];
     $totImponibile = 0.0;
 
@@ -86,16 +85,16 @@
         $totImponibile += $totRiga;
     }
 
-    // Imposta e totale documento
+    // Imposta e totale
     $imposta = $usaNatura ? 0.0 : $totImponibile * ($aliqEff / 100);
     $totDocumento = $totImponibile + $imposta;
 
-    // Importo pagamento: se presente "totale_netto_compilato" lo rispettiamo, altrimenti totale documento
+    // Importo pagamento
     $importoPagamento = is_null($ordine->totale_netto_compilato)
         ? $totDocumento
         : (float) $ordine->totale_netto_compilato;
 
-    // Dati anagrafici cedente/cessionario robusti
+    // Dati anagrafici
     $denomCed = trim($profilo->denominazione);
     $cfCed    = trim($profilo->codice_fiscale ?? '');
     $pivaCed  = trim($profilo->partita_iva);
@@ -105,15 +104,13 @@
     $cognCess  = trim($cliente->cognome ?? '');
     $pivaCess  = trim($cliente->partita_iva ?? '');
     $cfCess    = trim($cliente->codice_fiscale ?? '');
-
-    // Se è persona fisica senza denominazione, SdI vuole Nome + Cognome
     $isPersonaFisica = ($denomCess === '' && ($nomeCess !== '' || $cognCess !== ''));
 @endphp
 
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 
-<FatturaElettronica versione="FPR12"
-    xmlns="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2"
+<ns3:FatturaElettronica versione="FPR12"
+    xmlns:ns3="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2.2/Schema_del_file_xml_FatturaPA_versione_1.2.2.xsd">
@@ -122,7 +119,7 @@
     <DatiTrasmissione>
       <IdTrasmittente>
         @if($usaIntermediarioUnimatica)
-          <IdPaese>{{ $intermPaese }}</IdPaese>
+          <IdPaese>IT</IdPaese>
           <IdCodice>{{ $intermPiva }}</IdCodice>
         @else
           <IdPaese>IT</IdPaese>
@@ -226,7 +223,6 @@
         <Data>{{ $dataDoc }}</Data>
         <Numero>{{ $numeroDoc }}</Numero>
         <Causale>{{ $rifNorm }}</Causale>
-        {{-- opzionale: <ImportoTotaleDocumento>{{ $fmt($totDocumento) }}</ImportoTotaleDocumento> --}}
       </DatiGeneraliDocumento>
     </DatiGenerali>
 
@@ -263,14 +259,10 @@
     <DatiPagamento>
       <CondizioniPagamento>TP02</CondizioniPagamento>
       <DettaglioPagamento>
-        {{-- MP01 Bonifico, MP05 Rid/Altro: imposta quello che usi di solito --}}
         <ModalitaPagamento>MP01</ModalitaPagamento>
         <DataScadenzaPagamento>{{ $dataScad }}</DataScadenzaPagamento>
         <ImportoPagamento>{{ $fmt($importoPagamento) }}</ImportoPagamento>
-        {{-- opzionali: IBAN/Beneficiario se vuoi replicare lo stile Unimatica --}}
-        {{-- <Beneficiario>{{ $denomCed }}</Beneficiario> --}}
-        {{-- <IBAN>{{ $profilo->iban ?? '' }}</IBAN> --}}
       </DettaglioPagamento>
     </DatiPagamento>
   </FatturaElettronicaBody>
-</FatturaElettronica>
+</ns3:FatturaElettronica>
