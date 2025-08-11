@@ -3,28 +3,16 @@
 @php
     /** @var \App\Models\Ordine $ordine */
 
+    // Dati soggetti
     $cliente = $ordine->anagrafica;
     $profilo = \App\Models\Profilo::first();
     if (!$profilo) {
         die('⚠️ Nessun profilo configurato per l’esportazione XML.');
     }
 
-    // Controlli minimi (aiutano a evitare errori "campi vuoti" nei validatori)
-    if (empty($profilo->denominazione) || empty($profilo->partita_iva)) {
-        die('⚠️ Denominazione/Partita IVA del Cedente mancanti.');
-    }
-    if (empty($profilo->indirizzo_amministrativa) || empty($profilo->comune_amministrativa)) {
-        die('⚠️ Indirizzo/Comune sede Cedente mancanti.');
-    }
     if (empty($cliente->via_fatturazione) || empty($cliente->comune_fatturazione)) {
         die('⚠️ Dati cliente incompleti: Indirizzo e Comune sono obbligatori per lo SdI.');
     }
-
-    // Se invii tramite Unimatica come intermediario
-    $usaIntermediarioUnimatica = true;
-    $intermPaese  = 'IT';
-    $intermPiva   = '02098391200';
-    $intermDenom  = 'UNIMATICA S.P.A.';
 
     // Riferimento normativo (fallback)
     $rifNorm = $ordine->specifiche_iva
@@ -34,31 +22,25 @@
     $progressivo = str_pad($ordine->id, 5, '0', STR_PAD_LEFT);
     $dataDoc = \Carbon\Carbon::parse($ordine->data)->toDateString();
     $dataScad = \Carbon\Carbon::parse($ordine->data)->addDays(30)->toDateString();
-    $numeroDoc = str_replace('/', '-', (string) $ordine->codice); // es. 79-2025
 
-    // Destinatario (codice o PEC)
-    $codiceDest = trim($cliente->codice_univoco ?? '') !== '' ? strtoupper(trim($cliente->codice_univoco)) : '0000000';
-    $pecDest    = trim($cliente->pec ?? '');
-
-    // IVA a livello d'ordine
+    // IVA a livello d'ordine (default 0% + N2.2)
     $aliqOrd = (float)($ordine->aliquota_iva_ordine ?? 0.00);
     $natOrd  = $ordine->natura_iva_ordine ?? 'N2.2';
     $usaNatura = !empty($natOrd);
+
+    // Aliquota effettiva da esporre (se c'è Natura deve essere 0.00)
     $aliqEff = $usaNatura ? 0.00 : $aliqOrd;
 
     // Helper numerico
     $fmt = fn($n) => number_format((float)$n, 2, '.', '');
 
-    // Indirizzi
-    $capCed  = str_pad(preg_replace('/\D/', '', (string)($profilo->cap_amministrativa ?? '')), 5, '0', STR_PAD_LEFT) ?: '00000';
-    $capCess = str_pad(preg_replace('/\D/', '', (string)($cliente->cap_fatturazione ?? '')), 5, '0', STR_PAD_LEFT) ?: '00000';
-    $nazCed  = 'IT';
-    $nazCess = 'IT';
+    // Sanitizzazioni minime indirizzi
+    $capCed  = $profilo->cap_amministrativa ?: '00000';
+    $capCess = $cliente->cap_fatturazione ?: '00000';
+    $nazCed  = $profilo->nazione_amministrativa ?: 'IT';
+    $nazCess = $cliente->nazione_fatturazione ?: 'IT';
 
-    // Regime fiscale
-    $regimeFiscale = $profilo->regime_fiscale ?: 'RF07';
-
-    // Righe
+    // Costruzione linee
     $righe = [];
     $totImponibile = 0.0;
 
@@ -85,7 +67,7 @@
         $totImponibile += $totRiga;
     }
 
-    // Imposta e totale
+    // Imposta e totale documento
     $imposta = $usaNatura ? 0.0 : $totImponibile * ($aliqEff / 100);
     $totDocumento = $totImponibile + $imposta;
 
@@ -93,176 +75,143 @@
     $importoPagamento = is_null($ordine->totale_netto_compilato)
         ? $totDocumento
         : (float) $ordine->totale_netto_compilato;
-
-    // Dati anagrafici
-    $denomCed = trim($profilo->denominazione);
-    $cfCed    = trim($profilo->codice_fiscale ?? '');
-    $pivaCed  = trim($profilo->partita_iva);
-
-    $denomCess = trim($cliente->denominazione ?? '');
-    $nomeCess  = trim($cliente->nome ?? '');
-    $cognCess  = trim($cliente->cognome ?? '');
-    $pivaCess  = trim($cliente->partita_iva ?? '');
-    $cfCess    = trim($cliente->codice_fiscale ?? '');
-    $isPersonaFisica = ($denomCess === '' && ($nomeCess !== '' || $cognCess !== ''));
 @endphp
 
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 
-<ns3:FatturaElettronica versione="FPR12"
-    xmlns:ns3="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2"
+<p:FatturaElettronica versione="FPR12"
+    xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2.2/Schema_del_file_xml_FatturaPA_versione_1.2.2.xsd">
 
-  <FatturaElettronicaHeader>
-    <DatiTrasmissione>
-      <IdTrasmittente>
-        @if($usaIntermediarioUnimatica)
-          <IdPaese>IT</IdPaese>
-          <IdCodice>{{ $intermPiva }}</IdCodice>
-        @else
-          <IdPaese>IT</IdPaese>
-          <IdCodice>{{ $pivaCed }}</IdCodice>
-        @endif
-      </IdTrasmittente>
-      <ProgressivoInvio>{{ $progressivo }}</ProgressivoInvio>
-      <FormatoTrasmissione>FPR12</FormatoTrasmissione>
-      <CodiceDestinatario>{{ $codiceDest }}</CodiceDestinatario>
-      @if($codiceDest === '0000000' && $pecDest !== '')
-        <PECDestinatario>{{ $pecDest }}</PECDestinatario>
+  <p:FatturaElettronicaHeader>
+    <p:DatiTrasmissione>
+      <p:IdTrasmittente>
+        <p:IdPaese>IT</p:IdPaese>
+        <p:IdCodice>{{ $profilo->partita_iva ?? '00000000000' }}</p:IdCodice>
+      </p:IdTrasmittente>
+      <p:ProgressivoInvio>{{ $progressivo }}</p:ProgressivoInvio>
+      <p:FormatoTrasmissione>FPR12</p:FormatoTrasmissione>
+      <p:CodiceDestinatario>{{ $cliente->codice_univoco ?? '0000000' }}</p:CodiceDestinatario>
+      @if(!empty($cliente->pec))
+        <p:PECDestinatario>{{ $cliente->pec }}</p:PECDestinatario>
       @endif
-    </DatiTrasmissione>
+    </p:DatiTrasmissione>
 
-    <CedentePrestatore>
-      <DatiAnagrafici>
-        <IdFiscaleIVA>
-          <IdPaese>IT</IdPaese>
-          <IdCodice>{{ $pivaCed }}</IdCodice>
-        </IdFiscaleIVA>
-        @if($cfCed !== '')
-          <CodiceFiscale>{{ $cfCed }}</CodiceFiscale>
+    <p:CedentePrestatore>
+      <p:DatiAnagrafici>
+        <p:IdFiscaleIVA>
+          <p:IdPaese>IT</p:IdPaese>
+          <p:IdCodice>{{ $profilo->partita_iva ?? '00000000000' }}</p:IdCodice>
+        </p:IdFiscaleIVA>
+        @if(!empty($profilo->codice_fiscale))
+          <p:CodiceFiscale>{{ $profilo->codice_fiscale }}</p:CodiceFiscale>
         @endif
-        <Anagrafica>
-          <Denominazione>{{ $denomCed }}</Denominazione>
-        </Anagrafica>
-        <RegimeFiscale>{{ $regimeFiscale }}</RegimeFiscale>
-      </DatiAnagrafici>
-      <Sede>
-        <Indirizzo>{{ $profilo->indirizzo_amministrativa }}</Indirizzo>
+        <p:Anagrafica>
+          <p:Denominazione>{{ $profilo->denominazione }}</p:Denominazione>
+        </p:Anagrafica>
+        <p:RegimeFiscale>{{ $profilo->regime_fiscale ?? 'RF01' }}</p:RegimeFiscale>
+      </p:DatiAnagrafici>
+      <p:Sede>
+        <p:Indirizzo>{{ $profilo->indirizzo_amministrativa }}</p:Indirizzo>
         @if(!empty($profilo->numero_civico_amministrativa))
-          <NumeroCivico>{{ $profilo->numero_civico_amministrativa }}</NumeroCivico>
+          <p:NumeroCivico>{{ $profilo->numero_civico_amministrativa }}</p:NumeroCivico>
         @endif
-        <CAP>{{ $capCed }}</CAP>
-        <Comune>{{ $profilo->comune_amministrativa }}</Comune>
+        <p:CAP>{{ $capCed }}</p:CAP>
+        <p:Comune>{{ $profilo->comune_amministrativa }}</p:Comune>
         @if(!empty($profilo->provincia_amministrativa))
-          <Provincia>{{ $profilo->provincia_amministrativa }}</Provincia>
+          <p:Provincia>{{ $profilo->provincia_amministrativa }}</p:Provincia>
         @endif
-        <Nazione>{{ $nazCed }}</Nazione>
-      </Sede>
-    </CedentePrestatore>
+        <p:Nazione>{{ $nazCed }}</p:Nazione>
+      </p:Sede>
+    </p:CedentePrestatore>
 
-    <CessionarioCommittente>
-      <DatiAnagrafici>
-        @if($pivaCess !== '')
-          <IdFiscaleIVA>
-            <IdPaese>IT</IdPaese>
-            <IdCodice>{{ $pivaCess }}</IdCodice>
-          </IdFiscaleIVA>
-        @endif
-
-        @if($cfCess !== '')
-          <CodiceFiscale>{{ $cfCess }}</CodiceFiscale>
+    <p:CessionarioCommittente>
+      <p:DatiAnagrafici>
+        @if(!empty($cliente->partita_iva))
+          <p:IdFiscaleIVA>
+            <p:IdPaese>IT</p:IdPaese>
+            <p:IdCodice>{{ $cliente->partita_iva }}</p:IdCodice>
+          </p:IdFiscaleIVA>
         @endif
 
-        <Anagrafica>
-          @if(!$isPersonaFisica)
-            <Denominazione>{{ $denomCess !== '' ? $denomCess : 'Cliente' }}</Denominazione>
+        @if(!empty($cliente->codice_fiscale))
+          <p:CodiceFiscale>{{ $cliente->codice_fiscale }}</p:CodiceFiscale>
+        @endif
+
+        <p:Anagrafica>
+          @if(!empty($cliente->denominazione))
+            <p:Denominazione>{{ $cliente->denominazione }}</p:Denominazione>
           @else
-            <Nome>{{ $nomeCess !== '' ? $nomeCess : 'ND' }}</Nome>
-            <Cognome>{{ $cognCess !== '' ? $cognCess : 'ND' }}</Cognome>
+            <p:Nome>{{ $cliente->nome ?? 'ND' }}</p:Nome>
+            <p:Cognome>{{ $cliente->cognome ?? 'ND' }}</p:Cognome>
           @endif
-        </Anagrafica>
-      </DatiAnagrafici>
+        </p:Anagrafica>
+      </p:DatiAnagrafici>
 
-      <Sede>
-        <Indirizzo>{{ $cliente->via_fatturazione }}</Indirizzo>
+      <p:Sede>
+        <p:Indirizzo>{{ $cliente->via_fatturazione ?? 'ND' }}</p:Indirizzo>
         @if(!empty($cliente->civico_fatturazione))
-          <NumeroCivico>{{ $cliente->civico_fatturazione }}</NumeroCivico>
+          <p:NumeroCivico>{{ $cliente->civico_fatturazione }}</p:NumeroCivico>
         @endif
-        <CAP>{{ $capCess }}</CAP>
-        <Comune>{{ trim($cliente->comune_fatturazione) }}</Comune>
+        <p:CAP>{{ $capCess }}</p:CAP>
+        <p:Comune>{{ $cliente->comune_fatturazione ?? 'ND' }}</p:Comune>
         @if(!empty($cliente->provincia_fatturazione))
-          <Provincia>{{ $cliente->provincia_fatturazione }}</Provincia>
+          <p:Provincia>{{ $cliente->provincia_fatturazione }}</p:Provincia>
         @endif
-        <Nazione>{{ $nazCess }}</Nazione>
-      </Sede>
-    </CessionarioCommittente>
+        <p:Nazione>{{ $nazCess }}</p:Nazione>
+      </p:Sede>
+    </p:CessionarioCommittente>
+  </p:FatturaElettronicaHeader>
 
-    @if($usaIntermediarioUnimatica)
-      <TerzoIntermediarioOSoggettoEmittente>
-        <DatiAnagrafici>
-          <IdFiscaleIVA>
-            <IdPaese>{{ $intermPaese }}</IdPaese>
-            <IdCodice>{{ $intermPiva }}</IdCodice>
-          </IdFiscaleIVA>
-          <Anagrafica>
-            <Denominazione>{{ $intermDenom }}</Denominazione>
-          </Anagrafica>
-        </DatiAnagrafici>
-      </TerzoIntermediarioOSoggettoEmittente>
-      <SoggettoEmittente>TZ</SoggettoEmittente>
-    @endif
-  </FatturaElettronicaHeader>
+  <p:FatturaElettronicaBody>
+    <p:DatiGenerali>
+      <p:DatiGeneraliDocumento>
+        <p:TipoDocumento>TD01</p:TipoDocumento>
+        <p:Divisa>EUR</p:Divisa>
+        <p:Data>{{ $dataDoc }}</p:Data>
+        <p:Numero>{{ $ordine->codice }}</p:Numero>
+        <p:Causale>{{ $rifNorm }}</p:Causale>
+      </p:DatiGeneraliDocumento>
+    </p:DatiGenerali>
 
-  <FatturaElettronicaBody>
-    <DatiGenerali>
-      <DatiGeneraliDocumento>
-        <TipoDocumento>TD01</TipoDocumento>
-        <Divisa>EUR</Divisa>
-        <Data>{{ $dataDoc }}</Data>
-        <Numero>{{ $numeroDoc }}</Numero>
-        <Causale>{{ $rifNorm }}</Causale>
-      </DatiGeneraliDocumento>
-    </DatiGenerali>
-
-    <DatiBeniServizi>
+    <p:DatiBeniServizi>
       @foreach($righe as $r)
-        <DettaglioLinee>
-          <NumeroLinea>{{ $r['num'] }}</NumeroLinea>
-          <Descrizione>{{ $r['descrizione'] }}</Descrizione>
-          <Quantita>{{ $fmt($r['quantita']) }}</Quantita>
-          <PrezzoUnitario>{{ $fmt($r['prezzo_netto_unit']) }}</PrezzoUnitario>
-          <PrezzoTotale>{{ $fmt($r['totale']) }}</PrezzoTotale>
-          <AliquotaIVA>{{ $fmt($aliqEff) }}</AliquotaIVA>
+        <p:DettaglioLinee>
+          <p:NumeroLinea>{{ $r['num'] }}</p:NumeroLinea>
+          <p:Descrizione>{{ $r['descrizione'] }}</p:Descrizione>
+          <p:Quantita>{{ $fmt($r['quantita']) }}</p:Quantita>
+          <p:PrezzoUnitario>{{ $fmt($r['prezzo_netto_unit']) }}</p:PrezzoUnitario>
+          <p:PrezzoTotale>{{ $fmt($r['totale']) }}</p:PrezzoTotale>
+          <p:AliquotaIVA>{{ $fmt($aliqEff) }}</p:AliquotaIVA>
           @if($usaNatura)
-            <Natura>{{ $natOrd }}</Natura>
-            <RiferimentoNormativo>{{ $rifNorm }}</RiferimentoNormativo>
+            <p:Natura>{{ $natOrd }}</p:Natura>
           @endif
-        </DettaglioLinee>
+        </p:DettaglioLinee>
       @endforeach
 
-      <DatiRiepilogo>
-        <AliquotaIVA>{{ $fmt($aliqEff) }}</AliquotaIVA>
+      <p:DatiRiepilogo>
+        <p:AliquotaIVA>{{ $fmt($aliqEff) }}</p:AliquotaIVA>
         @if($usaNatura)
-          <Natura>{{ $natOrd }}</Natura>
+          <p:Natura>{{ $natOrd }}</p:Natura>
         @endif
-        <ImponibileImporto>{{ $fmt($totImponibile) }}</ImponibileImporto>
-        <Imposta>{{ $fmt($imposta) }}</Imposta>
-        <EsigibilitaIVA>I</EsigibilitaIVA>
+        <p:ImponibileImporto>{{ $fmt($totImponibile) }}</p:ImponibileImporto>
+        <p:Imposta>{{ $fmt($imposta) }}</p:Imposta>
+        <p:EsigibilitaIVA>I</p:EsigibilitaIVA>
         @if($usaNatura)
-          <RiferimentoNormativo>{{ $rifNorm }}</RiferimentoNormativo>
+          <p:RiferimentoNormativo>{{ $rifNorm }}</p:RiferimentoNormativo>
         @endif
-      </DatiRiepilogo>
-    </DatiBeniServizi>
+      </p:DatiRiepilogo>
+    </p:DatiBeniServizi>
 
-    <DatiPagamento>
-      <CondizioniPagamento>TP02</CondizioniPagamento>
-      <DettaglioPagamento>
-        <ModalitaPagamento>MP01</ModalitaPagamento>
-        <DataScadenzaPagamento>{{ $dataScad }}</DataScadenzaPagamento>
-        <ImportoPagamento>{{ $fmt($importoPagamento) }}</ImportoPagamento>
-      </DettaglioPagamento>
-    </DatiPagamento>
-  </FatturaElettronicaBody>
-</ns3:FatturaElettronica>
+    <p:DatiPagamento>
+      <p:Condizioni>TP02</p:Condizioni>
+      <p:DettaglioPagamento>
+        <p:ModalitaPagamento>MP01</p:ModalitaPagamento>
+        <p:DataScadenzaPagamento>{{ $dataScad }}</p:DataScadenzaPagamento>
+        <p:ImportoPagamento>{{ $fmt($importoPagamento) }}</p:ImportoPagamento>
+      </p:DettaglioPagamento>
+    </p:DatiPagamento>
+  </p:FatturaElettronicaBody>
+</p:FatturaElettronica>
